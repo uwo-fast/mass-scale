@@ -1,0 +1,53 @@
+/* Config
+    Defines various settings for DigitalMassBalance.
+*/
+
+
+#pragma once
+
+
+//-----HX711----//
+  // Number of averages while measuring. *Set to 1 because the library's averaging
+  // is too slow and interferes with other interactions.
+  const int HX_NUM_AVGS = 1;
+  
+  // Averaging window (applies only to calibrated value, not raw).
+  const int QUEUE_SIZE = 10;
+  double hxQueue[QUEUE_SIZE];
+
+
+//----LCD----//
+  // Is there an LCD?
+  bool isLCD = true;
+
+  // Display size.
+  const int LCD_ROWS = 2;
+  const int LCD_COLS = 16;
+
+
+//----Calibration/Sensitivity----//
+  // Button hold length to enter/exit calibration mode (ms).
+  const int CAL_WAIT = 3000;
+  
+  // Signature to store in the memory when calibrating.
+  const char CAL_SIGNATURE = 'C';
+
+  // Address of calibration signature.
+  const int CAL_SIGNATURE_ADDR = 0;
+
+  // Address of the stored calibration value.
+  const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
+
+  // Mass used to calibrate (1 US cup of water);
+  const double CAL_STANDARD_MASS = 0.2359;
+
+  // Mass units.
+  String units = "kg";
+  
+  const double CAL_THRESHOLD = 20000;
+  
+
+//----Readouts----//  
+  // Number of digits after the decimal.
+  const int NUM_DIGITS = 3;
+  
