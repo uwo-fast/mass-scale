@@ -26,13 +26,13 @@ This can be supplied by a computer or a 5V wall adapter.
 
 ## Wishlist
 * Send a calibration value over serial, or offer a selection on the display (select with Tare)
-* Improve readout on the display to offer more information and work with calibration
-* Condense readout commands into functions to make the code 
-[DRY](https://pragprog.com/the-pragmatic-programmer/extracts/tips)
-* Improved averaging algorithm to improve Signal-to-Noise-Ratio
+* ~~Improve readout on the display to offer more information and work with calibration`~~
+* ~~Condense readout commands into functions to make the code 
+[DRY](https://pragprog.com/the-pragmatic-programmer/extracts/tips)~~
+* ~~Improved averaging algorithm to improve Signal-to-Noise-Ratio~~
 * Add compatibility for different types of displays
 * Update readout resolution (number of decimals) to match the resolution of the load cell.
-This could be adaptive baseed on the calibration value. 
+This could be adaptive based on the calibration value. 
 (eg a 5000g load cell offers a different level of precision than a 50kg load cell).
 
 ## Printable Parts
