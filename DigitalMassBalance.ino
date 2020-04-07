@@ -62,21 +62,17 @@ void loop() {
   //----Initialize----//
     void initSerial() {
       // Initialize the serial connection; wait until it's running.
-      
       Serial.begin(BAUD);
       
       while(!Serial) {
         // Wait for serial to initialize.
       } // Serial initialized.
-      
-      return;
     }
     
     
     void initLoadCell() {
       // Set up the HX711 for use. Turns on the device, then verifies the 
       // calibration value.
-      
       Serial.println("Initializing HX711...");
       
       // Turn on the HX711 power supply.
@@ -107,14 +103,11 @@ void loop() {
       
       Serial.println("HX711 Initialized!");
       Serial.println();
-      
-      return;
     }
     
     
     void initLCD() {
       // Runs all the necessary startup for the LCD.
-      
       if (!isLCD) {
         return;
       }
@@ -153,11 +146,9 @@ void loop() {
       
       Serial.println("LCD initialized!");
       Serial.println();
-      
-      return;
     }
     
-    
+    // TODO: replace averaging queue with a low pass filter.
     void initQueue() {
       for (int i = 0; i < QUEUE_SIZE; i++) {
         hxQueue[i] = 0.00;
@@ -167,27 +158,22 @@ void loop() {
     
   //----Serial----//
     void doSerial() {
-      // Give everything a chance to transmit.
+      // Give everything a chance to transmit over serial.
       delay(200);
       // Make sure the buffer is settled.
       Serial.flush();
 
       // Determine how many characters are waiting.
       int len = Serial.available();
+      
+      // Initialize an array to hold the command.
       int serialIn[len];
 
       // Fill up serialIn.
       receiveCommand(len, serialIn);
       
-      if (isDiag) {
-        Serial.print(serialIn[0], HEX);
-        Serial.println(serialIn[len], HEX);
-      }
-      Serial.flush();
       // Parse and execute the command.
       interpretCommand(len, serialIn);
-      
-      return;
     }
 
     // Note that arrays are pointers, so just pass in the array's variable.
@@ -197,62 +183,47 @@ void loop() {
     //        command. Can be accomplished by peeking for a <CR>. Could have
     //        timing issues.
     void receiveCommand(int len, int *serialIn) {  
-      // Read everything into the serialIn array.
+      // Read everything but the last character into the serialIn array.
+      // The last character could be an LF which would lead the next command.
       for (int i = 0; i < len-1; i++) {
         serialIn[i] = Serial.read();
-        
-        if (isDiag) {
-          Serial.print((int)serialIn[i], HEX);
-          Serial.print(' ');
-        }
       }
 
-      // If the next guy is <LF>, leave 'er alone.
+      // If the next guy is <LF>, leave 'er alone (this accommodates Arduino
+      // Serial Monitor behavior).
       char last = Serial.peek();
-      // If not, add it to the serialIn array (could be a CR from putty, or a single
-      // character from terminal without local echo/line editing on.
+      // If not, add it to the serialIn array (could be a CR from putty, or a 
+      // single character from terminal without local echo/line editing on.
       if (last != LF){
-        serialIn[len] = Serial.read();
-        
-        if (isDiag) {
-          Serial.print((int) last, HEX);
-        }
-      }
-
-      // New line on the display.
-      if (isDiag) {
-        Serial.println();
+        // Chuck it at the end of the array.
+        serialIn[len-1] = Serial.read();
       }
     }
 
 
     void interpretCommand(int len, int *serialIn) {
       // Commands are bounded by <LF> and <CR>.
-      // Read until the LF, just hanging out in integer form until then.
+      // Read until the <LF>, just hanging out in integer form until then.
       int tmp = serialIn[0];
       int idx = 1;
-      while (tmp != LF) {
-        // Read characters until the LF is found.
+      while (tmp != LF) { // TODO: Make this and the CR loop into a find() fcn.
+        // Check characters until the LF is found.
         tmp = serialIn[idx];
         // On to the next character.
         idx++;
         
         // Make sure we don't go looking where there's nothing to be found.
-        if (idx >= len) {
+        if (idx > len) {
+          // Abort.
           Serial.println("Insert proper error behavior here!");
           return;
         }
-      } // serialIn[idx] == one character past <LF>, start of command. ('c' in SMA).
+      } // serialIn[idx] == one character past <LF>, start of command.
 
       // Once the LF is found, store the index of the beginning of the command.
       int startIdx = idx;
       
-      if (isDiag) {
-        Serial.print("Start: ");
-        Serial.println(startIdx);
-      }
-      
-      // Find the end of the command.
+      // Find the end of the command (<CR>).
       while (tmp != CR) {
         // Read characters until the CR is found.
         tmp = serialIn[idx];
@@ -260,6 +231,7 @@ void loop() {
         
         // Make sure we don't go looking where there's nothing to be found.
         if (idx > len) {
+          // Abort.
           Serial.println("Insert proper error behavior here!");
           return;
         }
@@ -268,20 +240,11 @@ void loop() {
       // Store the end location for the command.
       int endIdx = idx - 1; // This is the index of the <CR>.
       
-      if (isDiag) {
-        Serial.print("End: ");
-        Serial.println(endIdx);
-      }
-      
       // Save the full command, still as ASCII integers.
       int cmdLen = endIdx - startIdx;
       int cmd[cmdLen];
       for (int i = startIdx; i < endIdx; i++) { // Go from c to one before <CR>
         cmd[i - startIdx] = serialIn[i];
-        
-        if (isDiag) {
-          Serial.println((char)cmd[i - startIdx]);
-        }
       }
       
       // By the SMA standard, the first character indicates the function. The scale
@@ -367,8 +330,6 @@ void loop() {
     void zero() {
       // Uses the HX711 built in tare() command to set the zero (empty bed).
       loadcell.tare(HX_NUM_AVGS);
-      
-      return;
     }
     
     
@@ -380,8 +341,6 @@ void loop() {
     void printToDisplay(String output, int row, int col) {
       lcd.setCursor(col, row);
       lcd.print(output);
-      
-      return;
     }
     
     
@@ -391,8 +350,6 @@ void loop() {
       
       // LCD.
       printToDisplay(output, row, col);
-      
-      return;
     }
     
     
@@ -434,8 +391,6 @@ void loop() {
     void reportMass(double mass) {
       clearDisplay();
       printToSerialAndDisplay(String(mass, NUM_DIGITS) + " " + units, 0, 0);
-      
-      return;
     }
     
     
@@ -466,8 +421,6 @@ void loop() {
           break;
         }
       }
-      
-      return;
     }
     
     
@@ -530,13 +483,10 @@ void loop() {
       EEPROM.put(CAL_VALUE_ADDR, sensitivity);
       
       Serial.println("Sensitivity stored.");
-      return;
     }
     
     
     void reportSensitivity() {
       Serial.println("Sensitivity: " + String(sensitivity, NUM_DIGITS) + 
         " div/" + units);
-        
-      return;
     }
