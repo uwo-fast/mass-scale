@@ -102,8 +102,8 @@ void loop() {
       // Give the HX711 a chance to finish initializing.
       delay(2000);
       
-      // Tare the thing.
-      tare();
+      // Zero the scale (set the offset on data returned by the HX711).
+      zero();
       
       Serial.println("HX711 Initialized!");
       Serial.println();
@@ -359,9 +359,8 @@ void loop() {
 
   
   //----Other----//
-    void tare() {
-      // Bundles up the output and the action for taring.
-      Serial.println("Tare...");
+    void zero() {
+      // Uses the HX711 built in tare() command to set the zero (empty bed).
       loadcell.tare(HX_NUM_AVGS);
       
       return;
@@ -450,7 +449,7 @@ void loop() {
           unsigned long time_of_release = millis();
           
           if (time_of_release - time_of_press < CAL_WAIT) {
-            tare();
+            zero();
           } else {
             calibrate();
           }
@@ -472,7 +471,7 @@ void loop() {
       printToSerialAndDisplay("Cal w/ " + String(CAL_STANDARD_MASS, NUM_DIGITS) + 
         " " + units, 0, 0);
         
-      tare();
+      zero();
       
       // Wait for the mass to get added.
       printToSerialAndDisplay("Add mass...", 1, 0);
