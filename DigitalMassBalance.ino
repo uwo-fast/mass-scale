@@ -172,10 +172,16 @@ void loop() {
       // Fill up cmd.
       receiveCommand(cmd, len);
       
-      // Parse the command.
-      int startIdx = 0;
-      int endIdx = 0;
-      parseCommand(cmd, len, &startIdx, &endIdx);
+      // Parse the command for the <LF> and <CR>. The command starts one char
+      // beyond the LF, and ends with the CR.
+      int startIdx = findInArray(cmd, LF, 0, len) + 1;
+      int endIdx = findInArray(cmd, CR, startIdx, len);
+      
+      // Check for errors. Since we start after the LF, minimum index is 1.
+      if (startIdx < 1 || endIdx < 1) {
+        Serial.println("Did not find LF or CR");
+        return;
+      }
       
       // Execute the command.
       doCommand(cmd, startIdx, endIdx);
@@ -204,48 +210,25 @@ void loop() {
         cmd[len-1] = Serial.read();
       }
     }
-
-
-    // TODO: could probably make this into a find() which returns the index of a
-    //        specified character, then use to return Idx of CR, idx of LF.
-    void parseCommand(int *cmd, int len, int *startIdx, int *endIdx) {
-      // Commands are bounded by <LF> and <CR>.
-      // Read until the <LF>, just hanging out in integer form until then.
-      int tmp = cmd[0];
-      int idx = 1;
-      while (tmp != LF) { // TODO: Make this and the CR loop into a find() fcn.
-        // Check characters until the LF is found.
-        tmp = cmd[idx];
-        // On to the next character.
-        idx++;
+   
+    
+    int findInArray(int *array, int query, int startSearch, int endSearch) {
+      // Finds a character in an integer array. Used to find <CR> and <LF>.
+      // Account for incrementing i at top of loop.
+      int i = startSearch - 1;
+      int c;  // Character being checked.
+      do {
+        // Increment i.
+        i++;
+        // Read a character from the array.
+        c = array[i];
         
-        // Make sure we don't go looking where there's nothing to be found.
-        if (idx > len) {
-          // Abort.
-          Serial.println("Insert proper error behavior here!");
-          return;
+        if (i > endSearch) {
+          return -1;
         }
-      } // cmd[idx] == one character past <LF>, start of command.
-
-      // Once the LF is found, store the index of the beginning of the command.
-      *startIdx = idx;
+      } while (c != query);
       
-      // Find the end of the command (<CR>).
-      while (tmp != CR) {
-        // Read characters until the CR is found.
-        tmp = cmd[idx];
-        idx++;
-        
-        // Make sure we don't go looking where there's nothing to be found.
-        if (idx > len) {
-          // Abort.
-          Serial.println("Insert proper error behavior here!");
-          return;
-        }
-      } // cmd[idx] == <CR>
-      
-      // Store the end location for the command.
-      *endIdx = idx - 1; // This is the index of the <CR>.
+      return i;
     }
     
     
