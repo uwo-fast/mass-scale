@@ -45,7 +45,7 @@ void loop() {
   // right.
   // When using Putty, use Ctrl+J for LF, followed by command, followed by 
   // Ctrl+M for CR.
-  if (Serial.available() > 1) { // If there is something beyond an LF
+  if (Serial.available() > 2) { // Minimum cmd length is 3 characters, <LF>c<CR>
     doSerial();
   }
   
@@ -191,6 +191,11 @@ void loop() {
     }
 
     // Note that arrays are pointers, so just pass in the array's variable.
+    // TODO: make this accommodate commands that come character by character.
+    //        This can be accomplished by clearing command in when receiving
+    //        a LF, but requires preallocating potentially too much memory for a 
+    //        command. Can be accomplished by peeking for a <CR>. Could have
+    //        timing issues.
     void receiveCommand(int len, int *serialIn) {  
       // Read everything into the serialIn array.
       for (int i = 0; i < len-1; i++) {
