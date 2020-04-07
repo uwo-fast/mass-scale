@@ -170,10 +170,15 @@ void loop() {
       int cmd[len];
 
       // Fill up cmd.
-      receiveCommand(len, cmd);
+      receiveCommand(cmd, len);
       
-      // Parse and execute the command.
-      interpretCommand(len, cmd);
+      // Parse the command.
+      int startIdx = 0;
+      int endIdx = 0;
+      parseCommand(cmd, len, &startIdx, &endIdx);
+      
+      // Execute the command.
+      doCommand(cmd, startIdx, endIdx);
     }
 
     // Note that arrays are pointers, so just pass in the array's variable.
@@ -182,7 +187,7 @@ void loop() {
     //        a LF, but requires preallocating potentially too much memory for a 
     //        command. Can be accomplished by peeking for a <CR>. Could have
     //        timing issues.
-    void receiveCommand(int len, int *cmd) {  
+    void receiveCommand(int *cmd, int len) {  
       // Read everything but the last character into the cmd array.
       // The last character could be an LF which would lead the next command.
       for (int i = 0; i < len-1; i++) {
@@ -201,7 +206,9 @@ void loop() {
     }
 
 
-    void interpretCommand(int len, int *cmd) {
+    // TODO: could probably make this into a find() which returns the index of a
+    //        specified character, then use to return Idx of CR, idx of LF.
+    void parseCommand(int *cmd, int len, int *startIdx, int *endIdx) {
       // Commands are bounded by <LF> and <CR>.
       // Read until the <LF>, just hanging out in integer form until then.
       int tmp = cmd[0];
@@ -221,7 +228,7 @@ void loop() {
       } // cmd[idx] == one character past <LF>, start of command.
 
       // Once the LF is found, store the index of the beginning of the command.
-      int startIdx = idx;
+      *startIdx = idx;
       
       // Find the end of the command (<CR>).
       while (tmp != CR) {
@@ -238,16 +245,16 @@ void loop() {
       } // cmd[idx] == <CR>
       
       // Store the end location for the command.
-      int endIdx = idx - 1; // This is the index of the <CR>.
-      
-      // Store the length of the command.
-      int cmdLen = endIdx - startIdx;
-      
-      // By the SMA standard, the first character indicates the function. The scale
-      // should not accept a command if it doesn't match the syntax exactly. (eg
-      // <LF> wa <CR> should not execute the <LF> w <CR> command.)
+      *endIdx = idx - 1; // This is the index of the <CR>.
+    }
+    
+    
+    void doCommand(int *cmd, int startIdx, int endIdx) {
+      // By the SMA standard, the first character indicates the function. 
+      // The scale should not accept a command if it doesn't match the syntax 
+      // exactly. (eg <LF> wa <CR> should not execute the <LF> w <CR> command.)
       // To combat this, interpret commands by length.
-      switch (cmdLen) {
+      switch (endIdx - startIdx) {
         case 1:   // Single character commands.
           switch ((char) cmd[startIdx]) {
             case 'w':
