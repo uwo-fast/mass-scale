@@ -167,13 +167,13 @@ void loop() {
       int len = Serial.available();
       
       // Initialize an array to hold the command.
-      int serialIn[len];
+      int cmd[len];
 
-      // Fill up serialIn.
-      receiveCommand(len, serialIn);
+      // Fill up cmd.
+      receiveCommand(len, cmd);
       
       // Parse and execute the command.
-      interpretCommand(len, serialIn);
+      interpretCommand(len, cmd);
     }
 
     // Note that arrays are pointers, so just pass in the array's variable.
@@ -182,33 +182,33 @@ void loop() {
     //        a LF, but requires preallocating potentially too much memory for a 
     //        command. Can be accomplished by peeking for a <CR>. Could have
     //        timing issues.
-    void receiveCommand(int len, int *serialIn) {  
-      // Read everything but the last character into the serialIn array.
+    void receiveCommand(int len, int *cmd) {  
+      // Read everything but the last character into the cmd array.
       // The last character could be an LF which would lead the next command.
       for (int i = 0; i < len-1; i++) {
-        serialIn[i] = Serial.read();
+        cmd[i] = Serial.read();
       }
 
       // If the next guy is <LF>, leave 'er alone (this accommodates Arduino
       // Serial Monitor behavior).
       char last = Serial.peek();
-      // If not, add it to the serialIn array (could be a CR from putty, or a 
+      // If not, add it to the cmd array (could be a CR from putty, or a 
       // single character from terminal without local echo/line editing on.
       if (last != LF){
         // Chuck it at the end of the array.
-        serialIn[len-1] = Serial.read();
+        cmd[len-1] = Serial.read();
       }
     }
 
 
-    void interpretCommand(int len, int *serialIn) {
+    void interpretCommand(int len, int *cmd) {
       // Commands are bounded by <LF> and <CR>.
       // Read until the <LF>, just hanging out in integer form until then.
-      int tmp = serialIn[0];
+      int tmp = cmd[0];
       int idx = 1;
       while (tmp != LF) { // TODO: Make this and the CR loop into a find() fcn.
         // Check characters until the LF is found.
-        tmp = serialIn[idx];
+        tmp = cmd[idx];
         // On to the next character.
         idx++;
         
@@ -218,7 +218,7 @@ void loop() {
           Serial.println("Insert proper error behavior here!");
           return;
         }
-      } // serialIn[idx] == one character past <LF>, start of command.
+      } // cmd[idx] == one character past <LF>, start of command.
 
       // Once the LF is found, store the index of the beginning of the command.
       int startIdx = idx;
@@ -226,7 +226,7 @@ void loop() {
       // Find the end of the command (<CR>).
       while (tmp != CR) {
         // Read characters until the CR is found.
-        tmp = serialIn[idx];
+        tmp = cmd[idx];
         idx++;
         
         // Make sure we don't go looking where there's nothing to be found.
@@ -235,17 +235,13 @@ void loop() {
           Serial.println("Insert proper error behavior here!");
           return;
         }
-      } // serialIn[idx] == <CR>
+      } // cmd[idx] == <CR>
       
       // Store the end location for the command.
       int endIdx = idx - 1; // This is the index of the <CR>.
       
-      // Save the full command, still as ASCII integers.
+      // Store the length of the command.
       int cmdLen = endIdx - startIdx;
-      int cmd[cmdLen];
-      for (int i = startIdx; i < endIdx; i++) { // Go from c to one before <CR>
-        cmd[i - startIdx] = serialIn[i];
-      }
       
       // By the SMA standard, the first character indicates the function. The scale
       // should not accept a command if it doesn't match the syntax exactly. (eg
@@ -253,7 +249,7 @@ void loop() {
       // To combat this, interpret commands by length.
       switch (cmdLen) {
         case 1:   // Single character commands.
-          switch ((char) cmd[0]) {
+          switch ((char) cmd[startIdx]) {
             case 'w':
             case 'W':
               Serial.println("Return weight");
