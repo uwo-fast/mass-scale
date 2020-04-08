@@ -102,7 +102,7 @@ void loop() {
       delay(2000);
       
       // Zero the scale (set the offset on data returned by the HX711).
-      zero();
+      zeroSilent();
       
       Serial.println("HX711 Initialized!");
       Serial.println();
@@ -320,7 +320,7 @@ void loop() {
       // Uses the HX711 built in tare() command to set the zero (empty bed).
       loadcell.tare(HX_NUM_AVGS);
       
-      clearTare();
+      clearTareSilent();
       
       mass = getMassAveraged();
       // SMA formatted response.
@@ -333,9 +333,14 @@ void loop() {
       response += rightJustify(String(mass, PRECISION), WT_WIDTH);  // <xxxxxx.xxx>
       response += units;          // <uuu>
       response += "\r";           // <CR>
-      Serial.println(response);
+      Serial.print(response);
     }
     
+    
+    void zeroSilent() {
+      loadcell.tare(HX_NUM_AVGS);
+      clearTareSilent();
+    }
     
     void tare() {
       // Sets the tareWeight to the current measured weight 
@@ -346,10 +351,20 @@ void loop() {
     }
     
     
+    void tareSilent() {
+      tareWeight += mass;
+    }
+    
+    
     void clearTare() {
       tareWeight = 0.0;
       
       reportMass();
+    }
+    
+    
+    void clearTareSilent() {
+      tareWeight = 0.0;
     }
     
     
@@ -365,7 +380,7 @@ void loop() {
       response += tareStr;        // <xxxxxx.xxx>
       response += units;          // <uuu>
       response += "\r";           // <CR>
-      Serial.println(response);
+      Serial.print(response);
     }
     
     
@@ -403,7 +418,7 @@ void loop() {
       response += massStr;              // <xxxxxx.xxx>
       response += units;                // <uuu>
       response += "\r";                 // <CR>
-      Serial.println(response);
+      Serial.print(response);
     }
     
     
@@ -476,7 +491,7 @@ void loop() {
           unsigned long time_of_release = millis();
           
           if (time_of_release - time_of_press < CAL_WAIT) {
-            zero();
+            zeroSilent();
           } else {
             calibrate();
           }
@@ -496,7 +511,7 @@ void loop() {
       printToDisplay("Cal w/ " + String(CAL_STANDARD_MASS, PRECISION) + 
         " " + units, 0, 0);
         
-      zero();
+      zeroSilent();
       
       // Wait for the mass to get added.
       printToDisplay("Add mass...", 1, 0);
