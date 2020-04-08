@@ -25,8 +25,10 @@
 HX711 loadcell;
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
-// Sensitivity.
-double sensitivity = 1;
+// Weight variables.
+double sensitivity = 1.0;
+double tareWeight = 0.0;
+double mass;
   
 
 void setup() {
@@ -40,6 +42,9 @@ void setup() {
 
 
 void loop() {
+  // Get the averaged, tared mass.
+  mass = getMassAveraged();
+  
   // Listen for input over serial.
   // When using Arduino Serial Monitor, switch to 'Both NL & CR' in bottom 
   // right.
@@ -50,11 +55,9 @@ void loop() {
   }
   
   
-  
-  // double mass = getMassAveraged();
-  
-  // reportMass(mass);
-  // listenForInput();
+  // Simple scale functionality.
+  displayMass(mass);
+  listenForButtonInput();
 }
 
 
@@ -276,7 +279,7 @@ void loop() {
               break;
             case 't':
             case 'T':
-              Serial.println("Taring!");
+              tare();
 
               break;
             case 'c':
@@ -319,6 +322,33 @@ void loop() {
     }
     
     
+    void tare() {
+      // Sets the tareWeight to the current measured weight 
+      // (accounting for current tare).
+      tareWeight += mass;
+      String response = "\n";     // <LF>
+      response += " ";            // <s>
+      response += String(range);  // <r>
+      response += "T";            // <n>
+      response += " ";            // <m>
+      response += " ";            // <f>
+      response += rightJustify(String(tareWeight, PRECISION), WT_WIDTH);  // <xxxxxx.xxx>
+      response += units;          // <uuu>
+      response += "\r";           // <CR>
+      Serial.println(response);
+    }
+    
+    
+    String rightJustify(String str, int width) {
+      int numWhtSpc = width - str.length();
+      for (int i = 0; i < numWhtSpc; i++) {
+        str = " " + str;
+      }
+      
+      return str;
+    }
+    
+    
     void clearDisplay() {
       lcd.clear();
     }
@@ -339,8 +369,9 @@ void loop() {
     }
     
     
+    // TODO: Check for overload.
     double getHxReadout() {
-      // Read the raw (tared) value from the loadcell amplifier.
+      // Read the raw (zeroed) value from the loadcell amplifier.
       return loadcell.get_value(HX_NUM_AVGS);
     }
     
@@ -365,26 +396,26 @@ void loop() {
     
       
     double getMass() {
-      return getHxReadout() / sensitivity;
+      return getHxReadout() / sensitivity - tareWeight;
     }
     
     
     double getMassAveraged() {
-      return getHxReadoutAveraged() / sensitivity;
+      return getHxReadoutAveraged() / sensitivity - tareWeight;
     }
     
     
-    void reportMass(double mass) {
+    void displayMass(double mass) {
       clearDisplay();
-      printToSerialAndDisplay(String(mass, NUM_DIGITS) + " " + units, 0, 0);
+      printToDisplay(String(mass, PRECISION) + " " + units, 0, 0);
     }
     
     
-    void listenForInput() {
+    void listenForButtonInput() {
       switch (digitalRead(BTN_TARE)) {
         case 0: {
           unsigned long time_of_press = millis();
-          printToSerialAndDisplay(".", LCD_ROWS - 1, LCD_COLS - 1);
+          printToDisplay(".", LCD_ROWS - 1, LCD_COLS - 1);
           
           while (digitalRead(BTN_TARE) == 0) {
             // Wait for button release.
