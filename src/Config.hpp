@@ -58,8 +58,12 @@
   // Continuous output to serial.
   bool isContinuousReport = 0;
   
-  // Response characters.
+  // Response characteristics.
+  // Response block width for a weight report.
   const int WT_WIDTH = 10;
   // Number of digits after the decimal.
-  const int PRECISION = 5;
+  const int PRECISION = 3;
+  
+  // Response characters.
   int range = 1;  // This scale is single-range.
+  

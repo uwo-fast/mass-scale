@@ -102,7 +102,8 @@ void loop() {
       delay(2000);
       
       // Zero the scale (set the offset on data returned by the HX711).
-      zero();
+      // Don't send a zero response over serial.
+      zero(0);
       
       Serial.println("HX711 Initialized!");
       Serial.println();
@@ -245,12 +246,12 @@ void loop() {
           switch ((char) cmd[startIdx]) {
             case 'w':
             case 'W':
-              Serial.println("Return weight");
+              reportMass();
 
               break;
             case 'z':
             case 'Z':
-              Serial.println("Zeroing");
+              zero();
 
               break;
             case 'd':
@@ -284,16 +285,16 @@ void loop() {
               break;
             case 'c':
             case 'C':
-              Serial.println("Clearing Tare!");
+              clearTare();
 
               break;
             case 'm':
             case 'M':
-              Serial.println("Returning Tare!");
+              reportTare();
 
               break;
             default:
-              Serial.println("???");
+              Serial.println("?");
               
               break;
           }
@@ -316,23 +317,59 @@ void loop() {
 
   
   //----Other----//
-    void zero() {
+    void zero(bool isRespond = 1) {
       // Uses the HX711 built in tare() command to set the zero (empty bed).
       loadcell.tare(HX_NUM_AVGS);
+      
+      clearTare(0);
+      
+      if (isRespond) {
+        mass = getMassAveraged();
+        // SMA formatted response.
+        String response = "\n";     // <LF>
+        response += "Z";            // <s>
+        response += String(range);  // <r>
+        response += String(netOrGross());            // <n>
+        response += " ";            // <m>
+        response += " ";            // <f>
+        response += rightJustify(String(mass, PRECISION), WT_WIDTH);  // <xxxxxx.xxx>
+        response += units;          // <uuu>
+        response += "\r";           // <CR>
+        Serial.println(response);
+      }
     }
     
     
-    void tare() {
+    void tare(bool isRespond = 1) {
       // Sets the tareWeight to the current measured weight 
       // (accounting for current tare).
       tareWeight += mass;
+      
+      if (isRespond) {
+        reportMass();
+      }      
+    }
+    
+    
+    void clearTare(bool isRespond = 1) {
+      tareWeight = 0.0;
+      
+      if (isRespond) {
+        reportMass();
+      }
+    }
+    
+    
+    void reportTare() {
+      String tareStr = rightJustify(String(tareWeight, PRECISION), WT_WIDTH);
+      // SMA formatted response.
       String response = "\n";     // <LF>
       response += " ";            // <s>
       response += String(range);  // <r>
       response += "T";            // <n>
       response += " ";            // <m>
       response += " ";            // <f>
-      response += rightJustify(String(tareWeight, PRECISION), WT_WIDTH);  // <xxxxxx.xxx>
+      response += tareStr;        // <xxxxxx.xxx>
       response += units;          // <uuu>
       response += "\r";           // <CR>
       Serial.println(response);
@@ -346,6 +383,34 @@ void loop() {
       }
       
       return str;
+    }
+    
+    
+    String netOrGross() {
+      // Net/Gross status. Net if tared, gross if tare = 0.
+      if (tareWeight == 0) {
+        return "G";
+      } else {
+        return "N";
+      }
+    }
+    
+    
+    void reportMass() {
+      mass = getMassAveraged();
+      String massStr = rightJustify(String(mass, PRECISION), WT_WIDTH);
+      
+      // SMA formatted response.
+      String response = "\n";           // <LF>
+      response += " ";                  // <s>
+      response += String(range);        // <r>
+      response += String(netOrGross()); // <n>
+      response += " ";                  // <m>
+      response += " ";                  // <f>
+      response += massStr;              // <xxxxxx.xxx>
+      response += units;                // <uuu>
+      response += "\r";                 // <CR>
+      Serial.println(response);
     }
     
     
@@ -398,7 +463,8 @@ void loop() {
     
     void displayMass(double mass) {
       clearDisplay();
-      printToDisplay(String(mass, PRECISION) + " " + units, 0, 0);
+      String massStr = rightJustify(String(mass, PRECISION), WT_WIDTH);
+      printToDisplay(massStr + " " + units, 0, 0);
     }
     
     
