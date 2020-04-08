@@ -483,7 +483,7 @@ void loop() {
           unsigned long time_of_release = millis();
           
           if (time_of_release - time_of_press < CAL_WAIT) {
-            zero();
+            tare(0);
           } else {
             calibrate();
           }
@@ -503,7 +503,7 @@ void loop() {
       printToDisplay("Cal w/ " + String(CAL_STANDARD_MASS, PRECISION) + 
         " " + units, 0, 0);
         
-      zero();
+      zero(0);
       
       // Wait for the mass to get added.
       printToDisplay("Add mass...", 1, 0);
