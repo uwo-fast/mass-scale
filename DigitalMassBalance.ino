@@ -360,15 +360,6 @@ void loop() {
     }
     
     
-    void printToSerialAndDisplay(String output, int row, int col) {
-      // Serial.
-      Serial.println(output);
-      
-      // LCD.
-      printToDisplay(output, row, col);
-    }
-    
-    
     // TODO: Check for overload.
     double getHxReadout() {
       // Read the raw (zeroed) value from the loadcell amplifier.
@@ -443,13 +434,13 @@ void loop() {
     
     void calibrate() {
       // Tell the user what mass to use.
-      printToSerialAndDisplay("Cal w/ " + String(CAL_STANDARD_MASS, NUM_DIGITS) + 
+      printToDisplay("Cal w/ " + String(CAL_STANDARD_MASS, PRECISION) + 
         " " + units, 0, 0);
         
       zero();
       
       // Wait for the mass to get added.
-      printToSerialAndDisplay("Add mass...", 1, 0);
+      printToDisplay("Add mass...", 1, 0);
       while (getHxReadout() < CAL_THRESHOLD) {
         // Wait for obvious addition of mass.
       } // Mass apparently added.
@@ -461,7 +452,7 @@ void loop() {
       
       for (int i = QUEUE_SIZE; i>0; i--) {
         // Add extra space to account for change in number of digits displayed.
-        printToSerialAndDisplay("Avg rem: " + String(i) + " ", 1, 0);
+        printToDisplay("Avg rem: " + String(i) + " ", 1, 0);
         hxReadout = getHxReadoutAveraged();
         delay(1000);
       }
@@ -504,6 +495,6 @@ void loop() {
     
     
     void reportSensitivity() {
-      Serial.println("Sensitivity: " + String(sensitivity, NUM_DIGITS) + 
+      Serial.println("Sensitivity: " + String(sensitivity, PRECISION) + 
         " div/" + units);
     }
