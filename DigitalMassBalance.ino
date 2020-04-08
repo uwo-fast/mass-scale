@@ -102,8 +102,7 @@ void loop() {
       delay(2000);
       
       // Zero the scale (set the offset on data returned by the HX711).
-      // Don't send a zero response over serial.
-      zero(0);
+      zero();
       
       Serial.println("HX711 Initialized!");
       Serial.println();
@@ -317,46 +316,40 @@ void loop() {
 
   
   //----Other----//
-    void zero(bool isRespond = 1) {
+    void zero() {
       // Uses the HX711 built in tare() command to set the zero (empty bed).
       loadcell.tare(HX_NUM_AVGS);
       
-      clearTare(0);
+      clearTare();
       
-      if (isRespond) {
-        mass = getMassAveraged();
-        // SMA formatted response.
-        String response = "\n";     // <LF>
-        response += "Z";            // <s>
-        response += String(range);  // <r>
-        response += String(netOrGross());            // <n>
-        response += " ";            // <m>
-        response += " ";            // <f>
-        response += rightJustify(String(mass, PRECISION), WT_WIDTH);  // <xxxxxx.xxx>
-        response += units;          // <uuu>
-        response += "\r";           // <CR>
-        Serial.println(response);
-      }
+      mass = getMassAveraged();
+      // SMA formatted response.
+      String response = "\n";     // <LF>
+      response += "Z";            // <s>
+      response += String(range);  // <r>
+      response += String(netOrGross());            // <n>
+      response += " ";            // <m>
+      response += " ";            // <f>
+      response += rightJustify(String(mass, PRECISION), WT_WIDTH);  // <xxxxxx.xxx>
+      response += units;          // <uuu>
+      response += "\r";           // <CR>
+      Serial.println(response);
     }
     
     
-    void tare(bool isRespond = 1) {
+    void tare() {
       // Sets the tareWeight to the current measured weight 
       // (accounting for current tare).
       tareWeight += mass;
       
-      if (isRespond) {
-        reportMass();
-      }      
+      reportMass();
     }
     
     
-    void clearTare(bool isRespond = 1) {
+    void clearTare() {
       tareWeight = 0.0;
       
-      if (isRespond) {
-        reportMass();
-      }
+      reportMass();
     }
     
     
@@ -483,7 +476,7 @@ void loop() {
           unsigned long time_of_release = millis();
           
           if (time_of_release - time_of_press < CAL_WAIT) {
-            tare(0);
+            zero();
           } else {
             calibrate();
           }
@@ -503,7 +496,7 @@ void loop() {
       printToDisplay("Cal w/ " + String(CAL_STANDARD_MASS, PRECISION) + 
         " " + units, 0, 0);
         
-      zero(0);
+      zero();
       
       // Wait for the mass to get added.
       printToDisplay("Add mass...", 1, 0);
