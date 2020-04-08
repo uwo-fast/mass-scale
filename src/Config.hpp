@@ -63,7 +63,8 @@
   const int WT_WIDTH = 10;
   // Number of digits after the decimal.
   const int PRECISION = 3;
-  
+  // About index.
+  int aboutIdx = 4;
   // Response characters.
   int range = 1;  // This scale is single-range.
   

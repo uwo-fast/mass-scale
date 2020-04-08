@@ -21,6 +21,8 @@
 #include "src\Config.hpp" 
 
 
+const String REV = "0.0.1";
+
 // Hardware objects.
 HX711 loadcell;
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
@@ -255,17 +257,36 @@ void loop() {
               break;
             case 'd':
             case 'D':
-              Serial.println("Diagnostics!");
+              // TODO: Implement actual diagnostics.
+              Serial.print("\n    \r");
 
               break;
             case 'a':
             case 'A':
-              Serial.println("About!");
-
+              aboutIdx = 0;
+              Serial.print("\nSMA:2/1.0\r");
               break;
             case 'b':
             case 'B':
-              Serial.println("Scrolling!");
+              switch (aboutIdx) {
+                case 0:
+                  Serial.print("\nMFG:Michigan Tech MOST\r");
+                  break;
+                case 1:
+                  Serial.print("\nMOD:Digital Mass Balance\r");
+                  break;
+                case 2:
+                  Serial.print("\nREV:" + REV + "\r");
+                  break;
+                case 3:
+                  Serial.print("\nEND:\r");
+                  break;
+                default:
+                  Serial.print("\n?\r");
+                  break;
+              }
+              
+              aboutIdx++;
               
               break;
             case ESC:
