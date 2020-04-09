@@ -7,7 +7,8 @@
       University's MOST group <https://www.appropedia.org/Category:MOST>
       
       REVISIONS:
-      1.0.0 : First release up to SMA standards. Work to do on data filtering.
+      1.0.0 : Initial release - function scale with serial reporting.
+      2.0.0 : First release up to SMA standards. Work to do on data filtering.
       
     Copyright (C) 2020 Benjamin Hubbard
       ! Note that external libraries included with this software are subject to
@@ -35,7 +36,7 @@
 #include "src\Config.hpp" 
 
 
-const String REV = "1.0.0";
+const String REV = "2.0.0";
 
 
 // Hardware objects (uses external libraries).
