@@ -61,7 +61,7 @@ void loop() {
     }
     
     if (isContinuousReport) {
-      reportMass();
+      reportMassAveraged();
     }
     
     // Simple scale functionality.
@@ -257,7 +257,7 @@ void loop() {
           switch ((char) cmd[startIdx]) {
             case 'w':
             case 'W':
-              reportMass();
+              reportMassAveraged();
 
               break;
             case 'z':
@@ -509,6 +509,23 @@ void loop() {
     
     
     void reportMass() {
+      mass = getMass();
+      String massStr = rightJustify(String(mass, PRECISION), WT_WIDTH);
+      
+      // SMA formatted response.
+      String response = "\n";           // <LF>
+      response += " ";                  // <s>
+      response += String(range);        // <r>
+      response += String(netOrGross()); // <n>
+      response += " ";                  // <m>
+      response += " ";                  // <f>
+      response += massStr;              // <xxxxxx.xxx>
+      response += units;                // <uuu>
+      response += "\r";                 // <CR>
+      Serial.print(response);
+    }
+    
+    void reportMassAveraged() {
       mass = getMassAveraged();
       String massStr = rightJustify(String(mass, PRECISION), WT_WIDTH);
       
