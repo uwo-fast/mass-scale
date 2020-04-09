@@ -44,30 +44,29 @@ void setup() {
 
 
 void loop() {
-  unsigned long time = millis();
-  
   // Get the averaged, tared mass.
   mass = getMassAveraged();
   
-  // Listen for input over serial.
-  // When using Arduino Serial Monitor, switch to 'Both NL & CR' in bottom 
-  // right.
-  // When using Putty, use Ctrl+J for LF, followed by command, followed by 
-  // Ctrl+M for CR.
-  if (Serial.available() > 2) { // Minimum cmd length is 3 characters, <LF>c<CR>
-    doSerial();
-  }
-  
-  if (isContinuousReport) {
-    reportMass();
-  }
-  
-  // Simple scale functionality.
-  displayMass(mass);
-  listenForButtonInput();
-  
-  // enforce report rate.
-  while (millis() - time < 1/REPORT_RATE * 1000) {
+  // enforce report rate without hampering sample rate.
+  if (millis() - lastRefresh > 1/REPORT_RATE * 1000) {
+    lastRefresh = millis();
+    
+    // Listen for input over serial.
+    // When using Arduino Serial Monitor, switch to 'Both NL & CR' in bottom 
+    // right.
+    // When using Putty, use Ctrl+J for LF, followed by command, followed by 
+    // Ctrl+M for CR.
+    if (Serial.available() > 2) { // Minimum cmd length is 3 characters, <LF>c<CR>
+      doSerial();
+    }
+    
+    if (isContinuousReport) {
+      reportMass();
+    }
+    
+    // Simple scale functionality.
+    displayMass(mass);
+    listenForButtonInput();
   }
 }
 
@@ -325,11 +324,12 @@ void loop() {
 
               break;
             default:
-              Serial.println("\n?\r");
+              Serial.print("\n?\r");
               
               break;
           }
-          /*
+          
+          break;
         case 2:
         
         case 12:
