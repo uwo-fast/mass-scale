@@ -16,6 +16,8 @@ Diagnostic, ABout and INformation commands
       <space> None of the above conditions
         Note: For ‘E’, ‘I’, ‘T’ error conditions, <xxxxxx.xxx>= ————— (center dashes)
               and ‘Z’, ‘O’, ‘U’ are overridden.
+      Added characters:
+        'C' Calibration mode <xxxxxx.xxx> = weight to add to the bed
     <r> range (‘1’, ‘2’, ‘3’, etc.) always ‘1’ for single range
     <n> gross/net status
       ‘G’ Gross normal weight

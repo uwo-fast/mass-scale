@@ -338,6 +338,18 @@ void loop() {
               switch ((char) cmd[startIdx + 1]) {
                 case 'c':
                 case 'C':
+                  // SMA formatted response.
+                  String response = "\n";     // <LF>
+                  response += "C";            // <s>
+                  response += String(range);  // <r>
+                  response += String(netOrGross());            // <n>
+                  response += " ";            // <m>
+                  response += " ";            // <f>
+                  response += rightJustify(String(cal_standard_mass, PRECISION), WT_WIDTH);  // <xxxxxx.xxx>
+                  response += units;          // <uuu>
+                  response += "\r";           // <CR>
+                  Serial.print(response);
+                  
                   calibrate();
                   
                   break;
@@ -367,6 +379,8 @@ void loop() {
                   // The calibration weight is submitted with 10 characters of 
                   // the value, plus 3 characters of units.
                   // TODO: handle multiple options for units.
+                  clearTareSilent();
+                  
                   String calStandard = "";
                   for (int i = 0; i < 10; i++) {
                     calStandard += String((char) cmd[startIdx + 2 + i]);
@@ -375,6 +389,19 @@ void loop() {
                   // BUG: toDouble() only returns two decimal points of 
                   //      precision.
                   cal_standard_mass = calStandard.toDouble();
+                  
+                  // SMA formatted response.
+                  String response = "\n";     // <LF>
+                  response += "C";            // <s>
+                  response += String(range);  // <r>
+                  response += String(netOrGross());            // <n>
+                  response += " ";            // <m>
+                  response += " ";            // <f>
+                  response += rightJustify(String(cal_standard_mass, PRECISION), WT_WIDTH);  // <xxxxxx.xxx>
+                  response += units;          // <uuu>
+                  response += "\r";           // <CR>
+                  Serial.print(response);
+                  
                   calibrate();
                   break;
                 default:
@@ -594,6 +621,11 @@ void loop() {
       printToDisplay("Add mass...", 1, 0);
       while (getHxReadout() < CAL_THRESHOLD) {
         // Wait for obvious addition of mass.
+        // Allow user interrupt - cancel if new command received or button
+        // pushed.
+        if (Serial.available() > 2 || digitalRead(BTN_TARE) == 0) {
+          return;
+        }
       } // Mass apparently added.
       
       delay(1000);
@@ -611,6 +643,7 @@ void loop() {
       sensitivity = hxReadout / cal_standard_mass;
       
       setSensitivity();
+      reportMass();
     }
     
     
@@ -634,14 +667,8 @@ void loop() {
     
     void setSensitivity() {
       // Send the current sensitivity to memory.
-      
-      Serial.println("Writing sensitivity to memory...");
-      reportSensitivity();
-      
       EEPROM.put(CAL_SIGNATURE_ADDR, CAL_SIGNATURE);
       EEPROM.put(CAL_VALUE_ADDR, sensitivity);
-      
-      Serial.println("Sensitivity stored.");
     }
     
     

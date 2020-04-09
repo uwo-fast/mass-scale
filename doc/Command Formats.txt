@@ -67,6 +67,22 @@ manufacturer to extend or customize the protocol for uses outside the scope of
 this standard.
 ‘c’ is any printable ASCII character the manufacturer desires.
 <LF><manufacturers specified response><CR>
+  Command: <LF>XC<CR>
+  Response: Scale clears tare weight, zeros, then reports the expected weight to
+  add. It measures for 2 minutes, then determines the new sensitivity, reporting 
+  the new measured weight after completion.
+  <LF><C><r><G><m><f><xxxxxx.xxx><uuu><CR>
+  2 minutes...
+  <LF><s><r><G><m><f><xxxxxx.xxx><uuu><CR>
+  
+  Command: <LF>XC<xxxxxx.xxx><CR>
+  Response: Scale clears tare weight, zeros, then uses the provided weight to
+  calibrate (reports back for verification). It measures for 2 minutes, then 
+  determines the new sensitivity, reporting the new measured weight after 
+  completion.
+  <LF><C><r><G><m><f><xxxxxx.xxx><uuu><CR>
+  2 minutes...
+  <LF><s><r><G><m><f><xxxxxx.xxx><uuu><CR>
 
 4.18 Abort Command (SMA#1)
 Command: <ESC>
