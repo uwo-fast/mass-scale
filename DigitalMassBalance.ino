@@ -331,16 +331,61 @@ void loop() {
           
           break;
         case 2:
-        
-        case 12:
+          // Command will be an x followed by a character.
+          switch ((char) cmd[startIdx]) {
+            case 'x':
             case 'X':
-              Serial.println("More to do!");
-
-              break; */
+              switch ((char) cmd[startIdx + 1]) {
+                case 'c':
+                case 'C':
+                  calibrate();
+                  
+                  break;
+                default:
+                  Serial.print("\n?\r");
+              }
               
+              break;
+            default:
+              Serial.print("\n?\r");
+              
+              break;
+          }
+          
+          // char data[2];
+          // sprintf(data, "%c%c", cmd[startIdx], cmd[startIdx+1]);
+          // Serial.println(data);
+          
+          break;
+        case 12:
+          switch ((char) cmd[startIdx]) {
+            case 'x':
+            case 'X':
+              switch ((char) cmd[startIdx + 1]) {
+                case 'c':
+                case 'C':
+                  // The calibration weight is submitted with 10 characters of 
+                  // the value, plus 3 characters of units.
+                  // TODO: handle multiple options for units.
+                  String calStandard = "";
+                  for (int i = 0; i < 10; i++) {
+                    calStandard += String((char) cmd[startIdx + 2 + i]);
+                  }
+                  // BUG: there seems to be an overflow issue for large inputs.
+                  // BUG: toDouble() only returns two decimal points of 
+                  //      precision.
+                  cal_standard_mass = calStandard.toDouble();
+                  calibrate();
+                  break;
+                default:
+                  Serial.print("\n?\r");
+              }
+              break;
+              
+          }
           break;
         default:
-          Serial.println("\n?\r");
+          Serial.print("\n?\r");
           
           break;
       }
@@ -540,7 +585,7 @@ void loop() {
     
     void calibrate() {
       // Tell the user what mass to use.
-      printToDisplay("Cal w/ " + String(CAL_STANDARD_MASS, PRECISION) + 
+      printToDisplay("Cal w/ " + String(cal_standard_mass, PRECISION) + 
         " " + units, 0, 0);
         
       zeroSilent();
@@ -563,7 +608,7 @@ void loop() {
         delay(1000);
       }
       
-      sensitivity = hxReadout / CAL_STANDARD_MASS;
+      sensitivity = hxReadout / cal_standard_mass;
       
       setSensitivity();
     }

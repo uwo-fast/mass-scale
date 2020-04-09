@@ -38,8 +38,8 @@
   // Address of the stored calibration value.
   const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
 
-  // Mass used to calibrate (1 US cup of water);
-  const double CAL_STANDARD_MASS = 0.2359;
+  // Mass used to calibrate (default: 1 US cup of water);
+  double cal_standard_mass = 235.9;
 
   // Mass units.
   String units = "  g";
