@@ -301,8 +301,8 @@ void loop() {
               
               break;
             case ESC:
-              Serial.println("Resetting!");
-
+              softReset();
+              
               break;
             case 'r':
             case 'R':
@@ -325,7 +325,7 @@ void loop() {
 
               break;
             default:
-              Serial.println("?");
+              Serial.println("\n?\r");
               
               break;
           }
@@ -340,7 +340,7 @@ void loop() {
               
           break;
         default:
-          Serial.println("???");
+          Serial.println("\n?\r");
           
           break;
       }
@@ -603,4 +603,9 @@ void loop() {
     void reportSensitivity() {
       Serial.println("Sensitivity: " + String(sensitivity, PRECISION) + 
         " div/" + units);
+    }
+    
+    
+    void softReset() {
+      asm volatile (" jmp 0");
     }
