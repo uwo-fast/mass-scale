@@ -50,6 +50,7 @@
 //----Serial----//
   // Communication rate.
   const int BAUD = 9600;
+  const int REPORT_RATE = 1; // Hz
   // Non-printable ASCII characters.
   const int LF = 0x0A;
   const int CR = 0x0D;

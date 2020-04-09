@@ -44,6 +44,8 @@ void setup() {
 
 
 void loop() {
+  int time = millis();
+  
   // Get the averaged, tared mass.
   mass = getMassAveraged();
   
@@ -63,6 +65,10 @@ void loop() {
   // Simple scale functionality.
   displayMass(mass);
   listenForButtonInput();
+  
+  // enforce report rate.
+  while (millis() - time < 1/REPORT_RATE * 1000) {
+  }
 }
 
 
