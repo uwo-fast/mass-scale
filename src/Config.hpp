@@ -38,16 +38,36 @@
   // Address of the stored calibration value.
   const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
 
-  // Mass used to calibrate (1 US cup of water);
-  const double CAL_STANDARD_MASS = 0.2359;
+  // Mass used to calibrate (default: 1 US cup of water);
+  double cal_standard_mass = 235.9;
 
   // Mass units.
-  String units = "kg";
+  String units = "  g";
   
   const double CAL_THRESHOLD = 20000;
   
-
-//----Readouts----//  
+ 
+//----Serial----//
+  // Communication rate.
+  const int BAUD = 9600;
+  const int REPORT_RATE = 1; // Hz
+  unsigned long lastRefresh = 1;  // milliseconds
+  
+  // Non-printable ASCII characters.
+  const int LF = 0x0A;
+  const int CR = 0x0D;
+  const int ESC= 0x1B;
+  const int SPACE = 0x20;
+  // Continuous output to serial.
+  bool isContinuousReport = 0;
+  
+  // Response characteristics.
+  // Response block width for a weight report.
+  const int WT_WIDTH = 10;
   // Number of digits after the decimal.
-  const int NUM_DIGITS = 3;
+  const int PRECISION = 3;
+  // About index.
+  int aboutIdx = 4;
+  // Response characters.
+  int range = 1;  // This scale is single-range.
   
