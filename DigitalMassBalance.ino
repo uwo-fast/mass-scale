@@ -44,7 +44,7 @@ void setup() {
 
 
 void loop() {
-  int time = millis();
+  unsigned long time = millis();
   
   // Get the averaged, tared mass.
   mass = getMassAveraged();
