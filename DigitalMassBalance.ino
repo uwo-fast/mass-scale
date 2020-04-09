@@ -56,6 +56,9 @@ void loop() {
     doSerial();
   }
   
+  if (isContinuousReport) {
+    reportMass();
+  }
   
   // Simple scale functionality.
   displayMass(mass);
@@ -242,6 +245,8 @@ void loop() {
       // The scale should not accept a command if it doesn't match the syntax 
       // exactly. (eg <LF> wa <CR> should not execute the <LF> w <CR> command.)
       // To combat this, interpret commands by length.
+      // First, cancel continuous reporting.
+      isContinuousReport = 0;
       switch (endIdx - startIdx) {
         case 1:   // Single character commands.
           switch ((char) cmd[startIdx]) {
@@ -295,7 +300,7 @@ void loop() {
               break;
             case 'r':
             case 'R':
-              Serial.println("Continuously Reporting!");
+              isContinuousReport = 1;
 
               break;
             case 't':
