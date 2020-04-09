@@ -1,6 +1,18 @@
 /*  DigitalMassBalance uses a load cell to measure and report an object's mass.
+      This firmware is designed to meet SMA SCP 0499 Level #2 for scale serial 
+      communication. The command and response formats for serial communication 
+      are documented in included files.
+      
+      The scale was designed by researchers ing Michigan Technological 
+      University's MOST group <https://www.appropedia.org/Category:MOST>
+      
+      REVISIONS:
+      1.0.0 : First release up to SMA standards. Work to do on data filtering.
+      
     Copyright (C) 2020 Benjamin Hubbard
-
+      ! Note that external libraries included with this software are subject to
+        their own licenses, included within their respective folders.
+        
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -16,24 +28,38 @@
 */
 
 
+// Headers including a variety of definitions for the scale. These are separated
+// to help reduce the length of this script.
 #include "src\Libraries.hpp"
 #include "src\Pinouts.hpp"
 #include "src\Config.hpp" 
 
 
-const String REV = "0.0.1";
+const String REV = "1.0.0";
 
-// Hardware objects.
+
+// Hardware objects (uses external libraries).
+// Load cell amplifier.
 HX711 loadcell;
+// LCD Display. Pins defined in Pinouts.hpp.
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
-// Weight variables.
+
+// Variables used during data collection.
+// Sensitivity is read from memory - this is here as a default.
 double sensitivity = 1.0;
+// Used as an offset from zero (ie for a container). Implemented in this script,
+// while zero is implemented within the HX711 library.
 double tareWeight = 0.0;
+// Measured mass (can be assigned an averaged/filtered value or an instantaneous
+// value.
 double mass;
   
 
 void setup() {
+  // Initialization methods have self-explanatory names. Initializers as of REV
+  // 1.0.0 report non-standard information over serial. Those at startup are the
+  // only non-standard serial communications this scale produces.
   initSerial();
   initLoadCell();
   initLCD();
@@ -47,16 +73,21 @@ void loop() {
   // Get the averaged, tared mass.
   mass = getMassAveraged();
   
-  // enforce report rate without hampering sample rate.
+  // Enforce report rate without hampering sample rate (sample rate depends on
+  // how much processing is done during each iteration of loop().
+  // TODO: add a command to change the report rate.
   if (millis() - lastRefresh > 1/REPORT_RATE * 1000) {
+    // Reset the time. Last refresh is initialized in Config.hpp.
     lastRefresh = millis();
     
     // Listen for input over serial.
     // When using Arduino Serial Monitor, switch to 'Both NL & CR' in bottom 
-    // right.
+    // right. When the scale first starts up, hit enter once to queue up a <LF>
+    // character, otherwise the first command will not meet com standards and 
+    // return a ?
     // When using Putty, use Ctrl+J for LF, followed by command, followed by 
-    // Ctrl+M for CR.
-    if (Serial.available() > 2) { // Minimum cmd length is 3 characters, <LF>c<CR>
+    // Ctrl+M or simply Enter for CR.
+    if (Serial.available() > 2) { // Minimum cmd length is 3 characters<LF>c<CR>
       doSerial();
     }
     
@@ -64,7 +95,9 @@ void loop() {
       reportMassAveraged();
     }
     
-    // Simple scale functionality.
+    // Simple scale functionality. Note that placement of button listener 
+    // requires an extended button press. Assuming a report rate of at least
+    // 1 Hz, this should not be an issue.
     displayMass(mass);
     listenForButtonInput();
   }
@@ -74,7 +107,8 @@ void loop() {
 //----Support methods----//
   //----Initialize----//
     void initSerial() {
-      // Initialize the serial connection; wait until it's running.
+      // Initialize the serial connection. BAUD is defined in Config.hpp to 
+      // match the SMA standard.
       Serial.begin(BAUD);
       
       while(!Serial) {
@@ -86,7 +120,7 @@ void loop() {
     void initLoadCell() {
       // Set up the HX711 for use. Turns on the device, then verifies the 
       // calibration value.
-      Serial.println("Initializing HX711...");
+      Serial.println("\nInitializing HX711...");
       
       // Turn on the HX711 power supply.
       pinMode(HX_VCC, OUTPUT);
@@ -185,14 +219,21 @@ void loop() {
       // Fill up cmd.
       receiveCommand(cmd, len);
       
+      // Check for abort command.
+      int escIdx = findInArray(cmd, ESC, 0, len);
+      if (escIdx >= 0) {  // If there's an escape character, reset.
+        softReset();
+      }
+      
       // Parse the command for the <LF> and <CR>. The command starts one char
       // beyond the LF, and ends with the CR.
       int startIdx = findInArray(cmd, LF, 0, len) + 1;
       int endIdx = findInArray(cmd, CR, startIdx, len);
       
-      // Check for errors. Since we start after the LF, minimum index is 1.
+      // Check for errors. Since we start after the LF, minimum index is 1. 
+      // Note that findInArray returns -1 if it cannot find the character.
       if (startIdx < 1 || endIdx < 1) {
-        Serial.println("Did not find LF or CR");
+        Serial.println("\n?\r");
         return;
       }
       
@@ -205,7 +246,7 @@ void loop() {
     //        This can be accomplished by clearing command in when receiving
     //        a LF, but requires preallocating potentially too much memory for a 
     //        command. Can be accomplished by peeking for a <CR>. Could have
-    //        timing issues.
+    //        timing issues. Maybe watch the change in Serial.available().
     void receiveCommand(int *cmd, int len) {  
       // Read everything but the last character into the cmd array.
       // The last character could be an LF which would lead the next command.
@@ -215,9 +256,9 @@ void loop() {
 
       // If the next guy is <LF>, leave 'er alone (this accommodates Arduino
       // Serial Monitor behavior).
-      char last = Serial.peek();
-      // If not, add it to the cmd array (could be a CR from putty, or a 
+      // If not, add it to the cmd array (could be a CR from PuTTY, or a 
       // single character from terminal without local echo/line editing on.
+      char last = Serial.peek();
       if (last != LF){
         // Chuck it at the end of the array.
         cmd[len-1] = Serial.read();
@@ -236,6 +277,7 @@ void loop() {
         // Read a character from the array.
         c = array[i];
         
+        // Don't go looking where there is nothing to be found.
         if (i > endSearch) {
           return -1;
         }
@@ -252,31 +294,33 @@ void loop() {
       // To combat this, interpret commands by length.
       // First, cancel continuous reporting.
       isContinuousReport = 0;
+      
       switch (endIdx - startIdx) {
         case 1:   // Single character commands.
           switch ((char) cmd[startIdx]) {
-            case 'w':
+            case 'w': // Report weight.
             case 'W':
               reportMassAveraged();
-
               break;
-            case 'z':
+              
+            case 'z': // Zero request.
             case 'Z':
               zero();
-
               break;
-            case 'd':
+              
+            case 'd': // Run diagnostics.
             case 'D':
               // TODO: Implement actual diagnostics.
               Serial.print("\n    \r");
-
               break;
-            case 'a':
+              
+            case 'a': // About (first row).
             case 'A':
               aboutIdx = 0;
               Serial.print("\nSMA:2/1.0\r");
               break;
-            case 'b':
+              
+            case 'b': // aBout (scrolling).
             case 'B':
               switch (aboutIdx) {
                 case 0:
@@ -295,92 +339,77 @@ void loop() {
                   Serial.print("\n?\r");
                   break;
               }
-              
               aboutIdx++;
-              
               break;
-            case ESC:
-              softReset();
               
-              break;
-            case 'r':
+            case 'r': // Continuous reporting request.
             case 'R':
               isContinuousReport = 1;
-
               break;
-            case 't':
+              
+            case 't': // Tare request.
             case 'T':
               tare();
-
               break;
-            case 'c':
+              
+            case 'c': // Clear tare.
             case 'C':
               clearTare();
-
               break;
-            case 'm':
+              
+            case 'm': // Return the current tare weight.
             case 'M':
               reportTare();
-
               break;
-            default:
-              Serial.print("\n?\r");
               
+            default:  // Unknown command.
+              Serial.print("\n?\r");
               break;
-          }
-          
+          } // End of single character commands.
           break;
-        case 2:
-          // Command will be an x followed by a character.
+          
+        case 2: // 2 character commands.
+          // Command will be an X followed by a character.
           switch ((char) cmd[startIdx]) {
-            case 'x':
+            case 'x': // Custom commands.
             case 'X':
               switch ((char) cmd[startIdx + 1]) {
-                case 'c':
+                case 'c': // Calibrate request (using hard-coded standard mass).
                 case 'C':
-                  // SMA formatted response.
-                  String response = "\n";     // <LF>
-                  response += "C";            // <s>
-                  response += String(range);  // <r>
-                  response += String(netOrGross());            // <n>
-                  response += " ";            // <m>
-                  response += " ";            // <f>
-                  response += rightJustify(String(cal_standard_mass, PRECISION), WT_WIDTH);  // <xxxxxx.xxx>
-                  response += units;          // <uuu>
-                  response += "\r";           // <CR>
-                  Serial.print(response);
-                  
+                  // Calibration occurs with no tare.
+                  clearTareSilent();
+                  calResponse();
                   calibrate();
-                  
                   break;
-                default:
+                  
+                default:  // Unrecognized custom command.
                   Serial.print("\n?\r");
-              }
-              
+                  break;
+              } // End of custom commands.
               break;
-            default:
+              
+              // TODO: Add power saving commands/methods.
+            default:  // Unrecognized 2 character command.
               Serial.print("\n?\r");
-              
               break;
-          }
-          
-          // char data[2];
-          // sprintf(data, "%c%c", cmd[startIdx], cmd[startIdx+1]);
-          // Serial.println(data);
-          
+          } // End of 2 character commands.          
           break;
-        case 12:
+          
+        case 12:  // Command with numeric input.
+          // Commands will be an x, character, then 10 character number (with
+          // leading whitespace).
           switch ((char) cmd[startIdx]) {
-            case 'x':
+            case 'x': // Custom command.
             case 'X':
               switch ((char) cmd[startIdx + 1]) {
-                case 'c':
-                case 'C':
+                case 'c': // Calibrate request.
+                case 'C': { // Use brackets to prevent fall-through warnings.
                   // The calibration weight is submitted with 10 characters of 
                   // the value, plus 3 characters of units.
                   // TODO: handle multiple options for units.
                   clearTareSilent();
                   
+                  // Read the requested calibration mass.
                   String calStandard = "";
                   for (int i = 0; i < 10; i++) {
                     calStandard += String((char) cmd[startIdx + 2 + i]);
@@ -390,32 +419,22 @@ void loop() {
                   //      precision.
                   cal_standard_mass = calStandard.toDouble();
                   
-                  // SMA formatted response.
-                  String response = "\n";     // <LF>
-                  response += "C";            // <s>
-                  response += String(range);  // <r>
-                  response += String(netOrGross());            // <n>
-                  response += " ";            // <m>
-                  response += " ";            // <f>
-                  response += rightJustify(String(cal_standard_mass, PRECISION), WT_WIDTH);  // <xxxxxx.xxx>
-                  response += units;          // <uuu>
-                  response += "\r";           // <CR>
-                  Serial.print(response);
-                  
+                  calResponse();
                   calibrate();
                   break;
-                default:
+                }
+                
+                default:  // Unrecognized custom, numeric input command.
                   Serial.print("\n?\r");
-              }
+              } // End of custom commands.
               break;
-              
-          }
+          } // End of 12 character commands.
           break;
-        default:
-          Serial.print("\n?\r");
           
+        default:  // Unrecognized command length.
+          Serial.print("\n?\r");
           break;
-      }
+      } // End of command interpretation.
     }
 
   
@@ -423,25 +442,29 @@ void loop() {
     void zero() {
       // Uses the HX711 built in tare() command to set the zero (empty bed).
       loadcell.tare(HX_NUM_AVGS);
-      
       clearTareSilent();
       
-      mass = getMassAveraged();
+      // Report instantaneous mass (the averaging window won't have caught up to
+      // the change yet).
+      mass = getMass();
+      String massStr = rightJustify(String(mass, PRECISION), WT_WIDTH);
+      
       // SMA formatted response.
-      String response = "\n";     // <LF>
-      response += "Z";            // <s>
-      response += String(range);  // <r>
-      response += String(netOrGross());            // <n>
-      response += " ";            // <m>
-      response += " ";            // <f>
-      response += rightJustify(String(mass, PRECISION), WT_WIDTH);  // <xxxxxx.xxx>
-      response += units;          // <uuu>
-      response += "\r";           // <CR>
+      String response = "\n";           // <LF>
+      response += "Z";                  // <s>
+      response += String(range);        // <r>
+      response += String(netOrGross()); // <n>
+      response += " ";                  // <m>
+      response += " ";                  // <f>
+      response += massStr;              // <xxxxxx.xxx>
+      response += units;                // <uuu>
+      response += "\r";                 // <CR>
       Serial.print(response);
     }
     
     
     void zeroSilent() {
+      // Zero without serial response. Used for button-press and calibrate.
       loadcell.tare(HX_NUM_AVGS);
       clearTareSilent();
     }
@@ -450,29 +473,33 @@ void loop() {
       // Sets the tareWeight to the current measured weight 
       // (accounting for current tare).
       tareWeight += mass;
-      
+      // Report instantaneous mass.
       reportMass();
     }
     
     
     void tareSilent() {
+      // Silently change the tare (no serial output).
       tareWeight += mass;
     }
     
     
     void clearTare() {
+      // Reset the tare.
       tareWeight = 0.0;
-      
+      // Report instantaneous mass.
       reportMass();
     }
     
     
     void clearTareSilent() {
+      // Silently reset the tare.
       tareWeight = 0.0;
     }
     
     
     void reportTare() {
+      // Report the tare weight over serial (response to 'M').
       String tareStr = rightJustify(String(tareWeight, PRECISION), WT_WIDTH);
       // SMA formatted response.
       String response = "\n";     // <LF>
@@ -489,6 +516,8 @@ void loop() {
     
     
     String rightJustify(String str, int width) {
+      // Sets a string right justified within a window. Used for formatting
+      // numbers to SMA specification on serial output.
       int numWhtSpc = width - str.length();
       for (int i = 0; i < numWhtSpc; i++) {
         str = " " + str;
@@ -499,7 +528,7 @@ void loop() {
     
     
     String netOrGross() {
-      // Net/Gross status. Net if tared, gross if tare = 0.
+      // Net/Gross status. Net if tared, Gross if tare = 0.
       if (tareWeight == 0) {
         return "G";
       } else {
@@ -509,6 +538,7 @@ void loop() {
     
     
     void reportMass() {
+      // Reports the instantaneous mass over serial. Used for 'T', 'Z', 'XC'.
       mass = getMass();
       String massStr = rightJustify(String(mass, PRECISION), WT_WIDTH);
       
@@ -526,6 +556,7 @@ void loop() {
     }
     
     void reportMassAveraged() {
+      // Reports averaged/filtered mass over serial. Used for 'W' and 'R'
       mass = getMassAveraged();
       String massStr = rightJustify(String(mass, PRECISION), WT_WIDTH);
       
@@ -544,11 +575,14 @@ void loop() {
     
     
     void clearDisplay() {
+      // Remove all information from the LCD.
       lcd.clear();
     }
     
     
     void printToDisplay(String output, int row, int col) {
+      // Sends a formatted string to the LCD, starting at the requested 
+      // location.
       lcd.setCursor(col, row);
       lcd.print(output);
     }
@@ -562,12 +596,14 @@ void loop() {
     
     
     double getHxReadoutAveraged() {
+      // Uses an array to read an average reading from the HX711 (not scaled for
+      // loadcell sensitivity).
       // Shift the queue.
       for (int i = QUEUE_SIZE - 1; i > 0; i--) {
         hxQueue[i] = hxQueue[i-1];
       }
       
-      // Place the current mass (scaled by sensitivity) in the queue.
+      // Place the current mass (24-bit unscaled number) in the queue.
       hxQueue[0] = getHxReadout();
       
       // Return the average value from the queue.
@@ -581,16 +617,19 @@ void loop() {
     
       
     double getMass() {
+      // Reads instantaneous, tared mass.
       return getHxReadout() / sensitivity - tareWeight;
     }
     
     
     double getMassAveraged() {
+      // Reads averaged, tared mass.
       return getHxReadoutAveraged() / sensitivity - tareWeight;
     }
     
     
     void displayMass(double mass) {
+      // Shows the mass (whether it is instantaneous or averaged) on the LCD.
       clearDisplay();
       String massStr = rightJustify(String(mass, PRECISION), WT_WIDTH);
       printToDisplay(massStr + " " + units, 0, 0);
@@ -598,43 +637,71 @@ void loop() {
     
     
     void listenForButtonInput() {
+      // Checks for a press of the tare button. Allows zero or calibration.
       switch (digitalRead(BTN_TARE)) {
-        case 0: {
+        case 0: { // Use brackets to prevent fall-through warnings.
+          // Prepare to measure how long the button is held.
           unsigned long time_of_press = millis();
+          // Give the user an indication of detection on the display.
           printToDisplay(".", LCD_ROWS - 1, LCD_COLS - 1);
           
           while (digitalRead(BTN_TARE) == 0) {
             // Wait for button release.
           } // Button released.
           
+          // Clear the '.' indicator once the button is released.
           printToDisplay(" ", LCD_ROWS - 1, LCD_COLS - 1);
           
+          // Check when the button was released.
           unsigned long time_of_release = millis();
           
+          // Behavior is determined by length of button press.
           if (time_of_release - time_of_press < CAL_WAIT) {
+            // Use zero to simulate tare because there is no way to clear tare 
+            // with the button.
             zeroSilent();
           } else {
+            // Calibrate if the button was held long enough.
             calibrate();
           }
-          
-          break;
-        }        
-        default: {
+          break; // End of button pressed response.
+        }
+        default: 
           // Buttons are active LOW; do nothing if button isn't pressed.
           break;
-        }
-      }
+      } // End of button-press check.
+    }
+    
+    
+    void calResponse() {
+      // SMA formatted response for calibration.
+      String calStr = String(cal_standard_mass, PRECISION);
+      calStr = rightJustify(calStr, WT_WIDTH);
+      
+      String response = "\n";           // <LF>
+      response += "C";                  // <s>
+      response += String(range);        // <r>
+      response += String(netOrGross()); // <n>
+      response += " ";                  // <m>
+      response += " ";                  // <f>
+      response += calStr;               // <xxxxxx.xxx>
+      response += units;                // <uuu>
+      response += "\r";                 // <CR>
+      Serial.print(response);
     }
     
     
     void calibrate() {
+      // Calibration sequence.
       // Tell the user what mass to use.
       printToDisplay("Cal w/ " + String(cal_standard_mass, PRECISION) + 
         " " + units, 0, 0);
         
+      // Ensure the scale is zeroed.
       zeroSilent();
       
-      // Wait for the mass to get added.
+      // Wait for the mass to get added (no use averaging with no weight on the
+      // scale).
       printToDisplay("Add mass...", 1, 0);
       while (getHxReadout() < CAL_THRESHOLD) {
         // Wait for obvious addition of mass.
@@ -645,11 +712,14 @@ void loop() {
         }
       } // Mass apparently added.
       
+      // Allow the loadcell to settle.
       delay(1000);
       
+      // Clear the averaging queue.
       initQueue();
       double hxReadout;
       
+      // Fill the averaging queue.
       for (int i = QUEUE_SIZE; i>0; i--) {
         // Add extra space to account for change in number of digits displayed.
         printToDisplay("Avg rem: " + String(i) + " ", 1, 0);
@@ -657,16 +727,20 @@ void loop() {
         delay(1000);
       }
       
+      // Determine the new sensitivity.
       sensitivity = hxReadout / cal_standard_mass;
       
+      // Save the sensitivity to hard memory for next time.
       setSensitivity();
+      
+      // Report an instantaneous mass so the user can see if the calibration was
+      // successful.
       reportMass();
     }
     
     
     void getSensitivity() {
-      // Fetch the stored sensitivity value.
-      
+      // Fetch the stored sensitivity value from memory.
       Serial.println("Reading sensitivity from memory...");
       
       char cal_check;
@@ -683,18 +757,21 @@ void loop() {
     
     
     void setSensitivity() {
-      // Send the current sensitivity to memory.
+      // Send the current sensitivity to memory silently.
       EEPROM.put(CAL_SIGNATURE_ADDR, CAL_SIGNATURE);
       EEPROM.put(CAL_VALUE_ADDR, sensitivity);
     }
     
     
     void reportSensitivity() {
+      // No longer used.
       Serial.println("Sensitivity: " + String(sensitivity, PRECISION) + 
         " div/" + units);
     }
     
     
     void softReset() {
+      // Reset the software. This seems to jump back to setup(), but not 
+      // completely reset the Arduino.
       asm volatile (" jmp 0");
     }
