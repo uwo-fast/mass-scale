@@ -36,7 +36,7 @@
 #include "src\Config.hpp" 
 
 
-const String REV = "2.0.0";
+const String REV = "2.0.1";
 
 
 // Hardware objects (uses external libraries).
