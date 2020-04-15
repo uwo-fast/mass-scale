@@ -122,7 +122,7 @@ void loop() {
     void initLoadCell() {
       // Set up the HX711 for use. Turns on the device, then verifies the 
       // calibration value.
-      Serial.println("\nInitializing HX711...");
+      Serial.print("\nInitializing HX711...");
       
       // Turn on the HX711 power supply.
       pinMode(HX_VCC, OUTPUT);
@@ -150,8 +150,7 @@ void loop() {
       // Zero the scale (set the offset on data returned by the HX711).
       zeroSilent();
       
-      Serial.println("HX711 Initialized!");
-      Serial.println();
+      Serial.print("HX711 Initialized!\r\n\r");
     }
     
     
@@ -161,7 +160,7 @@ void loop() {
         return;
       }
       
-      Serial.println("Initializing LCD...");
+      Serial.print("\nInitializing LCD...");
       
       // Turn on the LCD power supply.
       pinMode(LCD_VCC, OUTPUT);
@@ -182,7 +181,7 @@ void loop() {
       lcd.display();
       
       // Test the display.
-      Serial.println("Testing the display...");
+      Serial.print("Testing the display...");
       // Print an 8 to each character in the display.
       for (int i = 0; i < LCD_ROWS * LCD_COLS; i++) {
         lcd.print("8");
@@ -193,8 +192,7 @@ void loop() {
       delay(200);
       lcd.clear();
       
-      Serial.println("LCD initialized!");
-      Serial.println();
+      Serial.print("LCD initialized!\r\n\r");
     }
     
     // TODO: replace averaging queue with a low pass filter.
@@ -784,13 +782,13 @@ void loop() {
     
     void getSensitivity() {
       // Fetch the stored sensitivity value from memory.
-      Serial.println("Reading sensitivity from memory...");
+      Serial.print("\nReading sensitivity from memory...");
       
       char cal_check;
       EEPROM.get(CAL_SIGNATURE_ADDR, cal_check);
       
       if (cal_check != CAL_SIGNATURE) {
-        Serial.println("No sensitivity stored in memory.");
+        Serial.print("No sensitivity stored in memory.\r");
       } else {
         EEPROM.get(CAL_VALUE_ADDR, sensitivity);
       }
@@ -808,8 +806,8 @@ void loop() {
     
     void reportSensitivity() {
       // No longer used.
-      Serial.println("Sensitivity: " + String(sensitivity, precision) + 
-        " div/" + units);
+      Serial.print("\nSensitivity: " + String(sensitivity, precision) + 
+        " div/" + units + "\r\n\r");
     }
     
     
