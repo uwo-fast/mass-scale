@@ -67,6 +67,7 @@ void setup() {
   getSensitivity();
   initQueue();
   pinMode(BTN_TARE, INPUT_PULLUP);
+  Serial.print("\nUse <LF>X?<CR> to view serial commands\r");
 }
 
 
@@ -394,6 +395,27 @@ void loop() {
                     initLCD();
                   }
                   break;
+                  
+                case '?': // Tell the user what commands are available.
+                  Serial.print("\nSMA SCP 0499 Serial Protocol\r");
+                  Serial.print("\nAll cmds: <LF>cmd<CR>\r");
+                  Serial.print("\nw           : averaged Weight\r");
+                  Serial.print("\nz           : Zero scale\r");
+                  Serial.print("\nd           : run Diagnostics\r");
+                  Serial.print("\na           : About, first row\r");
+                  Serial.print("\nb           : aBout, scroll\r");
+                  Serial.print("\nr           : continuous Report\r");
+                  Serial.print("\nt           : Tare scale\r");
+                  Serial.print("\nc           : Clear tare\r");
+                  Serial.print("\nm           : report tare weight\r");
+                  Serial.print("\nxc          : enter Calibration mode\r");
+                  Serial.print("\nxl          : toggle Lcd power\r");
+                  Serial.print("\nxp          : scroll output Precision\r");
+                  Serial.print("\nx?          : list all commands\r");
+                  Serial.print("\nxc######.###: Calibrate with mass (needs 10 digits)\r");
+                  // Give time for everything to send.
+                  Serial.flush();
+                  break;  
                   
                 default:  // Unrecognized custom command.
                   Serial.print("\n?\r");
