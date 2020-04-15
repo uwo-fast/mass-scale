@@ -382,6 +382,18 @@ void loop() {
                   calResponse();
                   calibrate();
                   break;
+                
+                case 'l': // Toggle LCD power.
+                case 'L':
+                  if (isLCD) {
+                    isLCD = false;
+                    lcd.noDisplay();
+                    digitalWrite(LCD_VCC, LOW);
+                  } else if (!isLCD) {
+                    isLCD = true;
+                    initLCD();
+                  }
+                  break;
                   
                 default:  // Unrecognized custom command.
                   Serial.print("\n?\r");
