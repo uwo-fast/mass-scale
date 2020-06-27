@@ -40,12 +40,23 @@
 //  extern const ...
 // Non-constant variables can be defined in a normal fashion ('extern'
 // is not required).
+
+// Serial.
 extern const int BAUD;
+
+// Variables used internally.
+extern double mass;
+extern double tareWeight;
 
 
 class MOST_MassBalance {
   public:
     void initSerial();
+    //void initLoadCell();
+    
+    // Tare.
+    void tareSilent();
+    void clearTareSilent();
 };
     
     

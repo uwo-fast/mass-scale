@@ -53,10 +53,10 @@ MOST_MassBalance myBalance;
 double sensitivity = 1.0;
 // Used as an offset from zero (ie for a container). Implemented in this script,
 // while zero is implemented within the HX711 library.
-double tareWeight = 0.0;
+extern double tareWeight;
 // Measured mass (can be assigned an averaged/filtered value or an instantaneous
 // value.
-double mass;
+extern double mass;
   
 
 void setup() {
@@ -370,7 +370,7 @@ void loop() {
                 case 'c': // Calibrate request (using hard-coded standard mass).
                 case 'C':
                   // Calibration occurs with no tare.
-                  clearTareSilent();
+                  myBalance.clearTareSilent();
                   calResponse();
                   calibrate();
                   break;
@@ -441,7 +441,7 @@ void loop() {
                   // The calibration weight is submitted with 10 characters of 
                   // the value, plus 3 characters of units.
                   // TODO: handle multiple options for units.
-                  clearTareSilent();
+                  myBalance.clearTareSilent();
                   
                   // Read the requested calibration mass.
                   String calStandard = "";
@@ -476,7 +476,7 @@ void loop() {
     void zero() {
       // Uses the HX711 built in tare() command to set the zero (empty bed).
       loadcell.tare(HX_NUM_AVGS);
-      clearTareSilent();
+      myBalance.clearTareSilent();
       
       // Report instantaneous mass (the averaging window won't have caught up to
       // the change yet).
@@ -500,8 +500,9 @@ void loop() {
     void zeroSilent() {
       // Zero without serial response. Used for button-press and calibrate.
       loadcell.tare(HX_NUM_AVGS);
-      clearTareSilent();
+      myBalance.clearTareSilent();
     }
+    
     
     void tare() {
       // Sets the tareWeight to the current measured weight 
@@ -512,23 +513,11 @@ void loop() {
     }
     
     
-    void tareSilent() {
-      // Silently change the tare (no serial output).
-      tareWeight += mass;
-    }
-    
-    
     void clearTare() {
       // Reset the tare.
       tareWeight = 0.0;
       // Report instantaneous mass.
       reportMass();
-    }
-    
-    
-    void clearTareSilent() {
-      // Silently reset the tare.
-      tareWeight = 0.0;
     }
     
     

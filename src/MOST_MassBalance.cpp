@@ -31,6 +31,14 @@
 #include "MOST_MassBalance.h"
 
 
+// Measured mass (can be assigned an averaged/filtered value or an instantaneous
+// value.
+double mass;
+// Used as an offset from zero (ie for a container). Implemented in this script,
+// while zero is implemented within the HX711 library.
+double tareWeight = 0.0;
+
+
 void MOST_MassBalance::initSerial() {
   // Initialize the serial connection.
   Serial.begin(BAUD);
@@ -38,4 +46,16 @@ void MOST_MassBalance::initSerial() {
   while(!Serial) {
     // Wait for serial to initialize.
   } // Serial initialized.
+}
+
+
+void MOST_MassBalance::tareSilent() {
+  // Silently change the tare (no serial output).
+  tareWeight += mass;
+}
+
+
+void MOST_MassBalance::clearTareSilent() {
+  // Silently reset the tare.
+  tareWeight = 0.0;
 }
