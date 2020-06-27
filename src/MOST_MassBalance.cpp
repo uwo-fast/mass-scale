@@ -31,12 +31,14 @@
 #include "MOST_MassBalance.h"
 
 
-// Measured mass (can be assigned an averaged/filtered value or an instantaneous
-// value.
+// Measured mass (can be assigned an averaged/filtered value or an 
+// instantaneous value.
 double mass;
-// Used as an offset from zero (ie for a container). Implemented in this script,
-// while zero is implemented within the HX711 library.
+// Used as an offset from zero (ie for a container). Implemented in this
+// script, while zero is implemented within the HX711 library.
 double tareWeight = 0.0;
+// Sensitivity is read from memory - this is here as a default.
+double sensitivity = 1.0;
 
 
 // INITIALIZATION functions //
@@ -60,6 +62,37 @@ void MOST_MassBalance::tareSilent() {
 void MOST_MassBalance::clearTareSilent() {
   // Silently reset the tare.
   tareWeight = 0.0;
+}
+
+
+// SENSITIVITY Functions //
+void MOST_MassBalance::getSensitivity() {
+  // Fetch the stored sensitivity value from memory.
+  Serial.print(F("\nReading sensitivity from memory..."));
+  
+  char cal_check;
+  EEPROM.get(CAL_SIGNATURE_ADDR, cal_check);
+  
+  if (cal_check != CAL_SIGNATURE) {
+    Serial.print(F("No sensitivity stored in memory.\r"));
+  } else {
+    EEPROM.get(CAL_VALUE_ADDR, sensitivity);
+  }
+  
+  reportSensitivity();
+}
+
+
+void MOST_MassBalance::setSensitivity() {
+  // Send the current sensitivity to memory silently.
+  EEPROM.put(CAL_SIGNATURE_ADDR, CAL_SIGNATURE);
+  EEPROM.put(CAL_VALUE_ADDR, sensitivity);
+}
+
+
+void MOST_MassBalance::reportSensitivity() {
+  Serial.print("\nSensitivity: " + String(sensitivity, precision) + 
+    " div/" + units + "\r\n\r");
 }
 
 

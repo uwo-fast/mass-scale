@@ -32,17 +32,37 @@
 #define MOST_MASS_BALANCE_h
 
 
-#include <Arduino.h>
-
+// Main Arduino library needs to be explicitly included for libraries.
+#include <Arduino.h> 
+// Hard memory read/write. 
+#include <EEPROM.h>
 
 // Configurable variables (defined in external code).
-extern double mass;
-extern double tareWeight;
+// Number of digits after the decimal.
+extern int precision;
+// Unit of mass.
+extern String units;
+
+// Time (ms) that the push button is held to enter calibration mode.
+extern int cal_wait;
 
 
 // Non-configurable variables.
 // Baud rate defined by SMA SCP 0499.
 const double BAUD = 9600;
+
+// Signature to store in the memory when calibrating.
+const char CAL_SIGNATURE = 'C';
+// Address of calibration signature.
+const int CAL_SIGNATURE_ADDR = 0;
+// Address of the stored calibration value.
+const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
+
+
+// Internal Variables.
+extern double mass;
+extern double tareWeight;
+extern double sensitivity;
 
 
 class MOST_MassBalance {
@@ -53,6 +73,11 @@ class MOST_MassBalance {
     // Tare.
     void tareSilent();
     void clearTareSilent();
+    
+    // Sensitivity.
+    void getSensitivity();
+    void setSensitivity();
+    void reportSensitivity();
     
     // Helpers.
     String rightJustify(String str, int width);

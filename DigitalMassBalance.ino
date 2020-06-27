@@ -50,7 +50,7 @@ MOST_MassBalance myBalance;
 
 // Variables used during data collection.
 // Sensitivity is read from memory - this is here as a default.
-double sensitivity = 1.0;
+extern double sensitivity;
 // Used as an offset from zero (ie for a container). Implemented in this script,
 // while zero is implemented within the HX711 library.
 extern double tareWeight;
@@ -66,7 +66,7 @@ void setup() {
   myBalance.initSerial();
   initLoadCell();
   initLCD();
-  getSensitivity();
+  myBalance.getSensitivity();
   initQueue();
   pinMode(BTN_TARE, INPUT_PULLUP);
   Serial.print("\nUse <LF>X?<CR> to view serial commands\r");
@@ -742,41 +742,10 @@ void loop() {
       sensitivity = hxReadout / cal_standard_mass;
       
       // Save the sensitivity to hard memory for next time.
-      setSensitivity();
+      myBalance.setSensitivity();
       
       // Report an instantaneous mass so the user can see if the calibration was
       // successful.
       reportMass();
     }
-    
-    
-    void getSensitivity() {
-      // Fetch the stored sensitivity value from memory.
-      Serial.print("\nReading sensitivity from memory...");
-      
-      char cal_check;
-      EEPROM.get(CAL_SIGNATURE_ADDR, cal_check);
-      
-      if (cal_check != CAL_SIGNATURE) {
-        Serial.print("No sensitivity stored in memory.\r");
-      } else {
-        EEPROM.get(CAL_VALUE_ADDR, sensitivity);
-      }
-      
-      reportSensitivity();
-    }
-    
-    
-    void setSensitivity() {
-      // Send the current sensitivity to memory silently.
-      EEPROM.put(CAL_SIGNATURE_ADDR, CAL_SIGNATURE);
-      EEPROM.put(CAL_VALUE_ADDR, sensitivity);
-    }
-    
-    
-    void reportSensitivity() {
-      // No longer used.
-      Serial.print("\nSensitivity: " + String(sensitivity, precision) + 
-        " div/" + units + "\r\n\r");
-    }
-
+  

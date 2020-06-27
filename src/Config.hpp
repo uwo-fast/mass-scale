@@ -28,15 +28,6 @@
 //----Calibration/Sensitivity----//
   // Button hold length to enter/exit calibration mode (ms).
   const int CAL_WAIT = 3000;
-  
-  // Signature to store in the memory when calibrating.
-  const char CAL_SIGNATURE = 'C';
-
-  // Address of calibration signature.
-  const int CAL_SIGNATURE_ADDR = 0;
-
-  // Address of the stored calibration value.
-  const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
 
   // Mass used to calibrate (default: 1 US cup of water);
   double cal_standard_mass = 235.9;
