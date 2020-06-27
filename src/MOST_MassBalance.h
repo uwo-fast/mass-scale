@@ -109,6 +109,7 @@ class MOST_MassBalance {
     void reportTare();
     void reportMass();
     void reportMassAveraged();
+    void reportSmaFormat(double _mass, String gross_status);
     
     // Sensitivity.
     void getSensitivity();

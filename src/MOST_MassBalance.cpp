@@ -113,23 +113,7 @@ void MOST_MassBalance::initQueue() {
 void MOST_MassBalance::zero() {
   // Uses the HX711 built in tare() command to set the zero (empty bed).
   zeroSilent();
-  
-  // Report instantaneous mass (the averaging window won't have caught 
-  // up to the change yet).
-  mass = getMass();
-  String massStr = rightJustify(String(mass, precision), WT_WIDTH);
-  
-  // SMA formatted response.
-  String response = "\n";           // <LF>
-  response += "Z";                  // <s>
-  response += String(range);        // <r>
-  response += String(getNetOrGross()); // <n>
-  response += " ";                  // <m>
-  response += " ";                  // <f>
-  response += massStr;              // <xxxxxx.xxx>
-  response += units;                // <uuu>
-  response += "\r";                 // <CR>
-  Serial.print(response);
+  reportMass();
 }
 
 
@@ -215,50 +199,41 @@ double MOST_MassBalance::getMassAveraged() {
 // OUTPUT Functions //
 void MOST_MassBalance::reportTare() {
   // Report the tare weight over serial (response to 'M').
-  String tareStr = rightJustify(String(tareWeight, precision), WT_WIDTH);
-  // SMA formatted response.
-  String response = "\n";     // <LF>
-  response += " ";            // <s>
-  response += String(range);  // <r>
-  response += "T";            // <n>
-  response += " ";            // <m>
-  response += " ";            // <f>
-  response += tareStr;        // <xxxxxx.xxx>
-  response += units;          // <uuu>
-  response += "\r";           // <CR>
-  Serial.print(response);
+  reportSmaFormat(tareWeight, "T");
 }
 
 
 void MOST_MassBalance::reportMass() {
   // Reports the instantaneous mass over serial. Used for 'T', 'Z', 'XC'.
-  mass = getMass();
-  String massStr = rightJustify(String(mass, precision), WT_WIDTH);
-  
-  // SMA formatted response.
-  String response = "\n";           // <LF>
-  response += " ";                  // <s>
-  response += String(range);        // <r>
-  response += String(getNetOrGross()); // <n>
-  response += " ";                  // <m>
-  response += " ";                  // <f>
-  response += massStr;              // <xxxxxx.xxx>
-  response += units;                // <uuu>
-  response += "\r";                 // <CR>
-  Serial.print(response);
+  reportSmaFormat(getMass(), getNetOrGross());
 }
 
 
 void MOST_MassBalance::reportMassAveraged() {
   // Reports averaged/filtered mass over serial. Used for 'W' and 'R'
-  mass = getMassAveraged();
-  String massStr = rightJustify(String(mass, precision), WT_WIDTH);
+  reportSmaFormat(getMassAveraged(), getNetOrGross());
+}
+
+
+void MOST_MassBalance::reportSmaFormat(double _mass,
+                                       String gross_status) {
+  // Check for scale status.
+  String scale_status;
+  if (_mass == 0.0) {
+    scale_status = "Z";
+    // TODO: add cases for over-weight, under-weight.
+  } else {
+    scale_status = " ";
+  }
+  
+  // Size and string-ify the mass to report.
+  String massStr = rightJustify(String(_mass, precision), WT_WIDTH);
   
   // SMA formatted response.
   String response = "\n";           // <LF>
-  response += " ";                  // <s>
+  response += scale_status;         // <s>
   response += String(range);        // <r>
-  response += String(getNetOrGross()); // <n>
+  response += gross_status;         // <n>
   response += " ";                  // <m>
   response += " ";                  // <f>
   response += massStr;              // <xxxxxx.xxx>
