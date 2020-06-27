@@ -215,7 +215,7 @@ void loop() {
       // Check for abort command.
       int escIdx = findInArray(cmd, ESC, 0, len);
       if (escIdx >= 0) {  // If there's an escape character, reset.
-        softReset();
+        myBalance.softReset();
       }
       
       // Parse the command for the <LF> and <CR>. The command starts one char
@@ -779,10 +779,4 @@ void loop() {
       Serial.print("\nSensitivity: " + String(sensitivity, precision) + 
         " div/" + units + "\r\n\r");
     }
-    
-    
-    void softReset() {
-      // Reset the software. This seems to jump back to setup(), but not 
-      // completely reset the Arduino.
-      asm volatile (" jmp 0");
-    }
+

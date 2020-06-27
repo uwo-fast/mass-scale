@@ -74,3 +74,10 @@ String MOST_MassBalance::rightJustify(String str, int width) {
   
   return str;
 }
+
+
+void MOST_MassBalance::softReset() {
+  // Reset the software. This seems to jump back to setup(), but not 
+  // completely reset the Arduino.
+  asm volatile (" jmp 0");
+}
