@@ -39,6 +39,8 @@
 // Load cell amplifier.
 #include "HX711/src/HX711.h"
 
+
+// TODO: Move these into class scope after transfer (restrict external access).
 // Configurable variables (defined in external code).
 // Number of digits after the decimal.
 extern int precision;

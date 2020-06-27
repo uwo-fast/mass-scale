@@ -41,8 +41,6 @@ const String REV = "2.0.1";
 
 
 // Hardware objects (uses external libraries).
-// Load cell amplifier.
-extern HX711 loadcell;
 // LCD Display. Pins defined in Pinouts.hpp.
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
