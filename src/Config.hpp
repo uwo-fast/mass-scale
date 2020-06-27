@@ -9,11 +9,7 @@
 //-----HX711----//
   // TODO: Remove this variable after transfer.
   extern const int HX_NUM_AVGS;
-  
-  // TODO: implement indexed queue to save time lost moving numbers around.
-  // Averaging window (applies only to calibrated value, not raw).
-  const int QUEUE_SIZE = 10;
-  double hxQueue[QUEUE_SIZE];
+  extern const int QUEUE_SIZE;
 
 
 //----LCD----//

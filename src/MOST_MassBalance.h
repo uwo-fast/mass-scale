@@ -62,6 +62,9 @@ const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
 
 // Number of averages completed by HX711 library.
 const int HX_NUM_AVGS = 1;
+// Number of averages completed internally.
+const int QUEUE_SIZE = 10;
+
 
 // Internal Variables.
 extern HX711 loadcell;
@@ -69,12 +72,14 @@ extern HX711 loadcell;
 extern double mass;
 extern double tareWeight;
 extern double sensitivity;
+extern double hxQueue[QUEUE_SIZE];
 
 
 class MOST_MassBalance {
   public:
     void initSerial();
     void initLoadCell(int HX_VCC=4, int HX_DT=2, int HX_SCK=3);
+    void initQueue();
     
     // Zero.
     void zeroSilent();
@@ -82,6 +87,12 @@ class MOST_MassBalance {
     // Tare.
     void tareSilent();
     void clearTareSilent();
+    
+    // Mass.
+    double getHxReadout();
+    double getHxReadoutAveraged();
+    double getMass();
+    double getMassAveraged();
     
     // Sensitivity.
     void getSensitivity();

@@ -41,6 +41,10 @@ double mass;
 double tareWeight = 0.0;
 // Sensitivity is read from memory - this is here as a default.
 double sensitivity = 1.0;
+// Averaging window. 
+// TODO: implement indexed queue to save time lost moving numbers around.
+// Averaging window (applies only to calibrated value, not raw).
+double hxQueue[QUEUE_SIZE];
 
 
 // INITIALIZATION functions //
@@ -89,6 +93,14 @@ void MOST_MassBalance::initLoadCell(int HX_VCC, int HX_DT, int HX_SCK) {
 }
 
 
+// TODO: replace averaging queue with a low pass filter.
+void MOST_MassBalance::initQueue() {
+  for (int i = 0; i < QUEUE_SIZE; i++) {
+    hxQueue[i] = 0.00;
+  }
+}
+    
+
 // ZERO Functions //
 void MOST_MassBalance::zeroSilent() {
   // Zero without serial response. Used for button-press and calibrate.
@@ -107,6 +119,47 @@ void MOST_MassBalance::tareSilent() {
 void MOST_MassBalance::clearTareSilent() {
   // Silently reset the tare.
   tareWeight = 0.0;
+}
+
+
+// MASS Functions //
+// TODO: Check for overload.
+double MOST_MassBalance::getHxReadout() {
+  // Read the raw (zeroed) value from the loadcell amplifier.
+  return loadcell.get_value(HX_NUM_AVGS);
+}
+
+
+double MOST_MassBalance::getHxReadoutAveraged() {
+  // Uses an array to read an average reading from the HX711 (not scaled for
+  // loadcell sensitivity).
+  // Shift the queue.
+  for (int i = QUEUE_SIZE - 1; i > 0; i--) {
+    hxQueue[i] = hxQueue[i-1];
+  }
+  
+  // Place the current mass (24-bit unscaled number) in the queue.
+  hxQueue[0] = getHxReadout();
+  
+  // Return the average value from the queue.
+  double sum = 0;
+  for (int i = 0; i < QUEUE_SIZE; i++) {
+    sum += hxQueue[i];
+  }
+  
+  return sum / QUEUE_SIZE;
+}
+
+
+double MOST_MassBalance::getMass() {
+  // Reads instantaneous, tared mass.
+  return getHxReadout() / sensitivity - tareWeight;
+}
+
+
+double MOST_MassBalance::getMassAveraged() {
+  // Reads averaged, tared mass.
+  return getHxReadoutAveraged() / sensitivity - tareWeight;
 }
 
 

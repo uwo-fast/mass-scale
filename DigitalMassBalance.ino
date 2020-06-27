@@ -67,7 +67,7 @@ void setup() {
   myBalance.initLoadCell();
   initLCD();
   myBalance.getSensitivity();
-  initQueue();
+  myBalance.initQueue();
   pinMode(BTN_TARE, INPUT_PULLUP);
   Serial.print("\nUse <LF>X?<CR> to view serial commands\r");
 }
@@ -75,7 +75,7 @@ void setup() {
 
 void loop() {
   // Get the averaged, tared mass.
-  mass = getMassAveraged();
+  mass = myBalance.getMassAveraged();
   
   // Enforce report rate without hampering sample rate (sample rate depends on
   // how much processing is done during each iteration of loop().
@@ -151,13 +151,6 @@ void loop() {
       lcd.clear();
       
       Serial.print("LCD initialized!\r\n\r");
-    }
-    
-    // TODO: replace averaging queue with a low pass filter.
-    void initQueue() {
-      for (int i = 0; i < QUEUE_SIZE; i++) {
-        hxQueue[i] = 0.00;
-      }
     }
     
     
@@ -424,7 +417,7 @@ void loop() {
       
       // Report instantaneous mass (the averaging window won't have caught up to
       // the change yet).
-      mass = getMass();
+      mass = myBalance.getMass();
       String massStr = myBalance.rightJustify(String(mass, precision), WT_WIDTH);
       
       // SMA formatted response.
@@ -477,7 +470,7 @@ void loop() {
     
     void reportMass() {
       // Reports the instantaneous mass over serial. Used for 'T', 'Z', 'XC'.
-      mass = getMass();
+      mass = myBalance.getMass();
       String massStr = myBalance.rightJustify(String(mass, precision), WT_WIDTH);
       
       // SMA formatted response.
@@ -495,7 +488,7 @@ void loop() {
     
     void reportMassAveraged() {
       // Reports averaged/filtered mass over serial. Used for 'W' and 'R'
-      mass = getMassAveraged();
+      mass = myBalance.getMassAveraged();
       String massStr = myBalance.rightJustify(String(mass, precision), WT_WIDTH);
       
       // SMA formatted response.
@@ -523,46 +516,6 @@ void loop() {
       // location.
       lcd.setCursor(col, row);
       lcd.print(output);
-    }
-    
-    
-    // TODO: Check for overload.
-    double getHxReadout() {
-      // Read the raw (zeroed) value from the loadcell amplifier.
-      return loadcell.get_value(HX_NUM_AVGS);
-    }
-    
-    
-    double getHxReadoutAveraged() {
-      // Uses an array to read an average reading from the HX711 (not scaled for
-      // loadcell sensitivity).
-      // Shift the queue.
-      for (int i = QUEUE_SIZE - 1; i > 0; i--) {
-        hxQueue[i] = hxQueue[i-1];
-      }
-      
-      // Place the current mass (24-bit unscaled number) in the queue.
-      hxQueue[0] = getHxReadout();
-      
-      // Return the average value from the queue.
-      double sum = 0;
-      for (int i = 0; i < QUEUE_SIZE; i++) {
-        sum += hxQueue[i];
-      }
-      
-      return sum / QUEUE_SIZE;
-    }
-    
-      
-    double getMass() {
-      // Reads instantaneous, tared mass.
-      return getHxReadout() / sensitivity - tareWeight;
-    }
-    
-    
-    double getMassAveraged() {
-      // Reads averaged, tared mass.
-      return getHxReadoutAveraged() / sensitivity - tareWeight;
     }
     
     
@@ -641,7 +594,7 @@ void loop() {
       // Wait for the mass to get added (no use averaging with no weight on the
       // scale).
       printToDisplay("Add mass...", 1, 0);
-      while (getHxReadout() < CAL_THRESHOLD) {
+      while (myBalance.getHxReadout() < CAL_THRESHOLD) {
         // Wait for obvious addition of mass.
         // Allow user interrupt - cancel if new command received or button
         // pushed.
@@ -654,14 +607,14 @@ void loop() {
       delay(1000);
       
       // Clear the averaging queue.
-      initQueue();
+      myBalance.initQueue();
       double hxReadout;
       
       // Fill the averaging queue.
       for (int i = QUEUE_SIZE; i>0; i--) {
         // Add extra space to account for change in number of digits displayed.
         printToDisplay("Avg rem: " + String(i) + " ", 1, 0);
-        hxReadout = getHxReadoutAveraged();
+        hxReadout = myBalance.getHxReadoutAveraged();
         delay(1000);
       }
       
