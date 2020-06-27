@@ -35,18 +35,14 @@
 #include <Arduino.h>
 
 
-// Variables used extensively but defined externally.
-// When defining these variables, constants must be type-declared:
-//  extern const ...
-// Non-constant variables can be defined in a normal fashion ('extern'
-// is not required).
-
-// Serial.
-extern const int BAUD;
-
-// Variables used internally.
+// Configurable variables (defined in external code).
 extern double mass;
 extern double tareWeight;
+
+
+// Non-configurable variables.
+// Baud rate defined by SMA SCP 0499.
+const double BAUD = 9600;
 
 
 class MOST_MassBalance {
