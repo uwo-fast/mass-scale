@@ -65,6 +65,9 @@ const int HX_NUM_AVGS = 1;
 // Number of averages completed internally.
 const int QUEUE_SIZE = 10;
 
+// Response block width for a weight report.
+const int WT_WIDTH = 10;
+
 
 // Internal Variables.
 extern HX711 loadcell;
@@ -74,6 +77,11 @@ extern double tareWeight;
 extern double sensitivity;
 extern double hxQueue[QUEUE_SIZE];
 
+// Response characteristics.
+extern int precision;
+extern int aboutIdx;
+extern int range;
+
 
 class MOST_MassBalance {
   public:
@@ -82,10 +90,13 @@ class MOST_MassBalance {
     void initQueue();
     
     // Zero.
+    void zero();
     void zeroSilent();
     
     // Tare.
+    void tare();
     void tareSilent();
+    void clearTare();
     void clearTareSilent();
     
     // Mass.
@@ -93,6 +104,11 @@ class MOST_MassBalance {
     double getHxReadoutAveraged();
     double getMass();
     double getMassAveraged();
+    
+    // Output.
+    void reportTare();
+    void reportMass();
+    void reportMassAveraged();
     
     // Sensitivity.
     void getSensitivity();

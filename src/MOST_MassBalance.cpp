@@ -46,6 +46,14 @@ double sensitivity = 1.0;
 // Averaging window (applies only to calibrated value, not raw).
 double hxQueue[QUEUE_SIZE];
 
+// Response characteristics.
+// Number of digits after the decimal.
+int precision = 3;
+// About index.
+int aboutIdx = 4;
+// Scale range to report (this scale is single-range).
+int range = 1;
+
 
 // INITIALIZATION functions //
 void MOST_MassBalance::initSerial() {
@@ -102,6 +110,29 @@ void MOST_MassBalance::initQueue() {
     
 
 // ZERO Functions //
+void MOST_MassBalance::zero() {
+  // Uses the HX711 built in tare() command to set the zero (empty bed).
+  zeroSilent();
+  
+  // Report instantaneous mass (the averaging window won't have caught 
+  // up to the change yet).
+  mass = getMass();
+  String massStr = rightJustify(String(mass, precision), WT_WIDTH);
+  
+  // SMA formatted response.
+  String response = "\n";           // <LF>
+  response += "Z";                  // <s>
+  response += String(range);        // <r>
+  response += String(getNetOrGross()); // <n>
+  response += " ";                  // <m>
+  response += " ";                  // <f>
+  response += massStr;              // <xxxxxx.xxx>
+  response += units;                // <uuu>
+  response += "\r";                 // <CR>
+  Serial.print(response);
+}
+
+
 void MOST_MassBalance::zeroSilent() {
   // Zero without serial response. Used for button-press and calibrate.
   loadcell.tare(HX_NUM_AVGS);
@@ -110,9 +141,26 @@ void MOST_MassBalance::zeroSilent() {
 
 
 // TARE Functions //
+void MOST_MassBalance::tare() {
+  // Sets the tareWeight to the current measured weight 
+  // (accounting for current tare).
+  tareSilent();
+  // Report instantaneous mass.
+  reportMass();
+}
+
+
 void MOST_MassBalance::tareSilent() {
   // Silently change the tare (no serial output).
   tareWeight += mass;
+}
+
+
+void MOST_MassBalance::clearTare() {
+  // Reset the tare.
+  tareWeight = 0.0;
+  // Report instantaneous mass.
+  reportMass();
 }
 
 
@@ -123,6 +171,7 @@ void MOST_MassBalance::clearTareSilent() {
 
 
 // MASS Functions //
+// TODO: Does 'mass' need to be a global variable?
 // TODO: Check for overload.
 double MOST_MassBalance::getHxReadout() {
   // Read the raw (zeroed) value from the loadcell amplifier.
@@ -160,6 +209,62 @@ double MOST_MassBalance::getMass() {
 double MOST_MassBalance::getMassAveraged() {
   // Reads averaged, tared mass.
   return getHxReadoutAveraged() / sensitivity - tareWeight;
+}
+
+
+// OUTPUT Functions //
+void MOST_MassBalance::reportTare() {
+  // Report the tare weight over serial (response to 'M').
+  String tareStr = rightJustify(String(tareWeight, precision), WT_WIDTH);
+  // SMA formatted response.
+  String response = "\n";     // <LF>
+  response += " ";            // <s>
+  response += String(range);  // <r>
+  response += "T";            // <n>
+  response += " ";            // <m>
+  response += " ";            // <f>
+  response += tareStr;        // <xxxxxx.xxx>
+  response += units;          // <uuu>
+  response += "\r";           // <CR>
+  Serial.print(response);
+}
+
+
+void MOST_MassBalance::reportMass() {
+  // Reports the instantaneous mass over serial. Used for 'T', 'Z', 'XC'.
+  mass = getMass();
+  String massStr = rightJustify(String(mass, precision), WT_WIDTH);
+  
+  // SMA formatted response.
+  String response = "\n";           // <LF>
+  response += " ";                  // <s>
+  response += String(range);        // <r>
+  response += String(getNetOrGross()); // <n>
+  response += " ";                  // <m>
+  response += " ";                  // <f>
+  response += massStr;              // <xxxxxx.xxx>
+  response += units;                // <uuu>
+  response += "\r";                 // <CR>
+  Serial.print(response);
+}
+
+
+void MOST_MassBalance::reportMassAveraged() {
+  // Reports averaged/filtered mass over serial. Used for 'W' and 'R'
+  mass = getMassAveraged();
+  String massStr = rightJustify(String(mass, precision), WT_WIDTH);
+  
+  // SMA formatted response.
+  String response = "\n";           // <LF>
+  response += " ";                  // <s>
+  response += String(range);        // <r>
+  response += String(getNetOrGross()); // <n>
+  response += " ";                  // <m>
+  response += " ";                  // <f>
+  response += massStr;              // <xxxxxx.xxx>
+  response += units;                // <uuu>
+  response += "\r";                 // <CR>
+  Serial.print(response);
 }
 
 

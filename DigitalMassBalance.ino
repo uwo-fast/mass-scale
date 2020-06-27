@@ -96,7 +96,7 @@ void loop() {
     }
     
     if (isContinuousReport) {
-      reportMassAveraged();
+      myBalance.reportMassAveraged();
     }
     
     // Simple scale functionality. Note that placement of button listener 
@@ -230,12 +230,12 @@ void loop() {
           switch ((char) cmd[startIdx]) {
             case 'w': // Report weight.
             case 'W':
-              reportMassAveraged();
+              myBalance.reportMassAveraged();
               break;
               
             case 'z': // Zero request.
             case 'Z':
-              zero();
+              myBalance.zero();
               break;
               
             case 'd': // Run diagnostics.
@@ -279,17 +279,17 @@ void loop() {
               
             case 't': // Tare request.
             case 'T':
-              tare();
+              myBalance.tare();
               break;
               
             case 'c': // Clear tare.
             case 'C':
-              clearTare();
+              myBalance.clearTare();
               break;
               
             case 'm': // Return the current tare weight.
             case 'M':
-              reportTare();
+              myBalance.reportTare();
               break;
               
             default:  // Unknown command.
@@ -410,101 +410,6 @@ void loop() {
 
   
   //----Other----//
-    void zero() {
-      // Uses the HX711 built in tare() command to set the zero (empty bed).
-      loadcell.tare(HX_NUM_AVGS);
-      myBalance.clearTareSilent();
-      
-      // Report instantaneous mass (the averaging window won't have caught up to
-      // the change yet).
-      mass = myBalance.getMass();
-      String massStr = myBalance.rightJustify(String(mass, precision), WT_WIDTH);
-      
-      // SMA formatted response.
-      String response = "\n";           // <LF>
-      response += "Z";                  // <s>
-      response += String(range);        // <r>
-      response += String(myBalance.getNetOrGross()); // <n>
-      response += " ";                  // <m>
-      response += " ";                  // <f>
-      response += massStr;              // <xxxxxx.xxx>
-      response += units;                // <uuu>
-      response += "\r";                 // <CR>
-      Serial.print(response);
-    }
-    
-    
-    void tare() {
-      // Sets the tareWeight to the current measured weight 
-      // (accounting for current tare).
-      tareWeight += mass;
-      // Report instantaneous mass.
-      reportMass();
-    }
-    
-    
-    void clearTare() {
-      // Reset the tare.
-      tareWeight = 0.0;
-      // Report instantaneous mass.
-      reportMass();
-    }
-    
-    
-    void reportTare() {
-      // Report the tare weight over serial (response to 'M').
-      String tareStr = myBalance.rightJustify(String(tareWeight, precision), WT_WIDTH);
-      // SMA formatted response.
-      String response = "\n";     // <LF>
-      response += " ";            // <s>
-      response += String(range);  // <r>
-      response += "T";            // <n>
-      response += " ";            // <m>
-      response += " ";            // <f>
-      response += tareStr;        // <xxxxxx.xxx>
-      response += units;          // <uuu>
-      response += "\r";           // <CR>
-      Serial.print(response);
-    }
-    
-    
-    void reportMass() {
-      // Reports the instantaneous mass over serial. Used for 'T', 'Z', 'XC'.
-      mass = myBalance.getMass();
-      String massStr = myBalance.rightJustify(String(mass, precision), WT_WIDTH);
-      
-      // SMA formatted response.
-      String response = "\n";           // <LF>
-      response += " ";                  // <s>
-      response += String(range);        // <r>
-      response += String(myBalance.getNetOrGross()); // <n>
-      response += " ";                  // <m>
-      response += " ";                  // <f>
-      response += massStr;              // <xxxxxx.xxx>
-      response += units;                // <uuu>
-      response += "\r";                 // <CR>
-      Serial.print(response);
-    }
-    
-    void reportMassAveraged() {
-      // Reports averaged/filtered mass over serial. Used for 'W' and 'R'
-      mass = myBalance.getMassAveraged();
-      String massStr = myBalance.rightJustify(String(mass, precision), WT_WIDTH);
-      
-      // SMA formatted response.
-      String response = "\n";           // <LF>
-      response += " ";                  // <s>
-      response += String(range);        // <r>
-      response += String(myBalance.getNetOrGross()); // <n>
-      response += " ";                  // <m>
-      response += " ";                  // <f>
-      response += massStr;              // <xxxxxx.xxx>
-      response += units;                // <uuu>
-      response += "\r";                 // <CR>
-      Serial.print(response);
-    }
-    
-    
     void clearDisplay() {
       // Remove all information from the LCD.
       lcd.clear();
@@ -626,6 +531,6 @@ void loop() {
       
       // Report an instantaneous mass so the user can see if the calibration was
       // successful.
-      reportMass();
+      myBalance.reportMass();
     }
   
