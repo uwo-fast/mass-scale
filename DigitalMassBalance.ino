@@ -42,7 +42,7 @@ const String REV = "2.0.1";
 
 // Hardware objects (uses external libraries).
 // Load cell amplifier.
-HX711 loadcell;
+extern HX711 loadcell;
 // LCD Display. Pins defined in Pinouts.hpp.
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
@@ -64,7 +64,7 @@ void setup() {
   // 1.0.0 report non-standard information over serial. Those at startup are the
   // only non-standard serial communications this scale produces.
   myBalance.initSerial();
-  initLoadCell();
+  myBalance.initLoadCell();
   initLCD();
   myBalance.getSensitivity();
   initQueue();
@@ -110,41 +110,6 @@ void loop() {
 
 //----Support methods----//
   //----Initialize----//
-
-    
-    void initLoadCell() {
-      // Set up the HX711 for use. Turns on the device, then verifies the 
-      // calibration value.
-      Serial.print("\nInitializing HX711...");
-      
-      // Turn on the HX711 power supply.
-      pinMode(HX_VCC, OUTPUT);
-      digitalWrite(HX_VCC, HIGH);
-      
-      // Give it time to power on.
-      delay(500);
-      
-      // Initialize the HX711.
-      loadcell.begin(HX_DT, HX_SCK);
-      
-      // Wait until it's ready.
-      bool is_ready = false;
-      int num_retries = 3;
-      int wait_delay = 200;
-      while (!is_ready) {
-        // Give some indication that it's thinking.
-        Serial.print("...");
-        is_ready = loadcell.wait_ready_retry(num_retries, wait_delay);
-      }
-      
-      // Give the HX711 a chance to finish initializing.
-      delay(2000);
-      
-      // Zero the scale (set the offset on data returned by the HX711).
-      zeroSilent();
-      
-      Serial.print("HX711 Initialized!\r\n\r");
-    }
     
     
     void initLCD() {
@@ -497,13 +462,6 @@ void loop() {
     }
     
     
-    void zeroSilent() {
-      // Zero without serial response. Used for button-press and calibrate.
-      loadcell.tare(HX_NUM_AVGS);
-      myBalance.clearTareSilent();
-    }
-    
-    
     void tare() {
       // Sets the tareWeight to the current measured weight 
       // (accounting for current tare).
@@ -660,7 +618,7 @@ void loop() {
           if (time_of_release - time_of_press < CAL_WAIT) {
             // Use zero to simulate tare because there is no way to clear tare 
             // with the button.
-            zeroSilent();
+            myBalance.zeroSilent();
           } else {
             // Calibrate if the button was held long enough.
             calibrate();
@@ -699,7 +657,7 @@ void loop() {
         " " + units, 0, 0);
         
       // Ensure the scale is zeroed.
-      zeroSilent();
+      myBalance.zeroSilent();
       
       // Wait for the mass to get added (no use averaging with no weight on the
       // scale).

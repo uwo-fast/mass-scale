@@ -7,10 +7,10 @@
 
 
 //-----HX711----//
-  // Number of averages while measuring. *Set to 1 because the library's averaging
-  // is too slow and interferes with other interactions.
-  const int HX_NUM_AVGS = 1;
+  // TODO: Remove this variable after transfer.
+  extern const int HX_NUM_AVGS;
   
+  // TODO: implement indexed queue to save time lost moving numbers around.
   // Averaging window (applies only to calibrated value, not raw).
   const int QUEUE_SIZE = 10;
   double hxQueue[QUEUE_SIZE];

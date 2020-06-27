@@ -31,6 +31,8 @@
 #include "MOST_MassBalance.h"
 
 
+HX711 loadcell;
+
 // Measured mass (can be assigned an averaged/filtered value or an 
 // instantaneous value.
 double mass;
@@ -49,6 +51,49 @@ void MOST_MassBalance::initSerial() {
   while(!Serial) {
     // Wait for serial to initialize.
   } // Serial initialized.
+}
+
+
+void MOST_MassBalance::initLoadCell(int HX_VCC, int HX_DT, int HX_SCK) {
+  // Set up the HX711 for use. Turns on the device, then verifies the 
+  // calibration value.
+  Serial.print(F("\nInitializing HX711..."));
+  
+  // Turn on the HX711 power supply.
+  pinMode(HX_VCC, OUTPUT);
+  digitalWrite(HX_VCC, HIGH);
+  
+  // Give it time to power on.
+  delay(500);
+  
+  // Initialize the HX711.
+  loadcell.begin(HX_DT, HX_SCK);
+  
+  // Wait until it's ready.
+  bool is_ready = false;
+  int num_retries = 3;
+  int wait_delay = 200;
+  while (!is_ready) {
+    // Give some indication that it's thinking.
+    Serial.print(F("..."));
+    is_ready = loadcell.wait_ready_retry(num_retries, wait_delay);
+  }
+  
+  // Give the HX711 a chance to finish initializing.
+  delay(2000);
+  
+  // Zero the scale (set the offset on data returned by the HX711).
+  zeroSilent();
+  
+  Serial.print(F("HX711 Initialized!\r\n\r"));
+}
+
+
+// ZERO Functions //
+void MOST_MassBalance::zeroSilent() {
+  // Zero without serial response. Used for button-press and calibrate.
+  loadcell.tare(HX_NUM_AVGS);
+  clearTareSilent();
 }
 
 

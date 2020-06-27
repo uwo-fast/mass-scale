@@ -36,6 +36,8 @@
 #include <Arduino.h> 
 // Hard memory read/write. 
 #include <EEPROM.h>
+// Load cell amplifier.
+#include "HX711/src/HX711.h"
 
 // Configurable variables (defined in external code).
 // Number of digits after the decimal.
@@ -58,8 +60,12 @@ const int CAL_SIGNATURE_ADDR = 0;
 // Address of the stored calibration value.
 const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
 
+// Number of averages completed by HX711 library.
+const int HX_NUM_AVGS = 1;
 
 // Internal Variables.
+extern HX711 loadcell;
+
 extern double mass;
 extern double tareWeight;
 extern double sensitivity;
@@ -68,7 +74,10 @@ extern double sensitivity;
 class MOST_MassBalance {
   public:
     void initSerial();
-    //void initLoadCell();
+    void initLoadCell(int HX_VCC=4, int HX_DT=2, int HX_SCK=3);
+    
+    // Zero.
+    void zeroSilent();
     
     // Tare.
     void tareSilent();
