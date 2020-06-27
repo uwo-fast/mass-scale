@@ -89,6 +89,7 @@ class MOST_MassBalance {
     void reportSensitivity();
     
     // Helpers.
+    int findInArray(int *array, int query, int startSearch, int endSearch);
     String rightJustify(String str, int width);
     String getNetOrGross();
     void softReset();

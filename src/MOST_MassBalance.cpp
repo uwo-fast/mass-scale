@@ -142,6 +142,30 @@ void MOST_MassBalance::reportSensitivity() {
 
 
 // HELPER Functions //
+int MOST_MassBalance::findInArray(int *array,
+                                  int query,
+                                  int startSearch,
+                                  int endSearch) {
+  // Finds a character in an integer array. Used to find <CR> and <LF>.
+  // Account for incrementing i at top of loop.
+  int i = startSearch - 1;
+  int c;  // Character being checked.
+  do {
+    // Increment i.
+    i++;
+    // Read a character from the array.
+    c = array[i];
+    
+    // Don't go looking where there is nothing to be found.
+    if (i > endSearch) {
+      return -1;
+    }
+  } while (c != query);
+  
+  return i;
+}
+
+
 String MOST_MassBalance::rightJustify(String str, int width) {
   // Sets a string right justified within a window. Used for formatting
   // numbers to SMA specification on serial output.

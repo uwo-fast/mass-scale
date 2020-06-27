@@ -178,15 +178,15 @@ void loop() {
       receiveCommand(cmd, len);
       
       // Check for abort command.
-      int escIdx = findInArray(cmd, ESC, 0, len);
+      int escIdx = myBalance.findInArray(cmd, ESC, 0, len);
       if (escIdx >= 0) {  // If there's an escape character, reset.
         myBalance.softReset();
       }
       
       // Parse the command for the <LF> and <CR>. The command starts one char
       // beyond the LF, and ends with the CR.
-      int startIdx = findInArray(cmd, LF, 0, len) + 1;
-      int endIdx = findInArray(cmd, CR, startIdx, len);
+      int startIdx = myBalance.findInArray(cmd, LF, 0, len) + 1;
+      int endIdx = myBalance.findInArray(cmd, CR, startIdx, len);
       
       // Check for errors. Since we start after the LF, minimum index is 1. 
       // Note that findInArray returns -1 if it cannot find the character.
@@ -221,27 +221,6 @@ void loop() {
         // Chuck it at the end of the array.
         cmd[len-1] = Serial.read();
       }
-    }
-   
-    
-    int findInArray(int *array, int query, int startSearch, int endSearch) {
-      // Finds a character in an integer array. Used to find <CR> and <LF>.
-      // Account for incrementing i at top of loop.
-      int i = startSearch - 1;
-      int c;  // Character being checked.
-      do {
-        // Increment i.
-        i++;
-        // Read a character from the array.
-        c = array[i];
-        
-        // Don't go looking where there is nothing to be found.
-        if (i > endSearch) {
-          return -1;
-        }
-      } while (c != query);
-      
-      return i;
     }
     
     
