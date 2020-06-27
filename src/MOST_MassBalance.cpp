@@ -109,6 +109,16 @@ String MOST_MassBalance::rightJustify(String str, int width) {
 }
 
 
+String MOST_MassBalance::getNetOrGross() {
+  // Net/Gross status. Net if tared, Gross if tare = 0.
+  if (tareWeight == 0) {
+    return "G";
+  } else {
+    return "N";
+  }
+}
+
+
 void MOST_MassBalance::softReset() {
   // Reset the software. This seems to jump back to setup(), but not 
   // completely reset the Arduino.

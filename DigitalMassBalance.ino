@@ -487,7 +487,7 @@ void loop() {
       String response = "\n";           // <LF>
       response += "Z";                  // <s>
       response += String(range);        // <r>
-      response += String(netOrGross()); // <n>
+      response += String(myBalance.getNetOrGross()); // <n>
       response += " ";                  // <m>
       response += " ";                  // <f>
       response += massStr;              // <xxxxxx.xxx>
@@ -538,16 +538,6 @@ void loop() {
     }
     
     
-    String netOrGross() {
-      // Net/Gross status. Net if tared, Gross if tare = 0.
-      if (tareWeight == 0) {
-        return "G";
-      } else {
-        return "N";
-      }
-    }
-    
-    
     void reportMass() {
       // Reports the instantaneous mass over serial. Used for 'T', 'Z', 'XC'.
       mass = getMass();
@@ -557,7 +547,7 @@ void loop() {
       String response = "\n";           // <LF>
       response += " ";                  // <s>
       response += String(range);        // <r>
-      response += String(netOrGross()); // <n>
+      response += String(myBalance.getNetOrGross()); // <n>
       response += " ";                  // <m>
       response += " ";                  // <f>
       response += massStr;              // <xxxxxx.xxx>
@@ -575,7 +565,7 @@ void loop() {
       String response = "\n";           // <LF>
       response += " ";                  // <s>
       response += String(range);        // <r>
-      response += String(netOrGross()); // <n>
+      response += String(myBalance.getNetOrGross()); // <n>
       response += " ";                  // <m>
       response += " ";                  // <f>
       response += massStr;              // <xxxxxx.xxx>
@@ -692,7 +682,7 @@ void loop() {
       String response = "\n";           // <LF>
       response += "C";                  // <s>
       response += String(range);        // <r>
-      response += String(netOrGross()); // <n>
+      response += String(myBalance.getNetOrGross()); // <n>
       response += " ";                  // <m>
       response += " ";                  // <f>
       response += calStr;               // <xxxxxx.xxx>

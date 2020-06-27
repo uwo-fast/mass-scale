@@ -81,6 +81,7 @@ class MOST_MassBalance {
     
     // Helpers.
     String rightJustify(String str, int width);
+    String getNetOrGross();
     void softReset();
 
 };
