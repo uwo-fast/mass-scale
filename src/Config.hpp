@@ -49,7 +49,7 @@
  
 //----Serial----//
   // Communication rate.
-  const int BAUD = 9600;
+  extern const int BAUD = 9600;
   const int REPORT_RATE = 1; // Hz
   unsigned long lastRefresh = 1;  // milliseconds
   

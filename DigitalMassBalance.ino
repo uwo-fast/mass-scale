@@ -34,6 +34,7 @@
 #include "src\Libraries.hpp"
 #include "src\Pinouts.hpp"
 #include "src\Config.hpp" 
+#include "src\MOST_MassBalance.h"
 
 
 const String REV = "2.0.1";
@@ -45,6 +46,7 @@ HX711 loadcell;
 // LCD Display. Pins defined in Pinouts.hpp.
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
+MOST_MassBalance myBalance;
 
 // Variables used during data collection.
 // Sensitivity is read from memory - this is here as a default.
@@ -61,7 +63,7 @@ void setup() {
   // Initialization methods have self-explanatory names. Initializers as of REV
   // 1.0.0 report non-standard information over serial. Those at startup are the
   // only non-standard serial communications this scale produces.
-  initSerial();
+  myBalance.initSerial();
   initLoadCell();
   initLCD();
   getSensitivity();
@@ -108,16 +110,7 @@ void loop() {
 
 //----Support methods----//
   //----Initialize----//
-    void initSerial() {
-      // Initialize the serial connection. BAUD is defined in Config.hpp to 
-      // match the SMA standard.
-      Serial.begin(BAUD);
-      
-      while(!Serial) {
-        // Wait for serial to initialize.
-      } // Serial initialized.
-    }
-    
+
     
     void initLoadCell() {
       // Set up the HX711 for use. Turns on the device, then verifies the 
