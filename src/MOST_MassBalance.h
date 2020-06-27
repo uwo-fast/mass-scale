@@ -53,6 +53,10 @@ class MOST_MassBalance {
     // Tare.
     void tareSilent();
     void clearTareSilent();
+    
+    // Helpers.
+    String rightJustify(String str, int width);
+
 };
     
     

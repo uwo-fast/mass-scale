@@ -39,6 +39,7 @@ double mass;
 double tareWeight = 0.0;
 
 
+// INITIALIZATION functions //
 void MOST_MassBalance::initSerial() {
   // Initialize the serial connection.
   Serial.begin(BAUD);
@@ -49,6 +50,7 @@ void MOST_MassBalance::initSerial() {
 }
 
 
+// TARE Functions //
 void MOST_MassBalance::tareSilent() {
   // Silently change the tare (no serial output).
   tareWeight += mass;
@@ -58,4 +60,17 @@ void MOST_MassBalance::tareSilent() {
 void MOST_MassBalance::clearTareSilent() {
   // Silently reset the tare.
   tareWeight = 0.0;
+}
+
+
+// HELPER Functions //
+String MOST_MassBalance::rightJustify(String str, int width) {
+  // Sets a string right justified within a window. Used for formatting
+  // numbers to SMA specification on serial output.
+  int numWhtSpc = width - str.length();
+  for (int i = 0; i < numWhtSpc; i++) {
+    str = " " + str;
+  }
+  
+  return str;
 }

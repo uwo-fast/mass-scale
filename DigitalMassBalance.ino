@@ -481,7 +481,7 @@ void loop() {
       // Report instantaneous mass (the averaging window won't have caught up to
       // the change yet).
       mass = getMass();
-      String massStr = rightJustify(String(mass, precision), WT_WIDTH);
+      String massStr = myBalance.rightJustify(String(mass, precision), WT_WIDTH);
       
       // SMA formatted response.
       String response = "\n";           // <LF>
@@ -523,7 +523,7 @@ void loop() {
     
     void reportTare() {
       // Report the tare weight over serial (response to 'M').
-      String tareStr = rightJustify(String(tareWeight, precision), WT_WIDTH);
+      String tareStr = myBalance.rightJustify(String(tareWeight, precision), WT_WIDTH);
       // SMA formatted response.
       String response = "\n";     // <LF>
       response += " ";            // <s>
@@ -535,18 +535,6 @@ void loop() {
       response += units;          // <uuu>
       response += "\r";           // <CR>
       Serial.print(response);
-    }
-    
-    
-    String rightJustify(String str, int width) {
-      // Sets a string right justified within a window. Used for formatting
-      // numbers to SMA specification on serial output.
-      int numWhtSpc = width - str.length();
-      for (int i = 0; i < numWhtSpc; i++) {
-        str = " " + str;
-      }
-      
-      return str;
     }
     
     
@@ -563,7 +551,7 @@ void loop() {
     void reportMass() {
       // Reports the instantaneous mass over serial. Used for 'T', 'Z', 'XC'.
       mass = getMass();
-      String massStr = rightJustify(String(mass, precision), WT_WIDTH);
+      String massStr = myBalance.rightJustify(String(mass, precision), WT_WIDTH);
       
       // SMA formatted response.
       String response = "\n";           // <LF>
@@ -581,7 +569,7 @@ void loop() {
     void reportMassAveraged() {
       // Reports averaged/filtered mass over serial. Used for 'W' and 'R'
       mass = getMassAveraged();
-      String massStr = rightJustify(String(mass, precision), WT_WIDTH);
+      String massStr = myBalance.rightJustify(String(mass, precision), WT_WIDTH);
       
       // SMA formatted response.
       String response = "\n";           // <LF>
@@ -654,7 +642,7 @@ void loop() {
     void displayMass(double mass) {
       // Shows the mass (whether it is instantaneous or averaged) on the LCD.
       clearDisplay();
-      String massStr = rightJustify(String(mass, precision), WT_WIDTH);
+      String massStr = myBalance.rightJustify(String(mass, precision), WT_WIDTH);
       printToDisplay(massStr + " " + units, 0, 0);
     }
     
@@ -699,7 +687,7 @@ void loop() {
     void calResponse() {
       // SMA formatted response for calibration.
       String calStr = String(cal_standard_mass, precision);
-      calStr = rightJustify(calStr, WT_WIDTH);
+      calStr = myBalance.rightJustify(calStr, WT_WIDTH);
       
       String response = "\n";           // <LF>
       response += "C";                  // <s>
