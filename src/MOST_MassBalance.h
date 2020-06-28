@@ -165,6 +165,8 @@ class MOST_MassBalance {
 
     // Response block width for a weight report.
     const int WT_WIDTH = 10;
+    // Response block width for a unit.
+    const int UNIT_WIDTH = 3;
     
     
     // Internal Variables.

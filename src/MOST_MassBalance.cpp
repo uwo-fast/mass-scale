@@ -56,7 +56,7 @@ MOST_MassBalance::MOST_MassBalance(Display *_display,
   DISPLAY_VCC = display_vcc;
   BTN_TARE = btn_tare;
   cal_standard_mass = _cal_standard_mass;
-  cal_standard_units = rightJustify(_cal_standard_units, 3);
+  cal_standard_units = rightJustify(_cal_standard_units, UNIT_WIDTH);
 }
 
 
@@ -375,7 +375,9 @@ void MOST_MassBalance::getSensitivity() {
   } else {
     // The expected character is there.
     EEPROM.get(CAL_VALUE_ADDR, sensitivity);
-    EEPROM.get(CAL_UNITS_ADDR, units);
+    for (int i = 0; i < UNIT_WIDTH; i++) {
+      EEPROM.get(CAL_UNITS_ADDR + sizeof(char)*i, units[i]);
+    }
   }
   
   reportSensitivity();
@@ -452,8 +454,10 @@ void MOST_MassBalance::calibrate() {
 
 void MOST_MassBalance::setUnits(String _units) {
   // Change the units string, enforcing right-justified 3-char wide.
-  units = rightJustify(_units, 3);
-  EEPROM.put(CAL_UNITS_ADDR, units);
+  units = rightJustify(_units, UNIT_WIDTH);
+  for (int i = 0; i < UNIT_WIDTH; i++) {
+    EEPROM.put(CAL_UNITS_ADDR + sizeof(char)*i, units[i]);
+  }
 }
 
 
@@ -590,8 +594,9 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
   // To combat this, interpret commands by length.
   // First, cancel continuous reporting.
   isContinuousReport = 0;
+  int cmdLength = endIdx - startIdx;
   
-  switch (endIdx - startIdx) {
+  switch (cmdLength) {
     case 1:   // Single character commands.
       switch ((char) cmd[startIdx]) {
         case 'w': // Report weight.
@@ -736,18 +741,16 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
             case 'C': { // Brackets prevent fall-through warnings.
               // The calibration weight is submitted with 10 characters
               // of the value, plus 3 characters of units.
-              // TODO: handle multiple options for units.
-              // TODO: accept cal_std with or without units.
               // Read the requested calibration mass.
               String calStandard = "";
-              for (int i = 0; i < 10; i++) {
+              for (int i = 0; i < WT_WIDTH; i++) {
                 calStandard += String((char) cmd[startIdx + 2 + i]);
               }
               
               // Read the units, if provided.
               String _units = "";
-              for (int i = 10; i < 13; i++) {
-                _units += String((char) cmd[startIdx + 2 + i]);
+              for (int i = 0; i < cmdLength-WT_WIDTH-2; i++) {
+                _units += String((char) cmd[startIdx + 2 + WT_WIDTH + i]);
               }
               
               if (_units != "") {
@@ -770,7 +773,7 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
           break;
       } // End of 12/15 character commands.
       break;
-      
+    // TODO: Toggle units and apply scaling factors.
     default:  // Unrecognized command length.
       Serial.print(F("\n?\r"));
       break;
