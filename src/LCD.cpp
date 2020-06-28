@@ -81,6 +81,12 @@ void LCD::init(int vccPin) {
 }
 
 
+void LCD::shutdown(int vccPin) {
+  lcd->noDisplay();
+  digitalWrite(vccPin, LOW);
+}
+
+
 void LCD::print(String output, int row, int col) {
   // Sends a formatted string to the LCD, starting at the requested 
   // location.

@@ -1,7 +1,8 @@
 /*  MOST_MassBalance is a library of drivers for a digital mass balance
       
       This firmware is designed to meet SMA SCP 0499 Level #2 for scale
-      serial communication. The command and response formats for serial communication are documented in included files.
+      serial communication. The command and response formats for serial 
+      communication are documented in included files.
       
       The scale was designed by researchers in Michigan Technological 
       University's MOST group <https://www.appropedia.org/Category:MOST>
@@ -63,58 +64,16 @@ class MOST_MassBalance {
     MOST_MassBalance(Display *_display=NULL,
                      int display_vcc=5,
                      int btn_tare=8,
-                     double cal_standard_mass=100,
-                     String units="g");
+                     double _cal_standard_mass=100,
+                     String _cal_standard_units="g");
                      
     void measureListenReportAtRate(double report_rate=1.0);
     
     // Initialization.
     void begin();
     
-    // Zero.
-    void zero();
-    void zeroSilent();
-    
-    // Tare.
-    void tare();
-    void tareSilent();
-    void clearTare();
-    void clearTareSilent();
-    
     // Mass.
-    double getHxReadout();
-    double getHxReadoutAveraged();
-    double getMass();
     double getMassAveraged();
-    
-    // Input.
-    void listenForButtonInput();
-    
-    // Output.
-    void reportTare();
-    void reportMass();
-    void reportMassAveraged();
-    void reportSmaFormat(double _mass, String gross_status);
-    void displayMass(double _mass);
-    void reportCalibrationMass();
-    
-    // Sensitivity.
-    void getSensitivity();
-    void setSensitivity();
-    void reportSensitivity();
-    void calibrate();
-    void setUnits(String units);
-    
-    // Helpers.
-    int findInArray(int *array, int query, int startSearch, int endSearch);
-    String rightJustify(String str, int width);
-    String getNetOrGross();
-    void softReset();
-    
-    // Serial.
-    void doSerial();
-    void receiveCommand(int *cmd, int len);
-    void doCommand(int *cmd, int startIdx, int endIdx);
     
   private:
     //-------------Values---------------------------------------------//
@@ -126,8 +85,8 @@ class MOST_MassBalance {
     int BTN_TARE;
     // Calibration standard.
     double cal_standard_mass;
-    // Unit of mass.
-    String units;
+    // Calibration standard units.
+    String cal_standard_units;
     
     
     // Response characteristics.
@@ -149,6 +108,8 @@ class MOST_MassBalance {
     const int CAL_SIGNATURE_ADDR = 0;
     // Address of the stored calibration value.
     const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
+    // Address of units values.
+    const int CAL_UNITS_ADDR = CAL_VALUE_ADDR + sizeof(double);
     // Time (ms) that the push button is held to enter calibration mode.
     const uint16_t CAL_WAIT = 3000;
     // Threshold to begin calibration (to prevent premature measuring).
@@ -157,20 +118,27 @@ class MOST_MassBalance {
     // Number of averages completed by HX711 library.
     const int HX_NUM_AVGS = 1;
     // Number of averages completed internally.
-    const int QUEUE_SIZE = 10;
+    const uint16_t QUEUE_SIZE = 10;
 
     // Response block width for a weight report.
     const int WT_WIDTH = 10;
+    // Response block width for a unit.
+    const int UNIT_WIDTH = 3;
     
     
     // Internal Variables.
     HX711 loadcell;
 
-    double mass;
-    double tareWeight;
-    double sensitivity;
+    // Used as an offset from zero (ie for a container). Tare is done in
+    // this script, while zero is implemented within the HX711 library.
+    double tareWeight = 0.0;
+    // Load cell sensitivity - will update from memory.
+    double sensitivity = 1.0;
+    // Measured mass units - will update from memory.
+    String units = "  g";
     double *hxQueue;
     bool isContinuousReport = 0;
+    bool isDisplayOn = 1;
     
     // Non-printable ASCII characters.
     const int LF = 0x0A;
@@ -180,11 +148,61 @@ class MOST_MassBalance {
     
     
     //-------------Functions------------------------------------------//
+    // Kept private because the serial API serves as the interface.
     // Initialization.
     void initSerial();
     void initLoadCell(int HX_VCC=4, int HX_DT=2, int HX_SCK=3);
     void initDisplay();
     void initQueue();
+    
+    // Zero.
+    void zero();
+    void zeroSilent();
+    
+    // Tare.
+    void tare();
+    void tareSilent();
+    void clearTare();
+    void clearTareSilent();
+    
+    // Mass.
+    double getHxReadout();
+    double getHxReadoutAveraged();
+    double getMass();
+    
+    // Input.
+    void listenForButtonInput();
+    
+    // Output.
+    void reportTare();
+    double reportMass();
+    double reportMassAveraged();
+    void reportSmaFormat(double _mass,
+                         String _units,
+                         String gross_status);
+    void displayMass(double _mass);
+    void printToDisplay(String output, int row, int col);
+    void clearDisplay();
+    void shutdownDisplay();
+    void reportCalibrationMass();
+    
+    // Sensitivity.
+    void getSensitivity();
+    void setSensitivity();
+    void reportSensitivity();
+    void calibrate();
+    void setUnits(String units);
+    
+    // Helpers.
+    int findInArray(int *array, int query, int startSearch, int endSearch);
+    String rightJustify(String str, int width);
+    String getNetOrGross();
+    void softReset();
+    
+    // Serial.
+    void doSerial();
+    void receiveCommand(int *cmd, int len);
+    void doCommand(int *cmd, int startIdx, int endIdx);
 
 };
     
