@@ -408,6 +408,7 @@ void MOST_MassBalance::calibrate() {
     + units, 0, 0);
     
   // Ensure the scale is zeroed.
+  clearTareSilent();
   zeroSilent();
   
   // Wait for the mass to get added (no use averaging with no weight on
@@ -673,7 +674,6 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
             case 'c': // Calibrate request (using hard-coded standard mass).
             case 'C':
               // Calibration occurs with no tare.
-              clearTareSilent();
               reportCalibrationMass();
               calibrate();
               break;
@@ -737,8 +737,6 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
               // of the value, plus 3 characters of units.
               // TODO: handle multiple options for units.
               // TODO: accept cal_std with or without units.
-              clearTareSilent();
-              
               // Read the requested calibration mass.
               String calStandard = "";
               for (int i = 0; i < 10; i++) {
