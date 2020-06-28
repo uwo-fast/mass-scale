@@ -710,6 +710,7 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
               Serial.print(F("\nxp          : scroll output Precision\r"));
               Serial.print(F("\nx?          : list all commands\r"));
               Serial.print(F("\nxc######.###: Calibrate with mass (needs 10 digits)\r"));
+              Serial.print(F("\nxc######.###uuu : Calibrate with with mass and new units (needs 3 characters)\r"));
               // Give time for everything to send.
               Serial.flush();
               break;  
@@ -726,7 +727,8 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
       } // End of 2 character commands.          
       break;
       
-    case 12:  // Command with numeric input.
+    case 12:  // Command with numeric input (10 digits).
+    case 15:  // Command with numeric input and units (3 add'l digits).
       // Commands will be an x, character, then 10 character number
       // (with leading whitespace).
       switch ((char) cmd[startIdx]) {
@@ -744,6 +746,13 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
               for (int i = 0; i < 10; i++) {
                 calStandard += String((char) cmd[startIdx + 2 + i]);
               }
+              
+              // Read the units, if provided.
+              String _units = "";
+              for (int i = 10; i < 13; i++) {
+                _units += String((char) cmd[startIdx + 2 + i]);
+              }
+              
               // BUG: there seems to be an overflow issue for large inputs.
               // BUG: toDouble() only returns two decimal points of 
               //      precision.
