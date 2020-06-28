@@ -4,3 +4,12 @@
 [submodule "src/LiquidCrystal"]
 	path = src/LiquidCrystal
 	url = https://github.com/arduino-libraries/LiquidCrystal.git
+[submodule "src/OLED/Adafruit-GFX-Library"]
+	path = src/OLED/Adafruit-GFX-Library
+	url = https://github.com/adafruit/Adafruit-GFX-Library.git
+[submodule "src/OLED/Adafruit_BusIO"]
+	path = src/OLED/Adafruit_BusIO
+	url = https://github.com/adafruit/Adafruit_BusIO.git
+[submodule "src/OLED/Adafruit_SSD1306"]
+	path = src/OLED/Adafruit_SSD1306
+	url = https://github.com/adafruit/Adafruit_SSD1306.git
