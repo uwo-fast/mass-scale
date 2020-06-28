@@ -85,6 +85,8 @@ extern double tareWeight;
 extern double sensitivity;
 extern double hxQueue[QUEUE_SIZE];
 
+extern bool isContinuousReport;
+
 // Response characteristics.
 extern int precision;
 extern int aboutIdx;
@@ -140,12 +142,26 @@ class MOST_MassBalance {
     String getNetOrGross();
     void softReset();
     
+    // Serial.
+    void doSerial();
+    void receiveCommand(int *cmd, int len);
+    void doCommand(int *cmd, int startIdx, int endIdx);
+    
   private:
+    const String REV = "2.0.1";
+    
     Display *display;
     int DISPLAY_VCC;
     int BTN_TARE;
+    
     // Threshold to begin calibration (to prevent premature measuring).
     const double CAL_THRESHOLD = 20000;
+    
+    // Non-printable ASCII characters.
+    const int LF = 0x0A;
+    const int CR = 0x0D;
+    const int ESC= 0x1B;
+    const int SPACE = 0x20;
 
 };
     

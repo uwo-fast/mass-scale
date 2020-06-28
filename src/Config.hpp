@@ -34,11 +34,6 @@
   const int REPORT_RATE = 1; // Hz
   unsigned long lastRefresh = 1;  // milliseconds
   
-  // Non-printable ASCII characters.
-  const int LF = 0x0A;
-  const int CR = 0x0D;
-  const int ESC= 0x1B;
-  const int SPACE = 0x20;
   // Continuous output to serial.
   bool isContinuousReport = 0;
   

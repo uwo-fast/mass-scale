@@ -443,3 +443,252 @@ void MOST_MassBalance::softReset() {
   // completely reset the Arduino.
   asm volatile (" jmp 0");
 }
+
+
+// SERIAL Functions //
+void MOST_MassBalance::doSerial() {
+  // Give everything a chance to transmit over serial.
+  delay(200);
+  // Make sure the buffer is settled.
+  Serial.flush();
+
+  // Determine how many characters are waiting.
+  int len = Serial.available();
+  
+  // Initialize an array to hold the command.
+  int cmd[len];
+
+  // Fill up cmd.
+  receiveCommand(cmd, len);
+  
+  // Check for abort command.
+  int escIdx = findInArray(cmd, ESC, 0, len);
+  if (escIdx >= 0) {  // If there's an escape character, reset.
+    softReset();
+  }
+  
+  // Parse the command for the <LF> and <CR>. The command starts one char
+  // beyond the LF, and ends with the CR.
+  int startIdx = findInArray(cmd, LF, 0, len) + 1;
+  int endIdx = findInArray(cmd, CR, startIdx, len);
+  
+  // Check for errors. Since we start after the LF, minimum index is 1. 
+  // Note that findInArray returns -1 if it cannot find the character.
+  if (startIdx < 1 || endIdx < 1) {
+    Serial.println(F("\n?\r"));
+    return;
+  }
+  
+  // Execute the command.
+  doCommand(cmd, startIdx, endIdx);
+}
+
+
+// Note that arrays are pointers, so just pass in the array's variable.
+// TODO: make this accommodate commands that come character by character.
+//        This can be accomplished by clearing command in when receiving
+//        a LF, but requires preallocating potentially too much memory for a 
+//        command. Can be accomplished by peeking for a <CR>. Could have
+//        timing issues. Maybe watch the change in Serial.available().
+void MOST_MassBalance::receiveCommand(int *cmd, int len) {  
+  // Read everything but the last character into the cmd array.
+  // The last character could be an LF which would lead the next command.
+  for (int i = 0; i < len-1; i++) {
+    cmd[i] = Serial.read();
+  }
+
+  // If the next guy is <LF>, leave 'er alone (this accommodates Arduino
+  // Serial Monitor behavior).
+  // If not, add it to the cmd array (could be a CR from PuTTY, or a 
+  // single character from terminal without local echo/line editing on.
+  char last = Serial.peek();
+  if (last != LF){
+    // Chuck it at the end of the array.
+    cmd[len-1] = Serial.read();
+  }
+}
+
+
+void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
+  // By the SMA standard, the first character indicates the function. 
+  // The scale should not accept a command if it doesn't match the syntax 
+  // exactly. (eg <LF> wa <CR> should not execute the <LF> w <CR> command.)
+  // To combat this, interpret commands by length.
+  // First, cancel continuous reporting.
+  isContinuousReport = 0;
+  
+  switch (endIdx - startIdx) {
+    case 1:   // Single character commands.
+      switch ((char) cmd[startIdx]) {
+        case 'w': // Report weight.
+        case 'W':
+          reportMassAveraged();
+          break;
+          
+        case 'z': // Zero request.
+        case 'Z':
+          zero();
+          break;
+          
+        case 'd': // Run diagnostics.
+        case 'D':
+          // TODO: Implement actual diagnostics.
+          Serial.print(F("\n    \r"));
+          break;
+          
+        case 'a': // About (first row).
+        case 'A':
+          aboutIdx = 0;
+          Serial.print(F("\nSMA:2/1.0\r"));
+          break;
+          
+        case 'b': // aBout (scrolling).
+        case 'B':
+          switch (aboutIdx) {
+            case 0:
+              Serial.print(F("\nMFG:Michigan Tech MOST\r"));
+              break;
+            case 1:
+              Serial.print(F("\nMOD:Digital Mass Balance\r"));
+              break;
+            case 2:
+              Serial.print("\nREV:" + REV + "\r");
+              break;
+            case 3:
+              Serial.print(F("\nEND:\r"));
+              break;
+            default:
+              Serial.print(F("\n?\r"));
+              break;
+          }
+          aboutIdx++;
+          break;
+          
+        case 'r': // Continuous reporting request.
+        case 'R':
+          isContinuousReport = 1;
+          break;
+          
+        case 't': // Tare request.
+        case 'T':
+          tare();
+          break;
+          
+        case 'c': // Clear tare.
+        case 'C':
+          clearTare();
+          break;
+          
+        case 'm': // Return the current tare weight.
+        case 'M':
+          reportTare();
+          break;
+          
+        default:  // Unknown command.
+          Serial.print(F("\n?\r"));
+          break;
+      } // End of single character commands.
+      break;
+      
+    case 2: // 2 character commands.
+      // Command will be an X followed by a character.
+      switch ((char) cmd[startIdx]) {
+        case 'x': // Custom commands.
+        case 'X':
+          switch ((char) cmd[startIdx + 1]) {
+            case 'c': // Calibrate request (using hard-coded standard mass).
+            case 'C':
+              // Calibration occurs with no tare.
+              clearTareSilent();
+              reportCalibrationMass();
+              calibrate();
+              break;
+            
+            case 'l': // Toggle LCD power.
+            case 'L':
+              // TODO: Implement Power toggle.
+              break;
+              
+            case 'p': // Toggle output precision.
+            case 'P':
+              precision += 1;
+              if (precision > 4) {
+                precision = 0;
+              }
+              break;
+              
+            case '?': // Tell the user what commands are available.
+              Serial.print(F("\nSMA SCP 0499 Serial Protocol\r"));
+              Serial.print(F("\nAll cmds: <LF>cmd<CR>\r"));
+              Serial.print(F("\nw           : averaged Weight\r"));
+              Serial.print(F("\nz           : Zero scale\r"));
+              Serial.print(F("\nd           : run Diagnostics\r"));
+              Serial.print(F("\na           : About, first row\r"));
+              Serial.print(F("\nb           : aBout, scroll\r"));
+              Serial.print(F("\nr           : continuous Report\r"));
+              Serial.print(F("\nt           : Tare scale\r"));
+              Serial.print(F("\nc           : Clear tare\r"));
+              Serial.print(F("\nm           : report tare weight\r"));
+              Serial.print(F("\nxc          : enter Calibration mode\r"));
+              Serial.print(F("\nxl          : toggle Lcd power\r"));
+              Serial.print(F("\nxp          : scroll output Precision\r"));
+              Serial.print(F("\nx?          : list all commands\r"));
+              Serial.print(F("\nxc######.###: Calibrate with mass (needs 10 digits)\r"));
+              // Give time for everything to send.
+              Serial.flush();
+              break;  
+              
+            default:  // Unrecognized custom command.
+              Serial.print(F("\n?\r"));
+              break;
+          } // End of custom commands.
+          break;
+          
+          // TODO: Add power saving commands/methods.
+        default:  // Unrecognized 2 character command.
+          Serial.print(F("\n?\r"));
+          break;
+      } // End of 2 character commands.          
+      break;
+      
+    case 12:  // Command with numeric input.
+      // Commands will be an x, character, then 10 character number (with
+      // leading whitespace).
+      switch ((char) cmd[startIdx]) {
+        case 'x': // Custom command.
+        case 'X':
+          switch ((char) cmd[startIdx + 1]) {
+            case 'c': // Calibrate request.
+            case 'C': { // Use brackets to prevent fall-through warnings.
+              // The calibration weight is submitted with 10 characters of 
+              // the value, plus 3 characters of units.
+              // TODO: handle multiple options for units.
+              clearTareSilent();
+              
+              // Read the requested calibration mass.
+              String calStandard = "";
+              for (int i = 0; i < 10; i++) {
+                calStandard += String((char) cmd[startIdx + 2 + i]);
+              }
+              // BUG: there seems to be an overflow issue for large inputs.
+              // BUG: toDouble() only returns two decimal points of 
+              //      precision.
+              cal_standard_mass = calStandard.toDouble();
+              
+              reportCalibrationMass();
+              calibrate();
+              break;
+            }
+            
+            default:  // Unrecognized custom, numeric input command.
+              Serial.print(F("\n?\r"));
+          } // End of custom commands.
+          break;
+      } // End of 12 character commands.
+      break;
+      
+    default:  // Unrecognized command length.
+      Serial.print(F("\n?\r"));
+      break;
+  } // End of command interpretation.
+}
