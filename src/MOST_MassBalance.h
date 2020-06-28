@@ -92,8 +92,8 @@ class MOST_MassBalance {
     
     // Output.
     void reportTare();
-    void reportMass();
-    void reportMassAveraged();
+    double reportMass();
+    double reportMassAveraged();
     void reportSmaFormat(double _mass, String gross_status);
     void displayMass(double _mass);
     void reportCalibrationMass();

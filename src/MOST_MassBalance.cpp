@@ -72,7 +72,7 @@ void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
   // Initialize time tracker.
   static unsigned long lastRefresh = 1;
   
-  // Get the averaged, tared mass.
+  // Keep data moving through the averaging filter as fast as possible. 
   double mass = getMassAveraged();
   
   // Enforce report rate without hampering sample rate (sample rate 
@@ -87,8 +87,8 @@ void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
     }
     
     if (isContinuousReport) {
-      // BUG: This reports a different mass than displayMass below.
-      reportMassAveraged();
+      // Report to serial and update 'mass' so the display matches.
+      mass = reportMassAveraged();
     }
     
     // Simple scale functionality. Note that placement of button
@@ -309,15 +309,19 @@ void MOST_MassBalance::reportTare() {
 }
 
 
-void MOST_MassBalance::reportMass() {
+double MOST_MassBalance::reportMass() {
   // Report the instantaneous mass over serial ('T', 'Z', 'XC').
-  reportSmaFormat(getMass(), getNetOrGross());
+  double mass = getMass();
+  reportSmaFormat(mass, getNetOrGross());
+  return mass;
 }
 
 
-void MOST_MassBalance::reportMassAveraged() {
+double MOST_MassBalance::reportMassAveraged() {
   // Report averaged/filtered mass over serial ('W' and 'R').
-  reportSmaFormat(getMassAveraged(), getNetOrGross());
+  double mass = getMassAveraged();
+  reportSmaFormat(mass, getNetOrGross());
+  return mass;
 }
 
 
