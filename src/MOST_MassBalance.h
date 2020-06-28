@@ -52,10 +52,11 @@ class MOST_MassBalance {
                      int btn_tare=8,
                      double cal_standard_mass=100,
                      String units="g");
-    void initSerial();
-    void initLoadCell(int HX_VCC=4, int HX_DT=2, int HX_SCK=3);
-    void initDisplay();
-    void initQueue();
+                     
+    void measureListenReportAtRate(double report_rate=1.0);
+    
+    // Initialization.
+    void begin();
     
     // Zero.
     void zero();
@@ -103,6 +104,7 @@ class MOST_MassBalance {
     void doCommand(int *cmd, int startIdx, int endIdx);
     
   private:
+    // Values.
     const String REV = "2.0.1";
     
     Display *display;
@@ -133,7 +135,9 @@ class MOST_MassBalance {
     const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
     // Time (ms) that the push button is held to enter calibration mode.
     const uint16_t CAL_WAIT = 3000;
-
+    // Threshold to begin calibration (to prevent premature measuring).
+    const double CAL_THRESHOLD = 20000;
+    
     // Number of averages completed by HX711 library.
     const int HX_NUM_AVGS = 1;
     // Number of averages completed internally.
@@ -141,9 +145,6 @@ class MOST_MassBalance {
 
     // Response block width for a weight report.
     const int WT_WIDTH = 10;
-    
-    // Threshold to begin calibration (to prevent premature measuring).
-    const double CAL_THRESHOLD = 20000;
     
     
     // Internal Variables.
@@ -153,12 +154,21 @@ class MOST_MassBalance {
     double tareWeight;
     double sensitivity;
     double *hxQueue;
+    bool isContinuousReport = 0;
     
     // Non-printable ASCII characters.
     const int LF = 0x0A;
     const int CR = 0x0D;
     const int ESC= 0x1B;
     const int SPACE = 0x20;
+    
+    
+    // Functions.
+    // Initialization.
+    void initSerial();
+    void initLoadCell(int HX_VCC=4, int HX_DT=2, int HX_SCK=3);
+    void initDisplay();
+    void initQueue();
 
 };
     

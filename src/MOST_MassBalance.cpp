@@ -53,11 +53,63 @@ MOST_MassBalance::MOST_MassBalance(Display *_display,
   BTN_TARE = btn_tare;
   cal_standard_mass = _cal_standard_mass;
   setUnits(_units);
-  // Run setup.
+}
+
+
+void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
+  // Continuously update mass averaging window, slow down all else.
+  // Initialize time tracker.
+  static unsigned long lastRefresh = 1;
+  
+  // Get the averaged, tared mass.
+  double mass = getMassAveraged();
+  
+  // Enforce report rate without hampering sample rate (sample rate depends on
+  // how much processing is done during each iteration of loop().
+  if (millis() - lastRefresh > 1/report_rate * 1000) {
+    // Reset the time.
+    lastRefresh = millis();
+    
+    // Listen for input over serial.
+    // When using Arduino Serial Monitor, switch to 'Both NL & CR' in bottom 
+    // right. When the scale first starts up, hit enter once to queue up a <LF>
+    // character, otherwise the first command will not meet com standards and 
+    // return a ?
+    // When using Putty, use Ctrl+J for LF, followed by command, followed by 
+    // Ctrl+M or simply Enter for CR.
+    if (Serial.available() > 2) { // Minimum cmd length is 3 characters<LF>c<CR>
+      doSerial();
+    }
+    
+    if (isContinuousReport) {
+      // BUG: This reports a different mass than displayMass below.
+      reportMassAveraged();
+    }
+    
+    // Simple scale functionality. Note that placement of button listener 
+    // requires an extended button press. Assuming a report rate of at least
+    // 1 Hz, this should not be an issue.
+    displayMass(mass);
+    listenForButtonInput();
+  }
 }
 
 
 // INITIALIZATION functions //
+void MOST_MassBalance::begin(){
+  // Run all initialization functions.
+  // Initialization serial output is the only non-standard output in 
+  // this library.
+  initSerial();
+  initLoadCell();
+  initDisplay();
+  getSensitivity();
+  initQueue();
+  pinMode(BTN_TARE, INPUT_PULLUP);
+  Serial.print(F("\nUse <LF>X?<CR> to view serial commands\r"));
+}
+
+
 void MOST_MassBalance::initSerial() {
   // Initialize the serial connection.
   Serial.begin(BAUD);
