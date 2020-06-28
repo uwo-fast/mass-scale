@@ -157,7 +157,6 @@ void MOST_MassBalance::initDisplay(){
 }
 
 
-// TODO: replace averaging queue with a low pass filter.
 void MOST_MassBalance::initQueue() {
   // Set averaging window size and fill with zeros.
   hxQueue = new double[QUEUE_SIZE];
