@@ -168,8 +168,11 @@ class MOST_MassBalance {
     // Internal Variables.
     HX711 loadcell;
 
-    double tareWeight;
-    double sensitivity;
+    // Used as an offset from zero (ie for a container). Tare is done in
+    // this script, while zero is implemented within the HX711 library.
+    double tareWeight = 0.0;
+    // Load cell sensitivity - will update from memory.
+    double sensitivity = 1.0;
     double *hxQueue;
     bool isContinuousReport = 0;
     

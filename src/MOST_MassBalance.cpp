@@ -46,13 +46,6 @@
 
 HX711 loadcell;
 
-// Used as an offset from zero (ie for a container). Implemented in this
-// script, while zero is implemented within the HX711 library.
-double tareWeight = 0.0;
-// Sensitivity is read from memory - this is here as a default.
-double sensitivity = 1.0;
-
-
 MOST_MassBalance::MOST_MassBalance(Display *_display,
                                    int display_vcc,
                                    int btn_tare,
