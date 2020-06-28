@@ -3,11 +3,23 @@
       This firmware is designed to meet SMA SCP 0499 Level #2 for scale
       serial communication. The command and response formats for serial communication are documented in included files.
       
-      The scale was designed by researchers ing Michigan Technological 
+      The scale was designed by researchers in Michigan Technological 
       University's MOST group <https://www.appropedia.org/Category:MOST>
       
       REVISIONS:
+      1.0.0 : Initial release - function scale with serial reporting.
+      2.0.0 : First release up to SMA standards. Work to do on data
+              filtering.      
+      3.0.0 : Refactor all functionality into a library.
       
+    A NOTE ON SERIAL COMMUNICATION:
+    - All commands are straddled by a newline \n and carriage return \r.
+    - When using Arduino Serial Monitor, switch to 'Both NL & CR' in
+      bottom right. When the scale first starts up, hit enter once to 
+      queue up a <LF> character, otherwise the first command will not 
+      meet com standards and return a ?
+    - When using Putty, use Ctrl+J for LF, followed by command, followed
+      by Ctrl+M or simply Enter for CR.
       
     Copyright (C) 2020 Benjamin Hubbard
       ! Note that external libraries included with this software are 
@@ -25,7 +37,8 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    along with this program.  If not, see
+    <https://www.gnu.org/licenses/>.
 */
 
 #ifndef MOST_MASS_BALANCE_h
@@ -104,12 +117,18 @@ class MOST_MassBalance {
     void doCommand(int *cmd, int startIdx, int endIdx);
     
   private:
-    // Values.
-    const String REV = "2.0.1";
+    //-------------Values---------------------------------------------//
+    const String REV = "3.0.0";
     
+    // Configurable variables.
     Display *display;
     int DISPLAY_VCC;
     int BTN_TARE;
+    // Calibration standard.
+    double cal_standard_mass;
+    // Unit of mass.
+    String units;
+    
     
     // Response characteristics.
     // Number of digits after the decimal.
@@ -118,10 +137,7 @@ class MOST_MassBalance {
     int aboutIdx = 4;
     // Scale range to report (this scale is single-range).
     int range = 1;
-    // Unit of mass.
-    String units;
-    // Calibration standard.
-    double cal_standard_mass;
+    
     
     // Non-configurable variables.
     // Baud rate defined by SMA SCP 0499.
@@ -163,7 +179,7 @@ class MOST_MassBalance {
     const int SPACE = 0x20;
     
     
-    // Functions.
+    //-------------Functions------------------------------------------//
     // Initialization.
     void initSerial();
     void initLoadCell(int HX_VCC=4, int HX_DT=2, int HX_SCK=3);

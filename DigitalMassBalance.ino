@@ -3,7 +3,7 @@
       communication. The command and response formats for serial communication 
       are documented in included files.
       
-      The scale was designed by researchers ing Michigan Technological 
+      The scale was designed by researchers in Michigan Technological 
       University's MOST group <https://www.appropedia.org/Category:MOST>
       
       REVISIONS:
@@ -11,8 +11,9 @@
       2.0.0 : First release up to SMA standards. Work to do on data filtering.
       
     Copyright (C) 2020 Benjamin Hubbard
-      ! Note that external libraries included with this software are subject to
-        their own licenses, included within their respective folders.
+      ! Note that external libraries included with this software are 
+        subject to their own licenses, included within their respective 
+        folders.
         
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +26,8 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    along with this program.  If not, see
+    <https://www.gnu.org/licenses/>.
 */
 
 
