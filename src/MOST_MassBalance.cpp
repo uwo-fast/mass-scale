@@ -381,6 +381,7 @@ void MOST_MassBalance::getSensitivity() {
   } else {
     // The expected character is there.
     EEPROM.get(CAL_VALUE_ADDR, sensitivity);
+    EEPROM.get(CAL_UNITS_ADDR, units);
   }
   
   reportSensitivity();
@@ -455,6 +456,7 @@ void MOST_MassBalance::calibrate() {
 void MOST_MassBalance::setUnits(String _units) {
   // Change the units string, enforcing right-justified 3-char wide.
   units = rightJustify(_units, 3);
+  EEPROM.put(CAL_UNITS_ADDR, units);
 }
 
 

@@ -149,6 +149,8 @@ class MOST_MassBalance {
     const int CAL_SIGNATURE_ADDR = 0;
     // Address of the stored calibration value.
     const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
+    // Address of units values.
+    const int CAL_UNITS_ADDR = CAL_VALUE_ADDR + sizeof(double);
     // Time (ms) that the push button is held to enter calibration mode.
     const uint16_t CAL_WAIT = 3000;
     // Threshold to begin calibration (to prevent premature measuring).
