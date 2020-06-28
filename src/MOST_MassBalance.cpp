@@ -26,6 +26,14 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    
+    // Listen for input over serial.
+    // When using Arduino Serial Monitor, switch to 'Both NL & CR' in bottom 
+    // right. When the scale first starts up, hit enter once to queue up a <LF>
+    // character, otherwise the first command will not meet com standards and 
+    // return a ?
+    // When using Putty, use Ctrl+J for LF, followed by command, followed by 
+    // Ctrl+M or simply Enter for CR.
 */
 
 #include "MOST_MassBalance.h"
