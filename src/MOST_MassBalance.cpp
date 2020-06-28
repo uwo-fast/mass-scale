@@ -1,7 +1,8 @@
 /*  MOST_MassBalance is a library of drivers for a digital mass balance
       
       This firmware is designed to meet SMA SCP 0499 Level #2 for scale
-      serial communication. The command and response formats for serial communication are documented in included files.
+      serial communication. The command and response formats for serial 
+      communication are documented in included files.
       
       The scale was designed by researchers in Michigan Technological 
       University's MOST group <https://www.appropedia.org/Category:MOST>
@@ -100,7 +101,9 @@ void MOST_MassBalance::begin(){
   // this library.
   initSerial();
   initLoadCell();
-  initDisplay();
+  if (display) {
+    initDisplay();
+  }
   getSensitivity();
   initQueue();
   pinMode(BTN_TARE, INPUT_PULLUP);
@@ -153,7 +156,9 @@ void MOST_MassBalance::initLoadCell(int HX_VCC, int HX_DT, int HX_SCK) {
 
 
 void MOST_MassBalance::initDisplay(){
-  display->init(DISPLAY_VCC);
+  if (display) { // display is not a NULL pointer.
+    display->init(DISPLAY_VCC);
+  }
 }
 
 
@@ -261,14 +266,14 @@ void MOST_MassBalance::listenForButtonInput() {
       unsigned long time_of_press = millis();
       // Give the user an indication of detection on the display.
       // TODO: Make these numbers mean something.
-      display->print(".", 1, 15);
+      printToDisplay(".", 1, 15);
       
       while (digitalRead(BTN_TARE) == 0) {  // Button is pressed.
         // Wait for button release.
       } // Button is released.
       
       // Clear the '.' indicator once the button is released.
-      display->print(" ", 1, 15);
+      printToDisplay(" ", 1, 15);
       
       // Check when the button was released.
       unsigned long time_of_release = millis();
@@ -346,9 +351,25 @@ void MOST_MassBalance::reportSmaFormat(double _mass,
 
 
 void MOST_MassBalance::displayMass(double _mass) {
-  // Show the mass (whether it is instantaneous or averaged) on the LCD.
+  // Show the mass (whether it is instantaneous or averaged) on the LCD
   String massStr = rightJustify(String(_mass, precision), WT_WIDTH);
-  display->print(massStr + units, 0, 0);
+  printToDisplay(massStr + units, 0, 0);
+}
+
+
+void MOST_MassBalance::printToDisplay(String output, int row, int col) {
+  // Print to the display (if there is one).
+  if (display) { // display is not a NULL pointer.
+    display->print(output, row, col);
+  }
+}
+
+
+void MOST_MassBalance::clearDisplay() {
+  // Clear the display (if one exists).
+  if (display) { // display is not a NULL pointer.
+    display->clear();
+  }
 }
 
 
@@ -400,7 +421,7 @@ void MOST_MassBalance::reportSensitivity() {
 void MOST_MassBalance::calibrate() {
   // Calibration sequence.
   // Tell the user what mass to use.
-  display->print("Cal w/ " + String(cal_standard_mass, precision)
+  printToDisplay("Cal w/ " + String(cal_standard_mass, precision)
     + cal_standard_units, 0, 0);
     
   // Ensure the scale is zeroed.
@@ -409,12 +430,12 @@ void MOST_MassBalance::calibrate() {
   
   // Wait for the mass to get added (no use averaging with no weight on
   // the scale).
-  display->print("Add mass...", 1, 0);
+  printToDisplay("Add mass...", 1, 0);
   while (getHxReadout() < CAL_THRESHOLD) {
     // Wait for obvious addition of mass.
     if (Serial.available() > 2 || digitalRead(BTN_TARE) == 0) {
       // User interrupted via button or serial command - abort.
-      display->clear();
+      clearDisplay();
       return;
     }
   } // Mass apparently added.
@@ -430,7 +451,7 @@ void MOST_MassBalance::calibrate() {
   for (int i = QUEUE_SIZE; i>0; i--) {
     // Add extra space to overwrite trailing digit when a place 
     // disappears (e.g. 10 --> 9, the 0 would be left on screen).
-    display->print("Avg rem: " + String(i) + " ", 1, 0);
+    printToDisplay("Avg rem: " + String(i) + " ", 1, 0);
     hxReadout = getHxReadoutAveraged();
     delay(1000);
   }
@@ -446,7 +467,7 @@ void MOST_MassBalance::calibrate() {
   
   // Report an instantaneous mass so the user can see if the calibration
   // was successful.
-  display->clear();
+  clearDisplay();
   reportMass();
 }
 

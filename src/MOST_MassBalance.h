@@ -1,7 +1,8 @@
 /*  MOST_MassBalance is a library of drivers for a digital mass balance
       
       This firmware is designed to meet SMA SCP 0499 Level #2 for scale
-      serial communication. The command and response formats for serial communication are documented in included files.
+      serial communication. The command and response formats for serial 
+      communication are documented in included files.
       
       The scale was designed by researchers in Michigan Technological 
       University's MOST group <https://www.appropedia.org/Category:MOST>
@@ -179,6 +180,8 @@ class MOST_MassBalance {
                          String _units,
                          String gross_status);
     void displayMass(double _mass);
+    void printToDisplay(String output, int row, int col);
+    void clearDisplay();
     void reportCalibrationMass();
     
     // Sensitivity.
