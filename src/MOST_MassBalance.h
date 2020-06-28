@@ -166,7 +166,6 @@ class MOST_MassBalance {
     // Internal Variables.
     HX711 loadcell;
 
-    double mass;
     double tareWeight;
     double sensitivity;
     double *hxQueue;

@@ -46,9 +46,6 @@
 
 HX711 loadcell;
 
-// Measured mass (can be assigned an averaged/filtered value or an 
-// instantaneous value.
-double mass;
 // Used as an offset from zero (ie for a container). Implemented in this
 // script, while zero is implemented within the HX711 library.
 double tareWeight = 0.0;
@@ -203,7 +200,7 @@ void MOST_MassBalance::tare() {
 
 void MOST_MassBalance::tareSilent() {
   // Silently change the tare (no serial output).
-  tareWeight += mass;
+  tareWeight += getMassAveraged();
 }
 
 
