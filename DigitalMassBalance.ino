@@ -31,10 +31,10 @@
 
 // Headers including a variety of definitions for the scale. These are separated
 // to help reduce the length of this script.
-#include "src\Libraries.hpp"
 #include "src\Pinouts.hpp"
 #include "src\Config.hpp" 
 #include "src\MOST_MassBalance.h"
+#include "src\LCD.h"
 
 
 const String REV = "2.0.1";
@@ -43,8 +43,8 @@ const String REV = "2.0.1";
 // Hardware objects (uses external libraries).
 // LCD Display. Pins defined in Pinouts.hpp.
 LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
-
-MOST_MassBalance myBalance;
+LCD display(&lcd, LCD_ROWS, LCD_COLS);
+MOST_MassBalance myBalance(&display, LCD_VCC, BTN_TARE);
 
 // Variables used during data collection.
 // Sensitivity is read from memory - this is here as a default.
@@ -63,7 +63,7 @@ void setup() {
   // only non-standard serial communications this scale produces.
   myBalance.initSerial();
   myBalance.initLoadCell();
-  initLCD();
+  myBalance.initDisplay();
   myBalance.getSensitivity();
   myBalance.initQueue();
   pinMode(BTN_TARE, INPUT_PULLUP);
@@ -100,58 +100,13 @@ void loop() {
     // Simple scale functionality. Note that placement of button listener 
     // requires an extended button press. Assuming a report rate of at least
     // 1 Hz, this should not be an issue.
-    displayMass(mass);
-    listenForButtonInput();
+    myBalance.displayMass(mass);
+    myBalance.listenForButtonInput();
   }
 }
 
 
-//----Support methods----//
-  //----Initialize----//
-    
-    
-    void initLCD() {
-      // Runs all the necessary startup for the LCD.
-      if (!isLCD) {
-        return;
-      }
-      
-      Serial.print("\nInitializing LCD...");
-      
-      // Turn on the LCD power supply.
-      pinMode(LCD_VCC, OUTPUT);
-      digitalWrite(LCD_VCC, HIGH);
-      
-      // Give it time to power on.
-      delay(500);
-      
-      // Initialize the display.
-      lcd.begin(LCD_COLS, LCD_ROWS);
-      // Clear the display.
-      lcd.clear();
-      // Home the cursor.
-      lcd.home();
-      // Hide the cursor.
-      lcd.noCursor();
-      // Ensure the display is on. (lcd.noDisplay() turns off the display).
-      lcd.display();
-      
-      // Test the display.
-      Serial.print("Testing the display...");
-      // Print an 8 to each character in the display.
-      for (int i = 0; i < LCD_ROWS * LCD_COLS; i++) {
-        lcd.print("8");
-        if (i == LCD_COLS - 1) {
-          lcd.setCursor(0, 1);
-        }
-      }
-      delay(200);
-      lcd.clear();
-      
-      Serial.print("LCD initialized!\r\n\r");
-    }
-    
-    
+//----Support methods----// 
   //----Serial----//
     void doSerial() {
       // Give everything a chance to transmit over serial.
@@ -306,8 +261,8 @@ void loop() {
                 case 'C':
                   // Calibration occurs with no tare.
                   myBalance.clearTareSilent();
-                  calResponse();
-                  calibrate();
+                  myBalance.reportCalibrationMass();
+                  myBalance.calibrate();
                   break;
                 
                 case 'l': // Toggle LCD power.
@@ -318,7 +273,7 @@ void loop() {
                     digitalWrite(LCD_VCC, LOW);
                   } else if (!isLCD) {
                     isLCD = true;
-                    initLCD();
+                    myBalance.initDisplay();
                   }
                   break;
                   
@@ -388,8 +343,8 @@ void loop() {
                   //      precision.
                   cal_standard_mass = calStandard.toDouble();
                   
-                  calResponse();
-                  calibrate();
+                  myBalance.reportCalibrationMass();
+                  myBalance.calibrate();
                   break;
                 }
                 
@@ -405,130 +360,5 @@ void loop() {
           break;
       } // End of command interpretation.
     }
-
-  
-  //----Other----//
-    void clearDisplay() {
-      // Remove all information from the LCD.
-      lcd.clear();
-    }
     
-    
-    void printToDisplay(String output, int row, int col) {
-      // Sends a formatted string to the LCD, starting at the requested 
-      // location.
-      lcd.setCursor(col, row);
-      lcd.print(output);
-    }
-    
-    
-    void displayMass(double mass) {
-      // Shows the mass (whether it is instantaneous or averaged) on the LCD.
-      clearDisplay();
-      String massStr = myBalance.rightJustify(String(mass, precision), WT_WIDTH);
-      printToDisplay(massStr + " " + units, 0, 0);
-    }
-    
-    
-    void listenForButtonInput() {
-      // Checks for a press of the tare button. Allows zero or calibration.
-      switch (digitalRead(BTN_TARE)) {
-        case 0: { // Use brackets to prevent fall-through warnings.
-          // Prepare to measure how long the button is held.
-          unsigned long time_of_press = millis();
-          // Give the user an indication of detection on the display.
-          printToDisplay(".", LCD_ROWS - 1, LCD_COLS - 1);
-          
-          while (digitalRead(BTN_TARE) == 0) {
-            // Wait for button release.
-          } // Button released.
-          
-          // Clear the '.' indicator once the button is released.
-          printToDisplay(" ", LCD_ROWS - 1, LCD_COLS - 1);
-          
-          // Check when the button was released.
-          unsigned long time_of_release = millis();
-          
-          // Behavior is determined by length of button press.
-          if (time_of_release - time_of_press < CAL_WAIT) {
-            // Use zero to simulate tare because there is no way to clear tare 
-            // with the button.
-            myBalance.zeroSilent();
-          } else {
-            // Calibrate if the button was held long enough.
-            calibrate();
-          }
-          break; // End of button pressed response.
-        }
-        default: 
-          // Buttons are active LOW; do nothing if button isn't pressed.
-          break;
-      } // End of button-press check.
-    }
-    
-    
-    void calResponse() {
-      // SMA formatted response for calibration.
-      String calStr = String(cal_standard_mass, precision);
-      calStr = myBalance.rightJustify(calStr, WT_WIDTH);
-      
-      String response = "\n";           // <LF>
-      response += "C";                  // <s>
-      response += String(range);        // <r>
-      response += String(myBalance.getNetOrGross()); // <n>
-      response += " ";                  // <m>
-      response += " ";                  // <f>
-      response += calStr;               // <xxxxxx.xxx>
-      response += units;                // <uuu>
-      response += "\r";                 // <CR>
-      Serial.print(response);
-    }
-    
-    
-    void calibrate() {
-      // Calibration sequence.
-      // Tell the user what mass to use.
-      printToDisplay("Cal w/ " + String(cal_standard_mass, precision) + 
-        " " + units, 0, 0);
-        
-      // Ensure the scale is zeroed.
-      myBalance.zeroSilent();
-      
-      // Wait for the mass to get added (no use averaging with no weight on the
-      // scale).
-      printToDisplay("Add mass...", 1, 0);
-      while (myBalance.getHxReadout() < CAL_THRESHOLD) {
-        // Wait for obvious addition of mass.
-        // Allow user interrupt - cancel if new command received or button
-        // pushed.
-        if (Serial.available() > 2 || digitalRead(BTN_TARE) == 0) {
-          return;
-        }
-      } // Mass apparently added.
-      
-      // Allow the loadcell to settle.
-      delay(1000);
-      
-      // Clear the averaging queue.
-      myBalance.initQueue();
-      double hxReadout;
-      
-      // Fill the averaging queue.
-      for (int i = QUEUE_SIZE; i>0; i--) {
-        // Add extra space to account for change in number of digits displayed.
-        printToDisplay("Avg rem: " + String(i) + " ", 1, 0);
-        hxReadout = myBalance.getHxReadoutAveraged();
-        delay(1000);
-      }
-      
-      // Determine the new sensitivity.
-      sensitivity = hxReadout / cal_standard_mass;
-      
-      // Save the sensitivity to hard memory for next time.
-      myBalance.setSensitivity();
-      
-      // Report an instantaneous mass so the user can see if the calibration was
-      // successful.
-      myBalance.reportMass();
-    }
   

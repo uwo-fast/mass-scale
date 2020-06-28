@@ -55,6 +55,16 @@ int aboutIdx = 4;
 int range = 1;
 
 
+MOST_MassBalance::MOST_MassBalance(Display *_display,
+                                   int display_vcc,
+                                   int btn_tare){
+  display = _display;
+  DISPLAY_VCC = display_vcc;
+  BTN_TARE = btn_tare;
+  // Run setup.
+}
+
+
 // INITIALIZATION functions //
 void MOST_MassBalance::initSerial() {
   // Initialize the serial connection.
@@ -98,6 +108,11 @@ void MOST_MassBalance::initLoadCell(int HX_VCC, int HX_DT, int HX_SCK) {
   zeroSilent();
   
   Serial.print(F("HX711 Initialized!\r\n\r"));
+}
+
+
+void MOST_MassBalance::initDisplay(){
+  display->init(DISPLAY_VCC);
 }
 
 
@@ -196,6 +211,45 @@ double MOST_MassBalance::getMassAveraged() {
 }
 
 
+// INPUT Functions //
+void MOST_MassBalance::listenForButtonInput() {
+  // Checks for a press of the tare button. Allows zero or calibration.
+  switch (digitalRead(BTN_TARE)) {
+    case 0: { // Use brackets to prevent fall-through warnings.
+      // Prepare to measure how long the button is held.
+      unsigned long time_of_press = millis();
+      // Give the user an indication of detection on the display.
+      // TODO: Make these numbers mean something.
+      display->print(".", 1, 15);
+      
+      while (digitalRead(BTN_TARE) == 0) {
+        // Wait for button release.
+      } // Button released.
+      
+      // Clear the '.' indicator once the button is released.
+      display->print(" ", 1, 15);
+      
+      // Check when the button was released.
+      unsigned long time_of_release = millis();
+      
+      // Behavior is determined by length of button press.
+      if (time_of_release - time_of_press < CAL_WAIT) {
+        // Use zero to simulate tare because there is no way to clear tare 
+        // with the button.
+        zeroSilent();
+      } else {
+        // Calibrate if the button was held long enough.
+        calibrate();
+      }
+      break; // End of button pressed response.
+    }
+    default: 
+      // Buttons are active LOW; do nothing if button isn't pressed.
+      break;
+  } // End of button-press check.
+}
+
+
 // OUTPUT Functions //
 void MOST_MassBalance::reportTare() {
   // Report the tare weight over serial (response to 'M').
@@ -243,6 +297,19 @@ void MOST_MassBalance::reportSmaFormat(double _mass,
 }
 
 
+void MOST_MassBalance::displayMass(double _mass) {
+  // Shows the mass (whether it is instantaneous or averaged) on the LCD.
+  String massStr = rightJustify(String(_mass, precision), WT_WIDTH);
+  display->print(massStr + " " + units, 0, 0);
+}
+
+
+void MOST_MassBalance::reportCalibrationMass() {
+  // SMA formatted response for calibration.
+  reportSmaFormat(cal_standard_mass, "C");
+}
+
+
 // SENSITIVITY Functions //
 void MOST_MassBalance::getSensitivity() {
   // Fetch the stored sensitivity value from memory.
@@ -271,6 +338,56 @@ void MOST_MassBalance::setSensitivity() {
 void MOST_MassBalance::reportSensitivity() {
   Serial.print("\nSensitivity: " + String(sensitivity, precision) + 
     " div/" + units + "\r\n\r");
+}
+
+
+void MOST_MassBalance::calibrate() {
+  // Calibration sequence.
+  // Tell the user what mass to use.
+  display->print("Cal w/ " + String(cal_standard_mass, precision) + 
+    " " + units, 0, 0);
+    
+  // Ensure the scale is zeroed.
+  zeroSilent();
+  
+  // Wait for the mass to get added (no use averaging with no weight on the
+  // scale).
+  display->print("Add mass...", 1, 0);
+  while (getHxReadout() < CAL_THRESHOLD) {
+    // Wait for obvious addition of mass.
+    // Allow user interrupt - cancel if new command received or button
+    // pushed.
+    if (Serial.available() > 2 || digitalRead(BTN_TARE) == 0) {
+      display->clear();
+      return;
+    }
+  } // Mass apparently added.
+  
+  // Allow the loadcell to settle.
+  delay(1000);
+  
+  // Clear the averaging queue.
+  initQueue();
+  double hxReadout;
+  
+  // Fill the averaging queue.
+  for (int i = QUEUE_SIZE; i>0; i--) {
+    // Add extra space to account for change in number of digits displayed.
+    display->print("Avg rem: " + String(i) + " ", 1, 0);
+    hxReadout = getHxReadoutAveraged();
+    delay(1000);
+  }
+  
+  // Determine the new sensitivity.
+  sensitivity = hxReadout / cal_standard_mass;
+  
+  // Save the sensitivity to hard memory for next time.
+  setSensitivity();
+  
+  // Report an instantaneous mass so the user can see if the calibration was
+  // successful.
+  display->clear();
+  reportMass();
 }
 
 

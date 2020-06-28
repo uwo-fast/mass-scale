@@ -22,16 +22,11 @@
 
 
 //----Calibration/Sensitivity----//
-  // Button hold length to enter/exit calibration mode (ms).
-  const int CAL_WAIT = 3000;
-
   // Mass used to calibrate (default: 1 US cup of water);
   double cal_standard_mass = 235.9;
 
   // Mass units.
-  String units = "  g";
-  
-  const double CAL_THRESHOLD = 20000;
+  String units = "  g"; 
   
  
 //----Serial----//

@@ -38,6 +38,8 @@
 #include <EEPROM.h>
 // Load cell amplifier.
 #include "HX711/src/HX711.h"
+// Display.
+#include "DisplayInterface.h"
 
 
 // TODO: Move these into class scope after transfer (restrict external access).
@@ -46,9 +48,11 @@
 extern int precision;
 // Unit of mass.
 extern String units;
+// Calibration standard.
+extern double cal_standard_mass;
 
-// Time (ms) that the push button is held to enter calibration mode.
-extern int cal_wait;
+// Display VCC pin.
+extern int displayVccPin;
 
 
 // Non-configurable variables.
@@ -61,6 +65,8 @@ const char CAL_SIGNATURE = 'C';
 const int CAL_SIGNATURE_ADDR = 0;
 // Address of the stored calibration value.
 const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
+// Time (ms) that the push button is held to enter calibration mode.
+const int CAL_WAIT = 3000;
 
 // Number of averages completed by HX711 library.
 const int HX_NUM_AVGS = 1;
@@ -87,8 +93,12 @@ extern int range;
 
 class MOST_MassBalance {
   public:
+    MOST_MassBalance(Display *_display=NULL,
+                     int display_vcc=5,
+                     int btn_tare=8);
     void initSerial();
     void initLoadCell(int HX_VCC=4, int HX_DT=2, int HX_SCK=3);
+    void initDisplay();
     void initQueue();
     
     // Zero.
@@ -107,22 +117,35 @@ class MOST_MassBalance {
     double getMass();
     double getMassAveraged();
     
+    // Input.
+    void listenForButtonInput();
+    
     // Output.
     void reportTare();
     void reportMass();
     void reportMassAveraged();
     void reportSmaFormat(double _mass, String gross_status);
+    void displayMass(double _mass);
+    void reportCalibrationMass();
     
     // Sensitivity.
     void getSensitivity();
     void setSensitivity();
     void reportSensitivity();
+    void calibrate();
     
     // Helpers.
     int findInArray(int *array, int query, int startSearch, int endSearch);
     String rightJustify(String str, int width);
     String getNetOrGross();
     void softReset();
+    
+  private:
+    Display *display;
+    int DISPLAY_VCC;
+    int BTN_TARE;
+    // Threshold to begin calibration (to prevent premature measuring).
+    const double CAL_THRESHOLD = 20000;
 
 };
     
