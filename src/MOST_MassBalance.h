@@ -42,62 +42,16 @@
 #include "DisplayInterface.h"
 
 
-// TODO: Move these into class scope after transfer (restrict external access).
-// Configurable variables (defined in external code).
-// Number of digits after the decimal.
-extern int precision;
-// Unit of mass.
-extern String units;
-// Calibration standard.
-extern double cal_standard_mass;
-
-// Display VCC pin.
-extern int displayVccPin;
-
-
-// Non-configurable variables.
-// Baud rate defined by SMA SCP 0499.
-const double BAUD = 9600;
-
-// Signature to store in the memory when calibrating.
-const char CAL_SIGNATURE = 'C';
-// Address of calibration signature.
-const int CAL_SIGNATURE_ADDR = 0;
-// Address of the stored calibration value.
-const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
-// Time (ms) that the push button is held to enter calibration mode.
-const int CAL_WAIT = 3000;
-
-// Number of averages completed by HX711 library.
-const int HX_NUM_AVGS = 1;
-// Number of averages completed internally.
-const int QUEUE_SIZE = 10;
-
-// Response block width for a weight report.
-const int WT_WIDTH = 10;
-
-
-// Internal Variables.
-extern HX711 loadcell;
-
-extern double mass;
-extern double tareWeight;
-extern double sensitivity;
-extern double hxQueue[QUEUE_SIZE];
-
 extern bool isContinuousReport;
-
-// Response characteristics.
-extern int precision;
-extern int aboutIdx;
-extern int range;
 
 
 class MOST_MassBalance {
   public:
     MOST_MassBalance(Display *_display=NULL,
                      int display_vcc=5,
-                     int btn_tare=8);
+                     int btn_tare=8,
+                     double cal_standard_mass=100,
+                     String units="g");
     void initSerial();
     void initLoadCell(int HX_VCC=4, int HX_DT=2, int HX_SCK=3);
     void initDisplay();
@@ -135,6 +89,7 @@ class MOST_MassBalance {
     void setSensitivity();
     void reportSensitivity();
     void calibrate();
+    void setUnits(String units);
     
     // Helpers.
     int findInArray(int *array, int query, int startSearch, int endSearch);
@@ -154,8 +109,50 @@ class MOST_MassBalance {
     int DISPLAY_VCC;
     int BTN_TARE;
     
+    // Response characteristics.
+    // Number of digits after the decimal.
+    int precision = 3;
+    // About index.
+    int aboutIdx = 4;
+    // Scale range to report (this scale is single-range).
+    int range = 1;
+    // Unit of mass.
+    String units;
+    // Calibration standard.
+    double cal_standard_mass;
+    
+    // Non-configurable variables.
+    // Baud rate defined by SMA SCP 0499.
+    const double BAUD = 9600;
+
+    // Signature to store in the memory when calibrating.
+    const char CAL_SIGNATURE = 'C';
+    // Address of calibration signature.
+    const int CAL_SIGNATURE_ADDR = 0;
+    // Address of the stored calibration value.
+    const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
+    // Time (ms) that the push button is held to enter calibration mode.
+    const uint16_t CAL_WAIT = 3000;
+
+    // Number of averages completed by HX711 library.
+    const int HX_NUM_AVGS = 1;
+    // Number of averages completed internally.
+    const int QUEUE_SIZE = 10;
+
+    // Response block width for a weight report.
+    const int WT_WIDTH = 10;
+    
     // Threshold to begin calibration (to prevent premature measuring).
     const double CAL_THRESHOLD = 20000;
+    
+    
+    // Internal Variables.
+    HX711 loadcell;
+
+    double mass;
+    double tareWeight;
+    double sensitivity;
+    double *hxQueue;
     
     // Non-printable ASCII characters.
     const int LF = 0x0A;

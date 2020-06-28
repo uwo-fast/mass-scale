@@ -41,26 +41,18 @@ double mass;
 double tareWeight = 0.0;
 // Sensitivity is read from memory - this is here as a default.
 double sensitivity = 1.0;
-// Averaging window. 
-// TODO: implement indexed queue to save time lost moving numbers around.
-// Averaging window (applies only to calibrated value, not raw).
-double hxQueue[QUEUE_SIZE];
-
-// Response characteristics.
-// Number of digits after the decimal.
-int precision = 3;
-// About index.
-int aboutIdx = 4;
-// Scale range to report (this scale is single-range).
-int range = 1;
 
 
 MOST_MassBalance::MOST_MassBalance(Display *_display,
                                    int display_vcc,
-                                   int btn_tare){
+                                   int btn_tare,
+                                   double _cal_standard_mass,
+                                   String _units){
   display = _display;
   DISPLAY_VCC = display_vcc;
   BTN_TARE = btn_tare;
+  cal_standard_mass = _cal_standard_mass;
+  setUnits(_units);
   // Run setup.
 }
 
@@ -118,6 +110,10 @@ void MOST_MassBalance::initDisplay(){
 
 // TODO: replace averaging queue with a low pass filter.
 void MOST_MassBalance::initQueue() {
+  // Averaging window. 
+  // TODO: implement indexed queue to save time lost moving numbers around.
+  // Averaging window (applies only to calibrated value, not raw).
+  hxQueue = new double[QUEUE_SIZE];
   for (int i = 0; i < QUEUE_SIZE; i++) {
     hxQueue[i] = 0.00;
   }
@@ -300,7 +296,7 @@ void MOST_MassBalance::reportSmaFormat(double _mass,
 void MOST_MassBalance::displayMass(double _mass) {
   // Shows the mass (whether it is instantaneous or averaged) on the LCD.
   String massStr = rightJustify(String(_mass, precision), WT_WIDTH);
-  display->print(massStr + " " + units, 0, 0);
+  display->print(massStr + units, 0, 0);
 }
 
 
@@ -344,8 +340,8 @@ void MOST_MassBalance::reportSensitivity() {
 void MOST_MassBalance::calibrate() {
   // Calibration sequence.
   // Tell the user what mass to use.
-  display->print("Cal w/ " + String(cal_standard_mass, precision) + 
-    " " + units, 0, 0);
+  display->print("Cal w/ " + String(cal_standard_mass, precision)
+    + units, 0, 0);
     
   // Ensure the scale is zeroed.
   zeroSilent();
@@ -368,7 +364,7 @@ void MOST_MassBalance::calibrate() {
   
   // Clear the averaging queue.
   initQueue();
-  double hxReadout;
+  double hxReadout = 0;
   
   // Fill the averaging queue.
   for (int i = QUEUE_SIZE; i>0; i--) {
@@ -388,6 +384,12 @@ void MOST_MassBalance::calibrate() {
   // successful.
   display->clear();
   reportMass();
+}
+
+
+void MOST_MassBalance::setUnits(String _units) {
+  // Change the units string, enforcing right-justified 3-char wide.
+  units = rightJustify(_units, 3);
 }
 
 
@@ -416,6 +418,7 @@ int MOST_MassBalance::findInArray(int *array,
 }
 
 
+// TODO: Implement clipping.
 String MOST_MassBalance::rightJustify(String str, int width) {
   // Sets a string right justified within a window. Used for formatting
   // numbers to SMA specification on serial output.
