@@ -219,7 +219,6 @@ void MOST_MassBalance::clearTareSilent() {
 
 
 //-----------------MASS Functions-------------------------------------//
-// TODO: Check for overload.
 double MOST_MassBalance::getHxReadout() {
   // Read the raw (zeroed) value from the loadcell amplifier.
   return loadcell.get_value(HX_NUM_AVGS);
@@ -483,11 +482,14 @@ int MOST_MassBalance::findInArray(int *array,
 }
 
 
-// TODO: Implement clipping.
 String MOST_MassBalance::rightJustify(String str, int width) {
   // Set a string right justified within a window. Used for formatting
   // numbers to SMA specification on serial output.
   int numWhtSpc = width - str.length();
+  if (numWhtSpc < 0) {  // The string is longer than the width.
+    // Return the very end of the string.
+    return str.substring(-numWhtSpc);
+  }
   for (int i = 0; i < numWhtSpc; i++) {
     str = " " + str;
   }
