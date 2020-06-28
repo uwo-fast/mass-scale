@@ -71,52 +71,8 @@ class MOST_MassBalance {
     // Initialization.
     void begin();
     
-    // Zero.
-    void zero();
-    void zeroSilent();
-    
-    // Tare.
-    void tare();
-    void tareSilent();
-    void clearTare();
-    void clearTareSilent();
-    
     // Mass.
-    double getHxReadout();
-    double getHxReadoutAveraged();
-    double getMass();
     double getMassAveraged();
-    
-    // Input.
-    void listenForButtonInput();
-    
-    // Output.
-    void reportTare();
-    double reportMass();
-    double reportMassAveraged();
-    void reportSmaFormat(double _mass,
-                         String _units,
-                         String gross_status);
-    void displayMass(double _mass);
-    void reportCalibrationMass();
-    
-    // Sensitivity.
-    void getSensitivity();
-    void setSensitivity();
-    void reportSensitivity();
-    void calibrate();
-    void setUnits(String units);
-    
-    // Helpers.
-    int findInArray(int *array, int query, int startSearch, int endSearch);
-    String rightJustify(String str, int width);
-    String getNetOrGross();
-    void softReset();
-    
-    // Serial.
-    void doSerial();
-    void receiveCommand(int *cmd, int len);
-    void doCommand(int *cmd, int startIdx, int endIdx);
     
   private:
     //-------------Values---------------------------------------------//
@@ -190,11 +146,58 @@ class MOST_MassBalance {
     
     
     //-------------Functions------------------------------------------//
+    // Kept private because the serial API serves as the interface.
     // Initialization.
     void initSerial();
     void initLoadCell(int HX_VCC=4, int HX_DT=2, int HX_SCK=3);
     void initDisplay();
     void initQueue();
+    
+    // Zero.
+    void zero();
+    void zeroSilent();
+    
+    // Tare.
+    void tare();
+    void tareSilent();
+    void clearTare();
+    void clearTareSilent();
+    
+    // Mass.
+    double getHxReadout();
+    double getHxReadoutAveraged();
+    double getMass();
+    
+    // Input.
+    void listenForButtonInput();
+    
+    // Output.
+    void reportTare();
+    double reportMass();
+    double reportMassAveraged();
+    void reportSmaFormat(double _mass,
+                         String _units,
+                         String gross_status);
+    void displayMass(double _mass);
+    void reportCalibrationMass();
+    
+    // Sensitivity.
+    void getSensitivity();
+    void setSensitivity();
+    void reportSensitivity();
+    void calibrate();
+    void setUnits(String units);
+    
+    // Helpers.
+    int findInArray(int *array, int query, int startSearch, int endSearch);
+    String rightJustify(String str, int width);
+    String getNetOrGross();
+    void softReset();
+    
+    // Serial.
+    void doSerial();
+    void receiveCommand(int *cmd, int len);
+    void doCommand(int *cmd, int startIdx, int endIdx);
 
 };
     
