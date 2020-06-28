@@ -41,6 +41,7 @@ class Display {
   public:
     virtual ~Display();
     virtual void init(int vccPin);
+    virtual void shutdown(int vccPin);
     virtual void print(String output, int row, int col);  
     virtual void clear();
 };

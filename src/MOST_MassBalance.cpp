@@ -373,6 +373,14 @@ void MOST_MassBalance::clearDisplay() {
 }
 
 
+void MOST_MassBalance::shutdownDisplay() {
+  // Turn the display off to save power (if there is a display).
+  if (display) { // display is not a NULL pointer.
+    display->shutdown(DISPLAY_VCC);
+  }
+}
+
+
 void MOST_MassBalance::reportCalibrationMass() {
   // Report calibration mass over serial ('XC' and 'XCxxxxxxx.xx')
   reportSmaFormat(cal_standard_mass, cal_standard_units, "C");
@@ -704,7 +712,13 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
             
             case 'l': // Toggle LCD power.
             case 'L':
-              // TODO: Implement Power toggle.
+              if (isDisplayOn) {
+                isDisplayOn = 0;
+                shutdownDisplay();
+              } else {
+                isDisplayOn = 1;
+                initDisplay();
+              }
               break;
               
             case 'p': // Toggle output precision.

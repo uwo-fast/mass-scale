@@ -41,6 +41,7 @@ class LCD : virtual public Display {
     LCD(LiquidCrystal *_lcd, int _LCD_ROWS=2, int _LCD_COLS=16);
     ~LCD();
     void init(int vccPin);
+    void shutdown(int vccPin);
     void print(String output, int row, int col);  
     void clear();
     

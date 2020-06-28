@@ -138,6 +138,7 @@ class MOST_MassBalance {
     String units = "  g";
     double *hxQueue;
     bool isContinuousReport = 0;
+    bool isDisplayOn = 1;
     
     // Non-printable ASCII characters.
     const int LF = 0x0A;
@@ -182,6 +183,7 @@ class MOST_MassBalance {
     void displayMass(double _mass);
     void printToDisplay(String output, int row, int col);
     void clearDisplay();
+    void shutdownDisplay();
     void reportCalibrationMass();
     
     // Sensitivity.
