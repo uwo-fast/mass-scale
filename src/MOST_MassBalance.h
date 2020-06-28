@@ -157,7 +157,7 @@ class MOST_MassBalance {
     // Number of averages completed by HX711 library.
     const int HX_NUM_AVGS = 1;
     // Number of averages completed internally.
-    const int QUEUE_SIZE = 10;
+    const uint16_t QUEUE_SIZE = 10;
 
     // Response block width for a weight report.
     const int WT_WIDTH = 10;

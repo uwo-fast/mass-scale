@@ -168,7 +168,7 @@ void MOST_MassBalance::initDisplay(){
 void MOST_MassBalance::initQueue() {
   // Set averaging window size and fill with zeros.
   hxQueue = new double[QUEUE_SIZE];
-  for (int i = 0; i < QUEUE_SIZE; i++) {
+  for (uint16_t i = 0; i < QUEUE_SIZE; i++) {
     hxQueue[i] = 0.00;
   }
 }
@@ -242,7 +242,7 @@ double MOST_MassBalance::getHxReadoutAveraged() {
   
   // Return the average value from the queue.
   double sum = 0;
-  for (int i = 0; i < QUEUE_SIZE; i++) {
+  for (uint16_t i = 0; i < QUEUE_SIZE; i++) {
     sum += hxQueue[i];
   }
   
