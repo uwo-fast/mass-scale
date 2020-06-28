@@ -219,7 +219,6 @@ void MOST_MassBalance::clearTareSilent() {
 
 
 //-----------------MASS Functions-------------------------------------//
-// TODO: Does 'mass' need to be a global variable?
 // TODO: Check for overload.
 double MOST_MassBalance::getHxReadout() {
   // Read the raw (zeroed) value from the loadcell amplifier.
