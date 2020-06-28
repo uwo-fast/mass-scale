@@ -50,13 +50,13 @@ MOST_MassBalance::MOST_MassBalance(Display *_display,
                                    int display_vcc,
                                    int btn_tare,
                                    double _cal_standard_mass,
-                                   String _units){
+                                   String _cal_standard_units){
   // Assign configurable variables.
   display = _display;
   DISPLAY_VCC = display_vcc;
   BTN_TARE = btn_tare;
   cal_standard_mass = _cal_standard_mass;
-  setUnits(_units);
+  cal_standard_units = rightJustify(_cal_standard_units, 3);
 }
 
 
@@ -296,14 +296,14 @@ void MOST_MassBalance::listenForButtonInput() {
 //-----------------OUTPUT Functions-----------------------------------//
 void MOST_MassBalance::reportTare() {
   // Report the tare weight over serial (response to 'M').
-  reportSmaFormat(tareWeight, "T");
+  reportSmaFormat(tareWeight, units, "T");
 }
 
 
 double MOST_MassBalance::reportMass() {
   // Report the instantaneous mass over serial ('T', 'Z', 'XC').
   double mass = getMass();
-  reportSmaFormat(mass, getNetOrGross());
+  reportSmaFormat(mass, units, getNetOrGross());
   return mass;
 }
 
@@ -311,12 +311,13 @@ double MOST_MassBalance::reportMass() {
 double MOST_MassBalance::reportMassAveraged() {
   // Report averaged/filtered mass over serial ('W' and 'R').
   double mass = getMassAveraged();
-  reportSmaFormat(mass, getNetOrGross());
+  reportSmaFormat(mass, units, getNetOrGross());
   return mass;
 }
 
 
 void MOST_MassBalance::reportSmaFormat(double _mass,
+                                       String _units,
                                        String gross_status) {
   // Report a value over serial, adhering to SMA SCP 0499 format specs.
   // Check for scale status.
@@ -339,7 +340,7 @@ void MOST_MassBalance::reportSmaFormat(double _mass,
   response += " ";                  // <m>
   response += " ";                  // <f>
   response += massStr;              // <xxxxxx.xxx>
-  response += units;                // <uuu>
+  response += _units;               // <uuu>
   response += "\r";                 // <CR>
   Serial.print(response);
 }
@@ -354,7 +355,7 @@ void MOST_MassBalance::displayMass(double _mass) {
 
 void MOST_MassBalance::reportCalibrationMass() {
   // Report calibration mass over serial ('XC' and 'XCxxxxxxx.xx')
-  reportSmaFormat(cal_standard_mass, "C");
+  reportSmaFormat(cal_standard_mass, cal_standard_units, "C");
 }
 
 
@@ -399,7 +400,7 @@ void MOST_MassBalance::calibrate() {
   // Calibration sequence.
   // Tell the user what mass to use.
   display->print("Cal w/ " + String(cal_standard_mass, precision)
-    + units, 0, 0);
+    + cal_standard_units, 0, 0);
     
   // Ensure the scale is zeroed.
   clearTareSilent();
@@ -438,6 +439,9 @@ void MOST_MassBalance::calibrate() {
   
   // Save the sensitivity to hard memory for next time.
   setSensitivity();
+  
+  // Overwrite units with the calibration standard units.
+  setUnits(cal_standard_units);
   
   // Report an instantaneous mass so the user can see if the calibration
   // was successful.
@@ -746,6 +750,10 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
                 _units += String((char) cmd[startIdx + 2 + i]);
               }
               
+              if (_units != "") {
+                cal_standard_units = rightJustify(_units, 3);
+              }
+              
               // BUG: there seems to be an overflow issue for large inputs.
               // BUG: toDouble() only returns two decimal points of 
               //      precision.
@@ -760,7 +768,7 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
               Serial.print(F("\n?\r"));
           } // End of custom commands.
           break;
-      } // End of 12 character commands.
+      } // End of 12/15 character commands.
       break;
       
     default:  // Unrecognized command length.

@@ -63,8 +63,8 @@ class MOST_MassBalance {
     MOST_MassBalance(Display *_display=NULL,
                      int display_vcc=5,
                      int btn_tare=8,
-                     double cal_standard_mass=100,
-                     String units="g");
+                     double _cal_standard_mass=100,
+                     String _cal_standard_units="g");
                      
     void measureListenReportAtRate(double report_rate=1.0);
     
@@ -94,7 +94,9 @@ class MOST_MassBalance {
     void reportTare();
     double reportMass();
     double reportMassAveraged();
-    void reportSmaFormat(double _mass, String gross_status);
+    void reportSmaFormat(double _mass,
+                         String _units,
+                         String gross_status);
     void displayMass(double _mass);
     void reportCalibrationMass();
     
@@ -126,8 +128,8 @@ class MOST_MassBalance {
     int BTN_TARE;
     // Calibration standard.
     double cal_standard_mass;
-    // Unit of mass.
-    String units;
+    // Calibration standard units.
+    String cal_standard_units;
     
     
     // Response characteristics.
@@ -173,6 +175,8 @@ class MOST_MassBalance {
     double tareWeight = 0.0;
     // Load cell sensitivity - will update from memory.
     double sensitivity = 1.0;
+    // Measured mass units - will update from memory.
+    String units = "  g";
     double *hxQueue;
     bool isContinuousReport = 0;
     
