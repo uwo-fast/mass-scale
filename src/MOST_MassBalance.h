@@ -61,12 +61,13 @@ extern bool isContinuousReport;
 
 class MOST_MassBalance {
   public:
-    MOST_MassBalance(Display *_display=NULL,
+    MOST_MassBalance(Display *_display=nullptr,
                      int display_vcc=5,
                      int btn_tare=8,
                      double _cal_standard_mass=100,
                      String _cal_standard_units="g");
-                     
+    ~MOST_MassBalance();
+    
     void measureListenReportAtRate(double report_rate=1.0);
     
     // Initialization.

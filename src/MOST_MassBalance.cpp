@@ -61,6 +61,11 @@ MOST_MassBalance::MOST_MassBalance(Display *_display,
 }
 
 
+MOST_MassBalance::~MOST_MassBalance() {
+  delete display;
+}
+
+
 void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
   // Continuously update mass averaging window, slow down all else.
   // Initialize time tracker.
