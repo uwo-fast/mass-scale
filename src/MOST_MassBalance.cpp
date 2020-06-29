@@ -45,7 +45,6 @@
 #include "MOST_MassBalance.h"
 
 
-HX711 loadcell;
 
 MOST_MassBalance::MOST_MassBalance(Display *_display,
                                    int display_vcc,
