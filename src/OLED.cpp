@@ -30,9 +30,9 @@
 
 
 OLED::OLED(Adafruit_SSD1306 *_oled,
-           int _OLED_WIDTH,
-           int _OLED_HEIGHT,
-           int _OLED_ADDR) {
+           uint8_t _OLED_WIDTH,
+           uint8_t _OLED_HEIGHT,
+           uint8_t _OLED_ADDR) {
   // Store objects provided by the user.
   // The display object is initialized externally (requires pins).
   oled = _oled;
@@ -43,11 +43,12 @@ OLED::OLED(Adafruit_SSD1306 *_oled,
 
 OLED::~OLED() {
   // Remove the pointer from memory.
-  delete oled;
+  Serial.println("Deleting OLED");
+  // delete oled;
 }
 
 
-void OLED::init(int vccPin) {
+void OLED::init(uint8_t vccPin) {
   // Runs all the necessary startup for the OLED.
   Serial.print(F("\nInitializing OLED..."));
   
@@ -74,14 +75,13 @@ void OLED::init(int vccPin) {
 }
 
 
-void OLED::shutdown(int vccPin) {
+void OLED::shutdown(uint8_t vccPin) {
   //oled->noDisplay();
   digitalWrite(vccPin, LOW);
 }
 
 
-void OLED::print(String output, int row, int col) {
-  Serial.println("1");
+void OLED::print(String output, uint8_t row, uint8_t col) {
   // Send a formatted string to the OLED, starting at the requested 
   // location.
   oled->setTextSize(1);
@@ -91,7 +91,6 @@ void OLED::print(String output, int row, int col) {
   oled->setCursor(col * OLED_CHAR_WIDTH, row * OLED_CHAR_HEIGHT);
   oled->print(output);
   oled->display();
-  Serial.println("2");
 }
 
 

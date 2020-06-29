@@ -39,22 +39,22 @@ class OLED : virtual public Display {
   public:
     Adafruit_SSD1306 *oled;
     OLED(Adafruit_SSD1306 *_oled,
-         int _OLED_WIDTH=128,
-         int _OLED_HEIGHT=64,
-         int _OLED_ADDR=0x3C);
+         uint8_t _OLED_WIDTH=128,
+         uint8_t _OLED_HEIGHT=64,
+         uint8_t _OLED_ADDR=0x3C);
     ~OLED();
-    void init(int vccPin);
-    void shutdown(int vccPin);
-    void print(String output, int row, int col);  
+    void init(uint8_t vccPin);
+    void shutdown(uint8_t vccPin);
+    void print(String output, uint8_t row, uint8_t col);  
     void clear();
     
   private:
-    int OLED_WIDTH;
-    int OLED_HEIGHT;
-    int OLED_ADDR;
+    uint8_t OLED_WIDTH;
+    uint8_t OLED_HEIGHT;
+    uint8_t OLED_ADDR;
     
-    const int OLED_CHAR_WIDTH = 6;
-    const int OLED_CHAR_HEIGHT = 8;
+    #define OLED_CHAR_WIDTH 6
+    #define OLED_CHAR_HEIGHT 8
 };
 
 

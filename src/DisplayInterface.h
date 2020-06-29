@@ -40,9 +40,9 @@
 class Display {
   public:
     virtual ~Display();
-    virtual void init(int vccPin);
-    virtual void shutdown(int vccPin);
-    virtual void print(String output, int row, int col);  
+    virtual void init(uint8_t vccPin);
+    virtual void shutdown(uint8_t vccPin);
+    virtual void print(String output, uint8_t row, uint8_t col);  
     virtual void clear();
 };
 

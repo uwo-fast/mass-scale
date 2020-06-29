@@ -38,16 +38,18 @@
 class LCD : virtual public Display {
   public:
     LiquidCrystal *lcd;
-    LCD(LiquidCrystal *_lcd, int _LCD_ROWS=2, int _LCD_COLS=16);
+    LCD(LiquidCrystal *_lcd,
+        uint8_t _LCD_ROWS=2,
+        uint8_t _LCD_COLS=16);
     ~LCD();
-    void init(int vccPin);
-    void shutdown(int vccPin);
-    void print(String output, int row, int col);  
+    void init(uint8_t vccPin);
+    void shutdown(uint8_t vccPin);
+    void print(String output, uint8_t row, uint8_t col);  
     void clear();
     
   private:
-    int LCD_ROWS;
-    int LCD_COLS;
+    uint8_t LCD_ROWS;
+    uint8_t LCD_COLS;
 };
 
 

@@ -29,7 +29,7 @@
 #include "LCD.h"
 
 
-LCD::LCD(LiquidCrystal *_lcd, int _LCD_ROWS, int _LCD_COLS) {
+LCD::LCD(LiquidCrystal *_lcd, uint8_t _LCD_ROWS, uint8_t _LCD_COLS) {
   // Store objects provided by the user.
   // The display object is initialized externally (requires pins).
   lcd = _lcd;
@@ -43,7 +43,7 @@ LCD::~LCD() {
 }
 
 
-void LCD::init(int vccPin) {
+void LCD::init(uint8_t vccPin) {
   // Run all the necessary startup for the LCD.  
   Serial.print(F("\nInitializing LCD..."));
   
@@ -68,7 +68,7 @@ void LCD::init(int vccPin) {
   // Test the display.
   Serial.print(F("Testing the display..."));
   // Print an 8 to each character in the display.
-  for (int i = 0; i < LCD_ROWS * LCD_COLS; i++) {
+  for (uint8_t i = 0; i < LCD_ROWS * LCD_COLS; i++) {
     lcd->print("8");
     if (i == LCD_COLS - 1) {
       lcd->setCursor(0, 1);
@@ -81,13 +81,13 @@ void LCD::init(int vccPin) {
 }
 
 
-void LCD::shutdown(int vccPin) {
+void LCD::shutdown(uint8_t vccPin) {
   lcd->noDisplay();
   digitalWrite(vccPin, LOW);
 }
 
 
-void LCD::print(String output, int row, int col) {
+void LCD::print(String output, uint8_t row, uint8_t col) {
   // Sends a formatted string to the LCD, starting at the requested 
   // location.
   lcd->setCursor(col, row);
