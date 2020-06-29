@@ -169,6 +169,8 @@ void MOST_MassBalance::initDisplay(){
 
 void MOST_MassBalance::initQueue() {
   // Set averaging window size and fill with zeros.
+  // TODO: implement indexed queue to save time lost moving numbers
+  // around.
   hxQueue = new double[QUEUE_SIZE];
   for (uint16_t i = 0; i < QUEUE_SIZE; i++) {
     hxQueue[i] = 0.00;
@@ -229,16 +231,14 @@ double MOST_MassBalance::getHxReadout() {
 
 double MOST_MassBalance::getHxReadoutAveraged() {
   // Use an array to return an averaged raw reading from the HX711.
-  static uint16_t queueIndex = 0;
+  // TODO: Replace this with a moving index.
+  // Shift the queue.
+  for (int i = QUEUE_SIZE - 1; i > 0; i--) {
+    hxQueue[i] = hxQueue[i-1];
+  }
   
   // Place the current mass (24-bit unscaled number) in the queue.
-  hxQueue[queueIndex] = getHxReadout();
-  
-  // Increment the queue index.
-  queueIndex++;
-  if (queueIndex >= QUEUE_SIZE) {
-    queueIndex = 0;
-  }
+  hxQueue[0] = getHxReadout();
   
   // Return the average value from the queue.
   double sum = 0;
@@ -761,7 +761,8 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
               break;
           } // End of custom commands.
           break;
-
+          
+          // TODO: Add power saving commands/methods.
         default:  // Unrecognized 2 character command.
           Serial.print(F("\n?\r"));
           break;
