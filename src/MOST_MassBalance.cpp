@@ -58,6 +58,12 @@ MOST_MassBalance::MOST_MassBalance(Display *_display,
   BTN_TARE = btn_tare;
   cal_standard_mass = _cal_standard_mass;
   cal_standard_units = rightJustify(_cal_standard_units, UNIT_WIDTH);
+  hxQueue = new DataFilter(QUEUE_SIZE);
+}
+
+
+MOST_MassBalance::~MOST_MassBalance() {
+  delete hxQueue;
 }
 
 
@@ -164,10 +170,7 @@ void MOST_MassBalance::initDisplay(){
 
 void MOST_MassBalance::initQueue() {
   // Set averaging window size and fill with zeros.
-  hxQueue = new double[QUEUE_SIZE];
-  for (uint16_t i = 0; i < QUEUE_SIZE; i++) {
-    hxQueue[i] = 0.00;
-  }
+  hxQueue->fill(0);
 }
     
 
@@ -223,25 +226,11 @@ double MOST_MassBalance::getHxReadout() {
 
 
 double MOST_MassBalance::getHxReadoutAveraged() {
-  // Use an array to return an averaged raw reading from the HX711.
-  static uint16_t queueIndex = 0;
-  
+  // Interface with the data handler and return an average raw value.
   // Place the current mass (24-bit unscaled number) in the queue.
-  hxQueue[queueIndex] = getHxReadout();
+  hxQueue->push(getHxReadout());
   
-  // Increment the queue index.
-  queueIndex++;
-  if (queueIndex >= QUEUE_SIZE) {
-    queueIndex = 0;
-  }
-  
-  // Return the average value from the queue.
-  double sum = 0;
-  for (uint16_t i = 0; i < QUEUE_SIZE; i++) {
-    sum += hxQueue[i];
-  }
-  
-  return sum / QUEUE_SIZE;
+  return hxQueue->getAverage();
 }
 
 
