@@ -54,6 +54,8 @@
 #include "HX711/src/HX711.h"
 // Display.
 #include "DisplayInterface.h"
+// Data handler.
+#include "DataFilter.h"
 
 
 extern bool isContinuousReport;
@@ -66,7 +68,8 @@ class MOST_MassBalance {
                      int btn_tare=8,
                      double _cal_standard_mass=100,
                      String _cal_standard_units="g");
-                     
+    ~MOST_MassBalance();
+    
     void measureListenReportAtRate(double report_rate=1.0);
     
     // Initialization.
@@ -119,6 +122,8 @@ class MOST_MassBalance {
     const int HX_NUM_AVGS = 1;
     // Number of averages completed internally.
     const uint16_t QUEUE_SIZE = 10;
+    // Mass data holder.
+    DataFilter *hxQueue;
 
     // Response block width for a weight report.
     const int WT_WIDTH = 10;
@@ -136,7 +141,6 @@ class MOST_MassBalance {
     double sensitivity = 1.0;
     // Measured mass units - will update from memory.
     String units = "  g";
-    double *hxQueue;
     bool isContinuousReport = 0;
     bool isDisplayOn = 1;
     
