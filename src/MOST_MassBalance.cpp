@@ -12,6 +12,7 @@
       2.0.0 : First release up to SMA standards. Work to do on data
               filtering.      
       3.0.0 : Refactor all functionality into a library.
+      3.0.1 : Move data handling into a separate class.
 
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
