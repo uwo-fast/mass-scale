@@ -37,17 +37,46 @@
 
 class LCD : virtual public Display {
   public:
-    LiquidCrystal *lcd;
+    /**
+     * Constructor
+     *
+     * @param *_lcd pointer to the object driving the display.
+     * @param _LCD_ROWS, _LCD_COLS number of rows of characters (used by
+     * print)
+     */
     LCD(LiquidCrystal *_lcd,
         uint8_t _LCD_ROWS=2,
         uint8_t _LCD_COLS=16);
+    /// Free Allocated memory.
     ~LCD();
+    /**
+     * Turn on the display and initialize its driver.
+     *
+     * @param vccPin the pin used to power the display
+     */
     void init(uint8_t vccPin);
+    /**
+     * Turn off the display.
+     *
+     * @param vccPin the pin used to power the display
+     */
     void shutdown(uint8_t vccPin);
+    /**
+     * Print a string to the display, starting at a specific location.
+     *
+     * @param output the string to print
+     * @param row the vertical position to start at, measured by 
+     *    character (i.e. row 2 is shifted down the size of one mono-
+     *    spaced character from row 1).
+     * @param col the horizontal position to start at, measured in the
+     *    same manner as row.
+     */
     void print(String output, uint8_t row, uint8_t col);  
+    /// Clear the display.
     void clear();
     
   private:
+    LiquidCrystal *lcd;
     uint8_t LCD_ROWS;
     uint8_t LCD_COLS;
 };

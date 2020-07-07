@@ -12,6 +12,7 @@
       2.0.0 : First release up to SMA standards. Work to do on data
               filtering.      
       3.0.0 : Refactor all functionality into a library.
+      3.0.1 : Move data handling into a separate class.
 
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
@@ -57,11 +58,12 @@ MOST_MassBalance::MOST_MassBalance(Display *_display,
   BTN_TARE = btn_tare;
   cal_standard_mass = _cal_standard_mass;
   cal_standard_units = rightJustify(_cal_standard_units, UNIT_WIDTH);
+  hxQueue = new DataFilter(QUEUE_SIZE);
 }
 
 
 MOST_MassBalance::~MOST_MassBalance() {
-  delete display;
+  delete hxQueue;
 }
 
 
@@ -168,12 +170,7 @@ void MOST_MassBalance::initDisplay(){
 
 void MOST_MassBalance::initQueue() {
   // Set averaging window size and fill with zeros.
-  // TODO: implement indexed queue to save time lost moving numbers
-  // around.
-  hxQueue = new double[QUEUE_SIZE];
-  for (uint16_t i = 0; i < QUEUE_SIZE; i++) {
-    hxQueue[i] = 0.00;
-  }
+  hxQueue->fill(0);
 }
     
 
@@ -229,23 +226,11 @@ double MOST_MassBalance::getHxReadout() {
 
 
 double MOST_MassBalance::getHxReadoutAveraged() {
-  // Use an array to return an averaged raw reading from the HX711.
-  // TODO: Replace this with a moving index.
-  // Shift the queue.
-  for (int i = QUEUE_SIZE - 1; i > 0; i--) {
-    hxQueue[i] = hxQueue[i-1];
-  }
-  
+  // Interface with the data handler and return an average raw value.
   // Place the current mass (24-bit unscaled number) in the queue.
-  hxQueue[0] = getHxReadout();
+  hxQueue->push(getHxReadout());
   
-  // Return the average value from the queue.
-  double sum = 0;
-  for (uint16_t i = 0; i < QUEUE_SIZE; i++) {
-    sum += hxQueue[i];
-  }
-  
-  return sum / QUEUE_SIZE;
+  return hxQueue->getAverage();
 }
 
 

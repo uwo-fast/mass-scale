@@ -39,10 +39,32 @@
 
 class Display {
   public:
+    /// Free allocated memory.
     virtual ~Display();
+    /**
+     * Turn on the display and initialize its driver.
+     *
+     * @param vccPin the pin used to power the display
+     */
     virtual void init(uint8_t vccPin);
+    /**
+     * Turn off the display.
+     *
+     * @param vccPin the pin used to power the display
+     */
     virtual void shutdown(uint8_t vccPin);
-    virtual void print(String output, uint8_t row, uint8_t col);  
+    /**
+     * Print a string to the display, starting at a specific location.
+     *
+     * @param output the string to print
+     * @param row the vertical position to start at, measured by 
+     *    character (i.e. row 2 is shifted down the size of one mono-
+     *    spaced character from row 1).
+     * @param col the horizontal position to start at, measured in the
+     *    same manner as row.
+     */
+    virtual void print(String output, uint8_t row, uint8_t col);
+    /// Clear the display.
     virtual void clear();
 };
 
