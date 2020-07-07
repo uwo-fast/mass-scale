@@ -162,7 +162,7 @@ class MOST_MassBalance {
     // Measured mass units - will update from memory.
     String units = "  g";
     bool isContinuousReport = 0;
-    bool isDisplayOn = 1;
+    bool isDisplayOn = 0;
     
     // Non-printable ASCII characters.
     #define LF 0x0A
