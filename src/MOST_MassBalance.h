@@ -13,6 +13,7 @@
               filtering.      
       3.0.0 : Refactor all functionality into a library.
       3.0.1 : Move data handling into a separate class.
+      3.1.0 : Add OLED interface.
       
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
@@ -101,7 +102,7 @@ class MOST_MassBalance {
     
   private:
     //-------------Values---------------------------------------------//
-    const String REV = "3.0.1";
+    const String REV = "3.1.0";
     
     // Configurable variables.
     Display *display;
