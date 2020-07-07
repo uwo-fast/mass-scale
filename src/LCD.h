@@ -32,7 +32,7 @@
 
 #include <Arduino.h>
 #include "DisplayInterface.h"
-#include "LiquidCrystal\src\LiquidCrystal.h"
+#include <LiquidCrystal.h>
 
 
 class LCD : virtual public Display {

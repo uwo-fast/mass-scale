@@ -32,7 +32,7 @@
 
 #include <Arduino.h>
 #include "DisplayInterface.h"
-#include "OLED\Adafruit_SSD1306\Adafruit_SSD1306.h"
+#include <Adafruit_SSD1306.h>
 
 
 class OLED : virtual public Display {
