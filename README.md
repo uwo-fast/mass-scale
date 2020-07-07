@@ -27,6 +27,10 @@ This was developed by researchers at Michigan Technological University in the
 group.
 
 ## Use Notes
+To use an OLED display, the Adafruit SSD1306 library (and its dependencies,
+Adafruit_GFX-Library and Adafruit_Bus_IO) must be installed using the Arduino
+Library manager.
+
 Due to the SRAM demands to run an OLED display, a microcontroller with 
 more than 2 MB of memory is required when using an OLED (i.e. you must use a 
 Nano Every or a Mega). If using a Nano Every, install the Arduino megaAVR 

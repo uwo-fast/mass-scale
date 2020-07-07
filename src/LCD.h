@@ -3,6 +3,9 @@
       implementing the abstract class Display, defined in 
       DisplayInterface.h.
       
+      Dependencies: The LiquidCrystal library is built-in as of 1.8.6,
+                    so no libraries need to be installed for this.
+      
       The scale was designed by researchers in Michigan Technological 
       University's MOST group <https://www.appropedia.org/Category:MOST>
       
@@ -32,7 +35,7 @@
 
 #include <Arduino.h>
 #include "DisplayInterface.h"
-#include "LiquidCrystal\src\LiquidCrystal.h"
+#include <LiquidCrystal.h>
 
 
 class LCD : virtual public Display {
