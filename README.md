@@ -56,3 +56,8 @@ the instructions from
 > You will now be able to use the LiquidCrystal library with your Nano Every.
 > 
 > Please let me know if you run into any problems or questions while following those instructions.
+
+## Known Bugs
+* Using the command 'XL' to turn an OLED off, then immediately back on, can 
+  cause the program to stall. Waiting for at least 10 seconds tends to prevents
+  this issue.
