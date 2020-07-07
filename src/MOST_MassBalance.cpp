@@ -15,6 +15,7 @@
       3.0.1 : Move data handling into a separate class.
       3.1.0 : Add OLED interface.
       3.1.1 : Require installed libraries for displays.
+      3.1.2 : Make getMass() public.
 
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
