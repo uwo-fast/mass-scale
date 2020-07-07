@@ -39,7 +39,7 @@ DataFilter::DataFilter(uint8_t _n_taps) {
 
 DataFilter::~DataFilter() {
   // Delete allocated memory.
-  delete data_queue;
+  delete[] data_queue;
 }
 
 

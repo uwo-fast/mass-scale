@@ -42,9 +42,7 @@ OLED::OLED(Adafruit_SSD1306 *_oled,
 }
 
 OLED::~OLED() {
-  // Remove the pointer from memory.
-  Serial.println("Deleting OLED");
-  // delete oled;
+  // No memory is allocated by this class.
 }
 
 

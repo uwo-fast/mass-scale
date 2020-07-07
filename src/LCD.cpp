@@ -38,8 +38,7 @@ LCD::LCD(LiquidCrystal *_lcd, uint8_t _LCD_ROWS, uint8_t _LCD_COLS) {
 }
 
 LCD::~LCD() {
-  // Remove the pointer from memory.
-  delete lcd;
+  // No memory is allocated by this class.
 }
 
 
