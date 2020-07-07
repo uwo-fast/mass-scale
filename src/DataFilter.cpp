@@ -39,7 +39,7 @@ DataFilter::DataFilter(uint8_t _n_taps) {
 
 DataFilter::~DataFilter() {
   // Delete allocated memory.
-  delete data_queue;
+  delete[] data_queue;
 }
 
 
@@ -55,13 +55,9 @@ void DataFilter::push(double val) {
 
 double DataFilter::getAverage() {
   double sum = 0;
-  Serial.print("[");
   for (uint8_t i=0; i < n_taps; i++) {
     sum += data_queue[i];
-    Serial.print(data_queue[i]);
-    Serial.print(", ");
   }
-  Serial.println("]");
   return sum / n_taps;
 }
 

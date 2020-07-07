@@ -46,7 +46,6 @@
 #include "MOST_MassBalance.h"
 
 
-HX711 loadcell;
 
 MOST_MassBalance::MOST_MassBalance(Display *_display,
                                    int display_vcc,
@@ -163,8 +162,9 @@ void MOST_MassBalance::initLoadCell(int HX_VCC, int HX_DT, int HX_SCK) {
 
 
 void MOST_MassBalance::initDisplay(){
-  if (display) { // display is not a NULL pointer.
+  if (display && !isDisplayOn) { // display is not a NULL pointer.
     display->init(DISPLAY_VCC);
+    isDisplayOn = 1;
   }
 }
 
@@ -349,7 +349,7 @@ void MOST_MassBalance::displayMass(double _mass) {
 
 void MOST_MassBalance::printToDisplay(String output, int row, int col) {
   // Print to the display (if there is one).
-  if (display) { // display is not a NULL pointer.
+  if (display && isDisplayOn) { // display is not a NULL pointer.
     display->print(output, row, col);
   }
 }
@@ -357,7 +357,7 @@ void MOST_MassBalance::printToDisplay(String output, int row, int col) {
 
 void MOST_MassBalance::clearDisplay() {
   // Clear the display (if one exists).
-  if (display) { // display is not a NULL pointer.
+  if (display && isDisplayOn) { // display is not a NULL pointer.
     display->clear();
   }
 }
@@ -365,8 +365,9 @@ void MOST_MassBalance::clearDisplay() {
 
 void MOST_MassBalance::shutdownDisplay() {
   // Turn the display off to save power (if there is a display).
-  if (display) { // display is not a NULL pointer.
+  if (display && isDisplayOn) { // display is not a NULL pointer.
     display->shutdown(DISPLAY_VCC);
+    isDisplayOn = 0;
   }
 }
 
@@ -703,10 +704,8 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
             case 'l': // Toggle LCD power.
             case 'L':
               if (isDisplayOn) {
-                isDisplayOn = 0;
                 shutdownDisplay();
               } else {
-                isDisplayOn = 1;
                 initDisplay();
               }
               break;
@@ -746,7 +745,7 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
               break;
           } // End of custom commands.
           break;
-
+          
         default:  // Unrecognized 2 character command.
           Serial.print(F("\n?\r"));
           break;
