@@ -13,6 +13,7 @@
               filtering.      
       3.0.0 : Refactor all functionality into a library.
       3.0.1 : Move data handling into a separate class.
+      3.1.0 : Add OLED interface.
       
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
@@ -59,9 +60,6 @@
 #include "DataFilter.h"
 
 
-extern bool isContinuousReport;
-
-
 class MOST_MassBalance {
   public:
     /**
@@ -74,7 +72,7 @@ class MOST_MassBalance {
      * @param _cal_standard_mass default mass used for calibration
      * @param _cal_standard_units default units for calibration mass
      */
-    MOST_MassBalance(Display *_display=NULL,
+    MOST_MassBalance(Display *_display=nullptr,
                      int display_vcc=5,
                      int btn_tare=8,
                      double _cal_standard_mass=100,
@@ -104,12 +102,12 @@ class MOST_MassBalance {
     
   private:
     //-------------Values---------------------------------------------//
-    const String REV = "3.0.1";
+    const String REV = "3.1.0";
     
     // Configurable variables.
     Display *display;
-    int DISPLAY_VCC;
-    int BTN_TARE;
+    uint8_t DISPLAY_VCC;
+    uint8_t BTN_TARE;
     // Calibration standard.
     double cal_standard_mass;
     // Calibration standard units.
@@ -118,45 +116,44 @@ class MOST_MassBalance {
     
     // Response characteristics.
     // Number of digits after the decimal.
-    int precision = 3;
+    uint8_t precision = 3;
     // About index.
-    int aboutIdx = 4;
+    uint8_t aboutIdx = 4;
     // Scale range to report (this scale is single-range).
-    int range = 1;
+    uint8_t range = 1;
     
     
     // Non-configurable variables.
     // Baud rate defined by SMA SCP 0499.
-    const double BAUD = 9600;
+    #define BAUD 9600
 
     // Signature to store in the memory when calibrating.
-    const char CAL_SIGNATURE = 'C';
+    #define CAL_SIGNATURE 'C'
     // Address of calibration signature.
-    const int CAL_SIGNATURE_ADDR = 0;
+    #define CAL_SIGNATURE_ADDR 0
     // Address of the stored calibration value.
-    const int CAL_VALUE_ADDR = CAL_SIGNATURE_ADDR + sizeof(char);
+    #define CAL_VALUE_ADDR CAL_SIGNATURE_ADDR + sizeof(char)
     // Address of units values.
-    const int CAL_UNITS_ADDR = CAL_VALUE_ADDR + sizeof(double);
+    #define CAL_UNITS_ADDR CAL_VALUE_ADDR + sizeof(double)
     // Time (ms) that the push button is held to enter calibration mode.
-    const uint16_t CAL_WAIT = 3000;
+    #define CAL_WAIT 3000
     // Threshold to begin calibration (to prevent premature measuring).
-    const double CAL_THRESHOLD = 20000;
+    #define CAL_THRESHOLD 20000
     
     // Number of averages completed by HX711 library.
-    const int HX_NUM_AVGS = 1;
+    #define HX_NUM_AVGS 1
     // Number of averages completed internally.
-    const uint16_t QUEUE_SIZE = 10;
-    // Mass data holder.
-    DataFilter *hxQueue;
+    #define QUEUE_SIZE 10
 
     // Response block width for a weight report.
-    const int WT_WIDTH = 10;
+    #define WT_WIDTH 10
     // Response block width for a unit.
-    const int UNIT_WIDTH = 3;
+    #define UNIT_WIDTH 3
     
     
     // Internal Variables.
     HX711 loadcell;
+    DataFilter *hxQueue;
 
     // Used as an offset from zero (ie for a container). Tare is done in
     // this script, while zero is implemented within the HX711 library.
@@ -166,13 +163,13 @@ class MOST_MassBalance {
     // Measured mass units - will update from memory.
     String units = "  g";
     bool isContinuousReport = 0;
-    bool isDisplayOn = 1;
+    bool isDisplayOn = 0;
     
     // Non-printable ASCII characters.
-    const int LF = 0x0A;
-    const int CR = 0x0D;
-    const int ESC= 0x1B;
-    const int SPACE = 0x20;
+    #define LF 0x0A
+    #define CR 0x0D
+    #define ESC 0x1B
+    #define SPACE 0x20
     
     
     //-------------Functions------------------------------------------//

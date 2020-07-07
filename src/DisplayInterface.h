@@ -46,13 +46,13 @@ class Display {
      *
      * @param vccPin the pin used to power the display
      */
-    virtual void init(int vccPin);
+    virtual void init(uint8_t vccPin);
     /**
      * Turn off the display.
      *
      * @param vccPin the pin used to power the display
      */
-    virtual void shutdown(int vccPin);
+    virtual void shutdown(uint8_t vccPin);
     /**
      * Print a string to the display, starting at a specific location.
      *
@@ -63,7 +63,7 @@ class Display {
      * @param col the horizontal position to start at, measured in the
      *    same manner as row.
      */
-    virtual void print(String output, int row, int col);  
+    virtual void print(String output, uint8_t row, uint8_t col);
     /// Clear the display.
     virtual void clear();
 };

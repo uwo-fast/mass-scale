@@ -26,27 +26,31 @@
     <https://www.gnu.org/licenses/>.
 */
 
-#include "LCD.h"
+#include "OLED.h"
 
 
-LCD::LCD(LiquidCrystal *_lcd, uint8_t _LCD_ROWS, uint8_t _LCD_COLS) {
+OLED::OLED(Adafruit_SSD1306 *_oled,
+           uint8_t _OLED_WIDTH,
+           uint8_t _OLED_HEIGHT,
+           uint8_t _OLED_ADDR) {
   // Store objects provided by the user.
   // The display object is initialized externally (requires pins).
-  lcd = _lcd;
-  LCD_ROWS = _LCD_ROWS;
-  LCD_COLS = _LCD_COLS;
+  oled = _oled;
+  OLED_WIDTH = _OLED_WIDTH;
+  OLED_HEIGHT = _OLED_HEIGHT;
+  OLED_ADDR = _OLED_ADDR;
 }
 
-LCD::~LCD() {
+OLED::~OLED() {
   // No memory is allocated by this class.
 }
 
 
-void LCD::init(uint8_t vccPin) {
-  // Run all the necessary startup for the LCD.  
-  Serial.print(F("\nInitializing LCD..."));
+void OLED::init(uint8_t vccPin) {
+  // Runs all the necessary startup for the OLED.
+  Serial.print(F("\nInitializing OLED..."));
   
-  // Turn on the LCD power supply.
+  // Turn on the OLED power supply.
   pinMode(vccPin, OUTPUT);
   digitalWrite(vccPin, HIGH);
   
@@ -54,47 +58,42 @@ void LCD::init(uint8_t vccPin) {
   delay(500);
   
   // Initialize the display.
-  lcd->begin(LCD_COLS, LCD_ROWS);
-  // Clear the display.
-  lcd->clear();
-  // Home the cursor.
-  lcd->home();
-  // Hide the cursor.
-  lcd->noCursor();
-  // Ensure the display is on. (lcd.noDisplay() turns off the display).
-  lcd->display();
-  
-  // Test the display.
-  Serial.print(F("Testing the display..."));
-  // Print an 8 to each character in the display.
-  for (uint8_t i = 0; i < LCD_ROWS * LCD_COLS; i++) {
-    lcd->print("8");
-    if (i == LCD_COLS - 1) {
-      lcd->setCursor(0, 1);
-    }
+  while(!oled->begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)){
+    Serial.print(F("..."));
   }
-  delay(200);
-  lcd->clear();
   
-  Serial.print(F("LCD initialized!\r\n\r"));
+  // Splash screen.
+  Serial.print(F("Testing the display..."));
+  oled->display();
+  delay(2000);
+  // Clear buffer.
+  clear();
+  
+  Serial.print(F("OLED initialized!\r\n\r"));
 }
 
 
-void LCD::shutdown(uint8_t vccPin) {
-  lcd->noDisplay();
+void OLED::shutdown(uint8_t vccPin) {
+  //oled->noDisplay();
   digitalWrite(vccPin, LOW);
 }
 
 
-void LCD::print(String output, uint8_t row, uint8_t col) {
-  // Sends a formatted string to the LCD, starting at the requested 
+void OLED::print(String output, uint8_t row, uint8_t col) {
+  // Send a formatted string to the OLED, starting at the requested 
   // location.
-  lcd->setCursor(col, row);
-  lcd->print(output);
+  oled->setTextSize(1);
+  // Use built-in overtyping by setting the background to black.
+  // This only works for the built-in font.
+  oled->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
+  oled->setCursor(col * OLED_CHAR_WIDTH, row * OLED_CHAR_HEIGHT);
+  oled->print(output);
+  oled->display();
 }
 
 
-void LCD::clear() {
-  // Remove all information from the LCD.
-  lcd->clear();
+void OLED::clear() {
+  // Remove all information from the OLED.
+  oled->clearDisplay();
+  oled->display();
 }
