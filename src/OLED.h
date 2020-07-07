@@ -3,6 +3,10 @@
       implementing the abstract class Display, defined in 
       DisplayInterface.h.
       
+      Dependencies: Install Adafruit SSD1306 (and its dependencies,
+                    GFX-Library and Bus_IO) using the Arduino library
+                    manager.
+      
       The scale was designed by researchers in Michigan Technological 
       University's MOST group <https://www.appropedia.org/Category:MOST>
       
