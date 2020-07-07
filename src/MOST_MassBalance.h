@@ -94,6 +94,13 @@ class MOST_MassBalance {
     /// Run a sequence of initializers for the mass balance.
     void begin();
     
+    // Mass.
+    /**
+     * Run getHxReadout and scale it to mass using sensitivity.
+     *
+     * @returns the instantaneous mass from the HX711
+     */
+    double getMass();
     /**
      * Run getHxReadoutAveraged and scale it to mass using sensitivity.
      *
@@ -221,12 +228,6 @@ class MOST_MassBalance {
      * @returns the average value calculated by the data handler
      */
     double getHxReadoutAveraged();
-    /**
-     * Run getHxReadout and scale it to mass using sensitivity.
-     *
-     * @returns the instantaneous mass from the HX711
-     */
-    double getMass();
     
     // Input.
     /** 
