@@ -116,6 +116,15 @@ class MOST_MassBalance {
      */
     double getMassAveraged();
     
+    // Offsets.
+    /// Zero the HX711 object and report new mass over Serial.
+    void zero();
+    /// Run tareSilent and report new mass over Serial.
+    void tare();
+    /// Run clearTareSilent and report the new mass.
+    void clearTare();
+    
+    
   private:
     //-------------Values---------------------------------------------//
     const String REV = "3.2.0";
@@ -206,17 +215,12 @@ class MOST_MassBalance {
     /// Reset the data handler's queue to all zeros.
     void initQueue();
     
-    /// Zero the HX711 object and report new mass over Serial.
-    void zero();
+    // Offsets.
     /// Zero the HX711 without any Serial output. 
     void zeroSilent();
     
-    /// Run tareSilent and report new mass over Serial.
-    void tare();
     /// Apply current mass readout to the locally managed tareWeight.
     void tareSilent();
-    /// Run clearTareSilent and report the new mass.
-    void clearTare();
     /// Reset tareWeight to zero .
     void clearTareSilent();
     
