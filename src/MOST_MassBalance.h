@@ -16,6 +16,7 @@
       3.1.0 : Add OLED interface.
       3.1.1 : Require installed libraries for displays.
       3.1.2 : Make getMass() public.
+      3.2.0 : Add ArrayHelper namespace for interacting with arrays.
       
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
@@ -117,7 +118,7 @@ class MOST_MassBalance {
     
   private:
     //-------------Values---------------------------------------------//
-    const String REV = "3.1.2";
+    const String REV = "3.2.0";
     
     // Configurable variables.
     Display *display;
