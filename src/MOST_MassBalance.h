@@ -95,6 +95,10 @@ class MOST_MassBalance {
     /// Run a sequence of initializers for the mass balance.
     void begin();
     
+    // Serial.
+    /// Run the serial command receive/response sequence.
+    void doSerial();
+    
     // Mass.
     /**
      * Run getHxReadout and scale it to mass using sensitivity.
@@ -332,8 +336,6 @@ class MOST_MassBalance {
     void softReset();
     
     // Serial.
-    /// Run the serial command receive/response sequence.
-    void doSerial();
     /**
      * Read a command in from the Serial buffer.
      *
