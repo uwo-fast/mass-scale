@@ -60,7 +60,8 @@ MOST_MassBalance::MOST_MassBalance(Display *_display,
   DISPLAY_VCC = display_vcc;
   BTN_TARE = btn_tare;
   cal_standard_mass = _cal_standard_mass;
-  cal_standard_units = rightJustify(_cal_standard_units, UNIT_WIDTH);
+  cal_standard_units = ArrayHelper::rightJustify(_cal_standard_units,
+                                                 UNIT_WIDTH);
   hxQueue = new DataFilter(QUEUE_SIZE);
 }
 
@@ -327,7 +328,8 @@ void MOST_MassBalance::reportSmaFormat(double _mass,
   }
   
   // Size and string-ify the mass to report.
-  String massStr = rightJustify(String(_mass, precision), WT_WIDTH);
+  String massStr = ArrayHelper::rightJustify(String(_mass, precision),
+                                             WT_WIDTH);
   
   // SMA formatted response.
   String response = "\n";           // <LF>
@@ -345,7 +347,8 @@ void MOST_MassBalance::reportSmaFormat(double _mass,
 
 void MOST_MassBalance::displayMass(double _mass) {
   // Show the mass (whether it is instantaneous or averaged) on the LCD
-  String massStr = rightJustify(String(_mass, precision), WT_WIDTH);
+  String massStr = ArrayHelper::rightJustify(String(_mass, precision),
+                                             WT_WIDTH);
   printToDisplay(massStr + units, 0, 0);
 }
 
@@ -476,7 +479,7 @@ void MOST_MassBalance::calibrate() {
 
 void MOST_MassBalance::setUnits(String _units) {
   // Change the units string, enforcing right-justified 3-char wide.
-  units = rightJustify(_units, UNIT_WIDTH);
+  units = ArrayHelper::rightJustify(_units, UNIT_WIDTH);
   for (int i = 0; i < UNIT_WIDTH; i++) {
     EEPROM.put(CAL_UNITS_ADDR + sizeof(char)*i, units[i]);
   }
@@ -484,46 +487,6 @@ void MOST_MassBalance::setUnits(String _units) {
 
 
 //-----------------HELPER Functions-----------------------------------//
-int MOST_MassBalance::findInArray(int *array,
-                                  int query,
-                                  int startSearch,
-                                  int endSearch) {
-  // Find a character in an integer array (used to find <CR> and <LF>).
-  // Account for incrementing i at top of loop.
-  int i = startSearch - 1;
-  int c;  // Character being checked.
-  do {
-    // Increment i.
-    i++;
-    // Read a character from the array.
-    c = array[i];
-    
-    // Don't go looking where there is nothing to be found.
-    if (i > endSearch) {
-      return -1;
-    }
-  } while (c != query);
-  
-  return i;
-}
-
-
-String MOST_MassBalance::rightJustify(String str, int width) {
-  // Set a string right justified within a window. Used for formatting
-  // numbers to SMA specification on serial output.
-  int numWhtSpc = width - str.length();
-  if (numWhtSpc < 0) {  // The string is longer than the width.
-    // Return the very end of the string.
-    return str.substring(-numWhtSpc);
-  }
-  for (int i = 0; i < numWhtSpc; i++) {
-    str = " " + str;
-  }
-  
-  return str;
-}
-
-
 String MOST_MassBalance::getNetOrGross() {
   // Return Net/Gross status. Net if tared, Gross if tare = 0.
   if (tareWeight == 0) {
@@ -560,15 +523,15 @@ void MOST_MassBalance::doSerial() {
   receiveCommand(cmd, len);
   
   // Check for abort command.
-  int escIdx = findInArray(cmd, ESC, 0, len);
+  int escIdx = ArrayHelper::findInArray(cmd, ESC, 0, len);
   if (escIdx >= 0) {  // If there's an escape character, reset.
     softReset();
   }
   
   // Parse the command for the <LF> and <CR>. The command starts one
   // char beyond the LF, and ends with the CR.
-  int startIdx = findInArray(cmd, LF, 0, len) + 1;
-  int endIdx = findInArray(cmd, CR, startIdx, len);
+  int startIdx = ArrayHelper::findInArray(cmd, LF, 0, len) + 1;
+  int endIdx = ArrayHelper::findInArray(cmd, CR, startIdx, len);
   
   // Check for errors. Since we start after the LF, minimum index is 1. 
   // Note that findInArray returns -1 if it cannot find the character.
@@ -780,7 +743,7 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
               }
               
               if (_units != "") {
-                cal_standard_units = rightJustify(_units, 3);
+                cal_standard_units = ArrayHelper::rightJustify(_units, 3);
               }
               
               // BUG: there seems to be an overflow issue for large inputs.
