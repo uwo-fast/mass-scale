@@ -60,6 +60,8 @@
 #include "DisplayInterface.h"
 // Data handler.
 #include "DataFilter.h"
+// Array handler.
+#include "ArrayHelper.h"
 
 
 class MOST_MassBalance {
@@ -305,26 +307,6 @@ class MOST_MassBalance {
     void setUnits(String units);
     
     // Helpers.
-    /**
-     * Find a number or character within a range of memory.
-     *
-     * @param *array pointer to the array
-     * @param query the character/number to look for
-     * @param startSearch the index in the array to start at
-     * @param endSearch the index in the array to quit looking
-     * @returns the index of the query. -1 if not found.
-     */
-    int findInArray(int *array, int query, int startSearch, int endSearch);
-    /**
-     * Right justify a string within a window; clip if necessary.
-     *
-     * Clip favors the end of the string.
-     *
-     * @param str the string to right-justify
-     * @param width the final length of the string
-     * @returns the right-justified, clipped string
-     */
-    String rightJustify(String str, int width);
     /**
      * Check if the mass being reported is net or gross.
      *
