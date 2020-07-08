@@ -16,6 +16,7 @@
       3.1.0 : Add OLED interface.
       3.1.1 : Require installed libraries for displays.
       3.1.2 : Make getMass() public.
+      3.2.0 : Add ArrayHelper namespace for interacting with arrays.
       
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
@@ -60,6 +61,8 @@
 #include "DisplayInterface.h"
 // Data handler.
 #include "DataFilter.h"
+// Array handler.
+#include "ArrayHelper.h"
 
 
 class MOST_MassBalance {
@@ -95,6 +98,10 @@ class MOST_MassBalance {
     /// Run a sequence of initializers for the mass balance.
     void begin();
     
+    // Serial.
+    /// Run the serial command receive/response sequence.
+    void doSerial();
+    
     // Mass.
     /**
      * Run getHxReadout and scale it to mass using sensitivity.
@@ -111,7 +118,7 @@ class MOST_MassBalance {
     
   private:
     //-------------Values---------------------------------------------//
-    const String REV = "3.1.2";
+    const String REV = "3.2.0";
     
     // Configurable variables.
     Display *display;
@@ -302,26 +309,6 @@ class MOST_MassBalance {
     
     // Helpers.
     /**
-     * Find a number or character within a range of memory.
-     *
-     * @param *array pointer to the array
-     * @param query the character/number to look for
-     * @param startSearch the index in the array to start at
-     * @param endSearch the index in the array to quit looking
-     * @returns the index of the query. -1 if not found.
-     */
-    int findInArray(int *array, int query, int startSearch, int endSearch);
-    /**
-     * Right justify a string within a window; clip if necessary.
-     *
-     * Clip favors the end of the string.
-     *
-     * @param str the string to right-justify
-     * @param width the final length of the string
-     * @returns the right-justified, clipped string
-     */
-    String rightJustify(String str, int width);
-    /**
      * Check if the mass being reported is net or gross.
      *
      * @returns 'N' for Net if tareWeight is non-zero. 'G' for Gross if
@@ -332,8 +319,6 @@ class MOST_MassBalance {
     void softReset();
     
     // Serial.
-    /// Run the serial command receive/response sequence.
-    void doSerial();
     /**
      * Read a command in from the Serial buffer.
      *
