@@ -85,9 +85,7 @@ void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
     lastRefresh = millis();
     
     // Listen for input over serial.
-    if (Serial.available() > 2) { // Minimum cmd length is 3
-      doSerial();                 // characters <LF>c<CR>
-    }
+    doSerial();
     
     if (isContinuousReport) {
       // Report to serial and update 'mass' so the display matches.
@@ -550,6 +548,10 @@ void MOST_MassBalance::doSerial() {
   // Make sure the buffer is settled.
   Serial.flush();
 
+  // Gatekeeper.
+  if (Serial.available() < 3) { // Minimum cmd length is 3
+    return;                     // characters <LF>c<CR>
+  }
   // Determine how many characters are waiting.
   int len = Serial.available();
   
