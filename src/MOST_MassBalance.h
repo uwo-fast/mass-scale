@@ -15,6 +15,7 @@
       3.0.1 : Move data handling into a separate class.
       3.1.0 : Add OLED interface.
       3.1.1 : Require installed libraries for displays.
+      3.1.2 : Make getMass() public.
       
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
@@ -94,6 +95,13 @@ class MOST_MassBalance {
     /// Run a sequence of initializers for the mass balance.
     void begin();
     
+    // Mass.
+    /**
+     * Run getHxReadout and scale it to mass using sensitivity.
+     *
+     * @returns the instantaneous mass from the HX711
+     */
+    double getMass();
     /**
      * Run getHxReadoutAveraged and scale it to mass using sensitivity.
      *
@@ -103,7 +111,7 @@ class MOST_MassBalance {
     
   private:
     //-------------Values---------------------------------------------//
-    const String REV = "3.1.1";
+    const String REV = "3.1.2";
     
     // Configurable variables.
     Display *display;
@@ -221,12 +229,6 @@ class MOST_MassBalance {
      * @returns the average value calculated by the data handler
      */
     double getHxReadoutAveraged();
-    /**
-     * Run getHxReadout and scale it to mass using sensitivity.
-     *
-     * @returns the instantaneous mass from the HX711
-     */
-    double getMass();
     
     // Input.
     /** 
