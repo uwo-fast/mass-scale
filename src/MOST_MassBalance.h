@@ -167,8 +167,6 @@ class MOST_MassBalance {
     
     // Number of averages completed by HX711 library.
     #define HX_NUM_AVGS 1
-    // Number of averages completed internally.
-    #define QUEUE_SIZE 10
 
     // Response block width for a weight report.
     #define WT_WIDTH 10

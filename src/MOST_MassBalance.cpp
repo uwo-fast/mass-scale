@@ -55,7 +55,8 @@ MOST_MassBalance::MOST_MassBalance(Display *_display,
                                    int display_vcc,
                                    int btn_tare,
                                    double _cal_standard_mass,
-                                   String _cal_standard_units){
+                                   String _cal_standard_units
+                                   uint8_t queue_size) {
   // Assign configurable variables.
   display = _display;
   DISPLAY_VCC = display_vcc;
@@ -63,7 +64,7 @@ MOST_MassBalance::MOST_MassBalance(Display *_display,
   cal_standard_mass = _cal_standard_mass;
   cal_standard_units = ArrayHelper::rightJustify(_cal_standard_units,
                                                  UNIT_WIDTH);
-  hxQueue = new DataFilter(QUEUE_SIZE);
+  hxQueue = new DataFilter(queue_size);
 }
 
 
@@ -452,7 +453,7 @@ void MOST_MassBalance::calibrate() {
   double hxReadout = 0;
   
   // Fill the averaging queue.
-  for (int i = QUEUE_SIZE; i>0; i--) {
+  for (uint8_t i = hxQueue->getQueueSize(); i>0; i--) {
     // Add extra space to overwrite trailing digit when a place 
     // disappears (e.g. 10 --> 9, the 0 would be left on screen).
     printToDisplay("Avg rem: " + String(i) + " ", 1, 0);
