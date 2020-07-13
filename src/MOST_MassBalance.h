@@ -68,7 +68,7 @@
 class MOST_MassBalance {
   public:
     /**
-     * Contstructor
+     * Constructor (Deprecated - do not provide display_vcc)
      *
      * @param _display instance of a DisplayInterface child, used to
      *    manage the display output
@@ -78,10 +78,27 @@ class MOST_MassBalance {
      * @param _cal_standard_units default units for calibration mass
      */
     MOST_MassBalance(Display *_display=nullptr,
-                     int display_vcc=5,
-                     int btn_tare=8,
+                     uint8_t display_vcc=5, 
+                     uint8_t btn_tare=8,
+                     double _cal_standard_mass=100,
+                     String _cal_standard_units="g",
+                     uint8_t queue_size=10);
+                     
+    /**
+     * Constructor
+     *
+     * @param _display instance of a DisplayInterface child, used to
+     *    manage the display output
+     * @param btn_tare the pin in pullup mode to measure tare button
+     * @param _cal_standard_mass default mass used for calibration
+     * @param _cal_standard_units default units for calibration mass
+     */
+    MOST_MassBalance(uint8_t queue_size=10,
+                     uint8_t btn_tare=-1,
+                     Display *_display=nullptr,
                      double _cal_standard_mass=100,
                      String _cal_standard_units="g");
+    
     /// Free allocated memory.
     ~MOST_MassBalance();
     
@@ -95,8 +112,16 @@ class MOST_MassBalance {
      
     void measureListenReportAtRate(double report_rate=1.0);
     
-    /// Run a sequence of initializers for the mass balance.
-    void begin();
+    /**
+     * Run a sequence of initializers for the mass balance.
+     * 
+     * @param HX_VCC is the pin used to power the HX711
+     * @param HX_DT is the pin used to receive data from the HX711
+     * @param HX_SCK is the clock pin
+     */
+    void begin(uint8_t HX_VCC=4,
+               uint8_t HX_DT=2,
+               uint8_t HX_SCK=3);    
     
     // Serial.
     /// Run the serial command receive/response sequence.
@@ -116,13 +141,20 @@ class MOST_MassBalance {
      */
     double getMassAveraged();
     
+    // Offsets.
+    /// Zero the HX711 object and report new mass over Serial.
+    void zero();
+    /// Run tareSilent and report new mass over Serial.
+    void tare();
+    /// Run clearTareSilent and report the new mass.
+    void clearTare();
+    
+    
   private:
     //-------------Values---------------------------------------------//
     const String REV = "3.2.0";
     
     // Configurable variables.
-    Display *display;
-    uint8_t DISPLAY_VCC;
     uint8_t BTN_TARE;
     // Calibration standard.
     double cal_standard_mass;
@@ -158,8 +190,6 @@ class MOST_MassBalance {
     
     // Number of averages completed by HX711 library.
     #define HX_NUM_AVGS 1
-    // Number of averages completed internally.
-    #define QUEUE_SIZE 10
 
     // Response block width for a weight report.
     #define WT_WIDTH 10
@@ -170,6 +200,8 @@ class MOST_MassBalance {
     // Internal Variables.
     HX711 loadcell;
     DataFilter *hxQueue;
+    // Provided externally.
+    Display *display;
 
     // Used as an offset from zero (ie for a container). Tare is done in
     // this script, while zero is implemented within the HX711 library.
@@ -200,23 +232,18 @@ class MOST_MassBalance {
      * @param HX_DT pin connected to HX711 DT pin
      * @param HX_SCK pin connected to HX711 SCK pin
      */    
-    void initLoadCell(int HX_VCC=4, int HX_DT=2, int HX_SCK=3);
+    void initLoadCell(uint8_t HX_VCC, uint8_t HX_DT, uint8_t HX_SCK);
     /// Call the display's initialization sequence.
     void initDisplay();
     /// Reset the data handler's queue to all zeros.
     void initQueue();
     
-    /// Zero the HX711 object and report new mass over Serial.
-    void zero();
+    // Offsets.
     /// Zero the HX711 without any Serial output. 
     void zeroSilent();
     
-    /// Run tareSilent and report new mass over Serial.
-    void tare();
     /// Apply current mass readout to the locally managed tareWeight.
     void tareSilent();
-    /// Run clearTareSilent and report the new mass.
-    void clearTare();
     /// Reset tareWeight to zero .
     void clearTareSilent();
     

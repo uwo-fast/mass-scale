@@ -40,8 +40,17 @@ class DataFilter {
      * @param _n_taps the number of data points to be used by the filter
      */
     DataFilter(uint8_t _n_taps=10);
+    
     /// Free allocated memory.
     ~DataFilter();
+    
+    /**
+     * Get the queue size.
+     *
+     * @returns Size of the queue.
+     */
+    uint8_t getQueueSize();
+    
     /**
      * Replace the oldest value in the queue with the latest.
      *
@@ -51,12 +60,14 @@ class DataFilter {
      * @param val the new value
      */
     void push(double val);
+    
     /**
      * Run an average of the data_queue.
      *
      * @returns the average value of data_queue
      */
     double getAverage();
+    
     /**
      * Overwrite the whole queue with a single value.
      *

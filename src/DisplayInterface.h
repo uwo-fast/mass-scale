@@ -41,18 +41,29 @@ class Display {
   public:
     /// Free allocated memory.
     virtual ~Display();
+    
     /**
      * Turn on the display and initialize its driver.
      *
-     * @param vccPin the pin used to power the display
-     */
-    virtual void init(uint8_t vccPin);
-    /**
-     * Turn off the display.
+     * Expected to be used only once.
      *
      * @param vccPin the pin used to power the display
      */
-    virtual void shutdown(uint8_t vccPin);
+    virtual void init(uint8_t _vccPin);
+    
+    /// Initialize using a known vccPin.
+    virtual void init();
+    
+    /**
+     * (Deprecated - use without input) Turn off the display.
+     *
+     * @param vccPin the pin used to power the display
+     */
+    virtual void shutdown(uint8_t _vccPin);
+    
+    /// Shutdown using a known vccPin.
+    virtual void shutdown();
+    
     /**
      * Print a string to the display, starting at a specific location.
      *
@@ -64,8 +75,21 @@ class Display {
      *    same manner as row.
      */
     virtual void print(String output, uint8_t row, uint8_t col);
+    
     /// Clear the display.
     virtual void clear();
+    
+    /**
+     * Set the vccPin.
+     *
+     * Implemented for backwards compatibility of MOST_MassBalance.
+     *
+     * @param _vccPin the pin used to power the display
+     */
+    virtual void setVccPin(uint8_t _vccPin);
+    
+  protected:
+    uint8_t vccPin;
 };
 
 

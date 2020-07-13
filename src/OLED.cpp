@@ -1,5 +1,5 @@
-/*  LCD is a supporting class for MOST_MassBalance.
-      It acts as an interface with Liquid Crystal Displays by 
+/*  OLED is a supporting class for MOST_MassBalance.
+      It acts as an interface with Adafruits graphics library,
       implementing the abstract class Display, defined in 
       DisplayInterface.h.
       
@@ -32,13 +32,15 @@
 OLED::OLED(Adafruit_SSD1306 *_oled,
            uint8_t _OLED_WIDTH,
            uint8_t _OLED_HEIGHT,
-           uint8_t _OLED_ADDR) {
+           uint8_t _OLED_ADDR,
+           uint8_t _vccPin) {
   // Store objects provided by the user.
   // The display object is initialized externally (requires pins).
   oled = _oled;
   OLED_WIDTH = _OLED_WIDTH;
   OLED_HEIGHT = _OLED_HEIGHT;
   OLED_ADDR = _OLED_ADDR;
+  setVccPin(_vccPin);
 }
 
 OLED::~OLED() {
@@ -46,7 +48,13 @@ OLED::~OLED() {
 }
 
 
-void OLED::init(uint8_t vccPin) {
+void OLED::init(uint8_t _vccPin) {
+  setVccPin(_vccPin);
+  init();
+}
+
+
+void OLED::init() {
   // Runs all the necessary startup for the OLED.
   Serial.print(F("\nInitializing OLED..."));
   
@@ -73,7 +81,13 @@ void OLED::init(uint8_t vccPin) {
 }
 
 
-void OLED::shutdown(uint8_t vccPin) {
+void OLED::shutdown(uint8_t _vccPin) {
+  setVccPin(_vccPin);
+  shutdown();
+}
+
+
+void OLED::shutdown() {
   //oled->noDisplay();
   digitalWrite(vccPin, LOW);
 }
@@ -96,4 +110,8 @@ void OLED::clear() {
   // Remove all information from the OLED.
   oled->clearDisplay();
   oled->display();
+}
+
+void OLED::setVccPin(uint8_t _vccPin) {
+  vccPin = _vccPin;
 }
