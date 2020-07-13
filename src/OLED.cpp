@@ -40,7 +40,7 @@ OLED::OLED(Adafruit_SSD1306 *_oled,
   OLED_WIDTH = _OLED_WIDTH;
   OLED_HEIGHT = _OLED_HEIGHT;
   OLED_ADDR = _OLED_ADDR;
-  _vccPin = vccPin;
+  setVccPin(_vccPin);
 }
 
 OLED::~OLED() {
@@ -49,7 +49,7 @@ OLED::~OLED() {
 
 
 void OLED::init(uint8_t _vccPin) {
-  vccPin = _vccPin;
+  setVccPin(_vccPin);
   init();
 }
 
@@ -82,7 +82,7 @@ void OLED::init() {
 
 
 void OLED::shutdown(uint8_t _vccPin) {
-  vccPin = _vccPin;
+  setVccPin(_vccPin);
   shutdown();
 }
 

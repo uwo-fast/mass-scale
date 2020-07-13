@@ -38,7 +38,7 @@ LCD::LCD(LiquidCrystal *_lcd,
   lcd = _lcd;
   LCD_ROWS = _LCD_ROWS;
   LCD_COLS = _LCD_COLS;
-  vccPin = _vccPin;
+  setVccPin(_vccPin);
 }
 
 LCD::~LCD() {
@@ -47,7 +47,7 @@ LCD::~LCD() {
 
 
 void LCD::init(uint8_t _vccPin) {
-  vccPin = _vccPin;
+  setVccPin(_vccPin);
   init();
 }
 
@@ -91,7 +91,7 @@ void LCD::init() {
 
 
 void LCD::shutdown(uint8_t _vccPin) {
-  vccPin = _vccPin;
+  setVccPin(_vccPin);
   shutdown();
 }
 
