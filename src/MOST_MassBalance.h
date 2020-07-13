@@ -68,7 +68,7 @@
 class MOST_MassBalance {
   public:
     /**
-     * Contstructor
+     * Constructor (Deprecated - do not provide display_vcc)
      *
      * @param _display instance of a DisplayInterface child, used to
      *    manage the display output
@@ -78,10 +78,27 @@ class MOST_MassBalance {
      * @param _cal_standard_units default units for calibration mass
      */
     MOST_MassBalance(Display *_display=nullptr,
-                     int display_vcc=5,
-                     int btn_tare=8,
+                     uint8_t display_vcc=5, 
+                     uint8_t btn_tare=8,
                      double _cal_standard_mass=100,
-                     String _cal_standard_units="g");
+                     String _cal_standard_units="g",
+                     uint8_t queue_size=10);
+                     
+    /**
+     * Constructor
+     *
+     * @param _display instance of a DisplayInterface child, used to
+     *    manage the display output
+     * @param btn_tare the pin in pullup mode to measure tare button
+     * @param _cal_standard_mass default mass used for calibration
+     * @param _cal_standard_units default units for calibration mass
+     */
+    MOST_MassBalance(Display *_display=nullptr,
+                     uint8_t btn_tare=-1,
+                     double _cal_standard_mass=100,
+                     String _cal_standard_units="g",
+                     uint8_t queue_size=10);
+    
     /// Free allocated memory.
     ~MOST_MassBalance();
     
@@ -130,8 +147,6 @@ class MOST_MassBalance {
     const String REV = "3.2.0";
     
     // Configurable variables.
-    Display *display;
-    uint8_t DISPLAY_VCC;
     uint8_t BTN_TARE;
     // Calibration standard.
     double cal_standard_mass;
@@ -177,6 +192,8 @@ class MOST_MassBalance {
     // Internal Variables.
     HX711 loadcell;
     DataFilter *hxQueue;
+    // Provided externally.
+    Display *display;
 
     // Used as an offset from zero (ie for a container). Tare is done in
     // this script, while zero is implemented within the HX711 library.

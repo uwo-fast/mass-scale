@@ -79,6 +79,15 @@ class Display {
     /// Clear the display.
     virtual void clear();
     
+    /**
+     * Set the vccPin.
+     *
+     * Implemented for backwards compatibility of MOST_MassBalance.
+     *
+     * @param _vccPin the pin used to power the display
+     */
+    virtual void setVccPin(uint8_t _vccPin);
+    
   protected:
     uint8_t vccPin;
 };

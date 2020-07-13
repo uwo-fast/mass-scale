@@ -91,6 +91,15 @@ class LCD : virtual public Display {
     /// Clear the display.
     void clear() override;
     
+    /**
+     * Set the vccPin.
+     *
+     * Implemented for backwards compatibility of MOST_MassBalance.
+     *
+     * @param _vccPin the pin used to power the display
+     */
+    void setVccPin(uint8_t _vccPin) override;
+    
   private:
     LiquidCrystal *lcd;
     uint8_t LCD_ROWS;

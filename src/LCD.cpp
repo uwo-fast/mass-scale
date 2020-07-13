@@ -114,3 +114,8 @@ void LCD::clear() {
   // Remove all information from the LCD.
   lcd->clear();
 }
+
+
+void LCD::setVccPin(uint8_t _vccPin) {
+  vccPin = _vccPin;
+}

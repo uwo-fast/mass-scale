@@ -111,3 +111,7 @@ void OLED::clear() {
   oled->clearDisplay();
   oled->display();
 }
+
+void OLED::setVccPin(uint8_t _vccPin) {
+  vccPin = _vccPin;
+}

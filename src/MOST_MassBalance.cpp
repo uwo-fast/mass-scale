@@ -52,14 +52,27 @@
 
 
 MOST_MassBalance::MOST_MassBalance(Display *_display,
-                                   int display_vcc,
-                                   int btn_tare,
+                                   uint8_t display_vcc,
+                                   uint8_t btn_tare,
+                                   double _cal_standard_mass,
+                                   String _cal_standard_units
+                                   uint8_t queue_size) {
+  MOST_MassBalance(_display,
+                   btn_tare,
+                   _cal_standard_mass,
+                   _cal_standard_units,
+                   queue_size);
+  display->setVccPin(display_vcc);
+}
+
+
+MOST_MassBalance::MOST_MassBalance(Display *_display,
+                                   uint8_t btn_tare,
                                    double _cal_standard_mass,
                                    String _cal_standard_units
                                    uint8_t queue_size) {
   // Assign configurable variables.
   display = _display;
-  DISPLAY_VCC = display_vcc;
   BTN_TARE = btn_tare;
   cal_standard_mass = _cal_standard_mass;
   cal_standard_units = ArrayHelper::rightJustify(_cal_standard_units,
@@ -165,9 +178,9 @@ void MOST_MassBalance::initLoadCell(int HX_VCC, int HX_DT, int HX_SCK) {
 }
 
 
-void MOST_MassBalance::initDisplay(){
+void MOST_MassBalance::initDisplay() {
   if (display && !isDisplayOn) { // display is not a NULL pointer.
-    display->init(DISPLAY_VCC);
+    display->init();
     isDisplayOn = 1;
   }
 }
@@ -372,7 +385,7 @@ void MOST_MassBalance::clearDisplay() {
 void MOST_MassBalance::shutdownDisplay() {
   // Turn the display off to save power (if there is a display).
   if (display && isDisplayOn) { // display is not a NULL pointer.
-    display->shutdown(DISPLAY_VCC);
+    display->shutdown();
     isDisplayOn = 0;
   }
 }
