@@ -112,8 +112,16 @@ class MOST_MassBalance {
      
     void measureListenReportAtRate(double report_rate=1.0);
     
-    /// Run a sequence of initializers for the mass balance.
-    void begin();
+    /**
+     * Run a sequence of initializers for the mass balance.
+     * 
+     * @param HX_VCC is the pin used to power the HX711
+     * @param HX_DT is the pin used to receive data from the HX711
+     * @param HX_SCK is the clock pin
+     */
+    void begin(uint8_t HX_VCC=4,
+               uint8_t HX_DT=2,
+               uint8_t HX_SCK=3);    
     
     // Serial.
     /// Run the serial command receive/response sequence.
@@ -224,7 +232,7 @@ class MOST_MassBalance {
      * @param HX_DT pin connected to HX711 DT pin
      * @param HX_SCK pin connected to HX711 SCK pin
      */    
-    void initLoadCell(int HX_VCC=4, int HX_DT=2, int HX_SCK=3);
+    void initLoadCell(uint8_t HX_VCC, uint8_t HX_DT, uint8_t HX_SCK);
     /// Call the display's initialization sequence.
     void initDisplay();
     /// Reset the data handler's queue to all zeros.

@@ -118,15 +118,13 @@ void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
 
 
 //-----------------INITIALIZATION functions---------------------------//
-void MOST_MassBalance::begin(){
+void MOST_MassBalance::begin(uint8_t HX_VCC, uint8_t HX_DT, uint8_t HX_SCK) {
   // Run all initialization functions.
   // Initialization serial output is the only non-standard output in 
   // this library.
   initSerial();
-  initLoadCell();
-  if (display) {
-    initDisplay();
-  }
+  initLoadCell(HX_VCC, HX_DT, HX_SCK);
+  initDisplay();
   getSensitivity();
   initQueue();
   pinMode(BTN_TARE, INPUT_PULLUP);
@@ -144,7 +142,9 @@ void MOST_MassBalance::initSerial() {
 }
 
 
-void MOST_MassBalance::initLoadCell(int HX_VCC, int HX_DT, int HX_SCK) {
+void MOST_MassBalance::initLoadCell(uint8_t HX_VCC,
+                                    uint8_t HX_DT,
+                                    uint8_t HX_SCK) {
   // Turn on HX711 and read sensitivity from memory.
   Serial.print(F("\nInitializing HX711..."));
   
