@@ -17,6 +17,9 @@
       3.1.1 : Require installed libraries for displays.
       3.1.2 : Make getMass() public.
       3.2.0 : Add ArrayHelper namespace for interacting with arrays.
+      3.3.0 : Store data only with the owner. Add new argument lists to
+              give the caller better control of the layout. Add 
+              getUnits() to public API.
       
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
@@ -155,7 +158,7 @@ class MOST_MassBalance {
     
   private:
     //-------------Values---------------------------------------------//
-    const String REV = "3.2.0";
+    const String REV = "3.3.0";
     
     // Configurable variables.
     uint8_t BTN_TARE;
