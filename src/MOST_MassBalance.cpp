@@ -499,6 +499,11 @@ void MOST_MassBalance::setUnits(String _units) {
 }
 
 
+String MOST_MassBalance::getUnits() {
+  return units;
+}
+
+
 //-----------------HELPER Functions-----------------------------------//
 String MOST_MassBalance::getNetOrGross() {
   // Return Net/Gross status. Net if tared, Gross if tare = 0.

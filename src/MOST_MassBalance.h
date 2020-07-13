@@ -149,6 +149,9 @@ class MOST_MassBalance {
     /// Run clearTareSilent and report the new mass.
     void clearTare();
     
+    // Getters.
+    /// @returns units string (3 characters).
+    String getUnits();
     
   private:
     //-------------Values---------------------------------------------//
