@@ -55,22 +55,22 @@ MOST_MassBalance::MOST_MassBalance(Display *_display,
                                    uint8_t display_vcc,
                                    uint8_t btn_tare,
                                    double _cal_standard_mass,
-                                   String _cal_standard_units
+                                   String _cal_standard_units,
                                    uint8_t queue_size) {
-  MOST_MassBalance(_display,
+  MOST_MassBalance(queue_size,
                    btn_tare,
+                   _display,
                    _cal_standard_mass,
-                   _cal_standard_units,
-                   queue_size);
+                   _cal_standard_units);
   display->setVccPin(display_vcc);
 }
 
 
-MOST_MassBalance::MOST_MassBalance(Display *_display,
+MOST_MassBalance::MOST_MassBalance(uint8_t queue_size,
                                    uint8_t btn_tare,
+                                   Display *_display,
                                    double _cal_standard_mass,
-                                   String _cal_standard_units
-                                   uint8_t queue_size) {
+                                   String _cal_standard_units) {
   // Assign configurable variables.
   display = _display;
   BTN_TARE = btn_tare;

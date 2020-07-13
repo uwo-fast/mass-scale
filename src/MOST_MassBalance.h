@@ -93,11 +93,11 @@ class MOST_MassBalance {
      * @param _cal_standard_mass default mass used for calibration
      * @param _cal_standard_units default units for calibration mass
      */
-    MOST_MassBalance(Display *_display=nullptr,
+    MOST_MassBalance(uint8_t queue_size=10,
                      uint8_t btn_tare=-1,
+                     Display *_display=nullptr,
                      double _cal_standard_mass=100,
-                     String _cal_standard_units="g",
-                     uint8_t queue_size=10);
+                     String _cal_standard_units="g");
     
     /// Free allocated memory.
     ~MOST_MassBalance();
