@@ -45,25 +45,37 @@ class LCD : virtual public Display {
      *
      * @param *_lcd pointer to the object driving the display.
      * @param _LCD_ROWS, _LCD_COLS number of rows of characters (used by
-     * print)
+     *    print)
+     * @param _vccPin specifies the pin used to power the display.
      */
     LCD(LiquidCrystal *_lcd,
         uint8_t _LCD_ROWS=2,
-        uint8_t _LCD_COLS=16);
+        uint8_t _LCD_COLS=16,
+        uint8_t _vccPin=-1);
+        
     /// Free Allocated memory.
     ~LCD();
+    
     /**
      * Turn on the display and initialize its driver.
      *
      * @param vccPin the pin used to power the display
      */
-    void init(uint8_t vccPin);
+    void init(uint8_t _vccPin) override;
+        
+    /// Initialize using a known vccPin.
+    virtual void init() override;
+    
     /**
      * Turn off the display.
      *
      * @param vccPin the pin used to power the display
      */
-    void shutdown(uint8_t vccPin);
+    void shutdown(uint8_t _vccPin) override;
+        
+    /// Shutdown using a known vccPin.
+    virtual void shutdown() override;
+    
     /**
      * Print a string to the display, starting at a specific location.
      *
@@ -74,9 +86,19 @@ class LCD : virtual public Display {
      * @param col the horizontal position to start at, measured in the
      *    same manner as row.
      */
-    void print(String output, uint8_t row, uint8_t col);  
+    void print(String output, uint8_t row, uint8_t col) override;
+    
     /// Clear the display.
-    void clear();
+    void clear() override;
+    
+    /**
+     * Set the vccPin.
+     *
+     * Implemented for backwards compatibility of MOST_MassBalance.
+     *
+     * @param _vccPin the pin used to power the display
+     */
+    void setVccPin(uint8_t _vccPin) override;
     
   private:
     LiquidCrystal *lcd;

@@ -29,12 +29,16 @@
 #include "LCD.h"
 
 
-LCD::LCD(LiquidCrystal *_lcd, uint8_t _LCD_ROWS, uint8_t _LCD_COLS) {
+LCD::LCD(LiquidCrystal *_lcd,
+         uint8_t _LCD_ROWS,
+         uint8_t _LCD_COLS,
+         uint8_t _vccPin) {
   // Store objects provided by the user.
   // The display object is initialized externally (requires pins).
   lcd = _lcd;
   LCD_ROWS = _LCD_ROWS;
   LCD_COLS = _LCD_COLS;
+  setVccPin(_vccPin);
 }
 
 LCD::~LCD() {
@@ -42,7 +46,13 @@ LCD::~LCD() {
 }
 
 
-void LCD::init(uint8_t vccPin) {
+void LCD::init(uint8_t _vccPin) {
+  setVccPin(_vccPin);
+  init();
+}
+
+
+void LCD::init() {
   // Run all the necessary startup for the LCD.  
   Serial.print(F("\nInitializing LCD..."));
   
@@ -80,7 +90,13 @@ void LCD::init(uint8_t vccPin) {
 }
 
 
-void LCD::shutdown(uint8_t vccPin) {
+void LCD::shutdown(uint8_t _vccPin) {
+  setVccPin(_vccPin);
+  shutdown();
+}
+
+
+void LCD::shutdown() {
   lcd->noDisplay();
   digitalWrite(vccPin, LOW);
 }
@@ -97,4 +113,9 @@ void LCD::print(String output, uint8_t row, uint8_t col) {
 void LCD::clear() {
   // Remove all information from the LCD.
   lcd->clear();
+}
+
+
+void LCD::setVccPin(uint8_t _vccPin) {
+  vccPin = _vccPin;
 }

@@ -17,6 +17,9 @@
       3.1.1 : Require installed libraries for displays.
       3.1.2 : Make getMass() public.
       3.2.0 : Add ArrayHelper namespace for interacting with arrays.
+      3.3.0 : Store data only with the owner. Add new argument lists to
+              give the caller better control of the layout. Add 
+              getUnits() to public API.
 
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
@@ -52,18 +55,32 @@
 
 
 MOST_MassBalance::MOST_MassBalance(Display *_display,
-                                   int display_vcc,
-                                   int btn_tare,
+                                   uint8_t display_vcc,
+                                   uint8_t btn_tare,
                                    double _cal_standard_mass,
-                                   String _cal_standard_units){
+                                   String _cal_standard_units,
+                                   uint8_t queue_size) {
+  MOST_MassBalance(queue_size,
+                   btn_tare,
+                   _display,
+                   _cal_standard_mass,
+                   _cal_standard_units);
+  display->setVccPin(display_vcc);
+}
+
+
+MOST_MassBalance::MOST_MassBalance(uint8_t queue_size,
+                                   uint8_t btn_tare,
+                                   Display *_display,
+                                   double _cal_standard_mass,
+                                   String _cal_standard_units) {
   // Assign configurable variables.
   display = _display;
-  DISPLAY_VCC = display_vcc;
   BTN_TARE = btn_tare;
   cal_standard_mass = _cal_standard_mass;
   cal_standard_units = ArrayHelper::rightJustify(_cal_standard_units,
                                                  UNIT_WIDTH);
-  hxQueue = new DataFilter(QUEUE_SIZE);
+  hxQueue = new DataFilter(queue_size);
 }
 
 
@@ -104,15 +121,13 @@ void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
 
 
 //-----------------INITIALIZATION functions---------------------------//
-void MOST_MassBalance::begin(){
+void MOST_MassBalance::begin(uint8_t HX_VCC, uint8_t HX_DT, uint8_t HX_SCK) {
   // Run all initialization functions.
   // Initialization serial output is the only non-standard output in 
   // this library.
   initSerial();
-  initLoadCell();
-  if (display) {
-    initDisplay();
-  }
+  initLoadCell(HX_VCC, HX_DT, HX_SCK);
+  initDisplay();
   getSensitivity();
   initQueue();
   pinMode(BTN_TARE, INPUT_PULLUP);
@@ -130,7 +145,9 @@ void MOST_MassBalance::initSerial() {
 }
 
 
-void MOST_MassBalance::initLoadCell(int HX_VCC, int HX_DT, int HX_SCK) {
+void MOST_MassBalance::initLoadCell(uint8_t HX_VCC,
+                                    uint8_t HX_DT,
+                                    uint8_t HX_SCK) {
   // Turn on HX711 and read sensitivity from memory.
   Serial.print(F("\nInitializing HX711..."));
   
@@ -164,9 +181,9 @@ void MOST_MassBalance::initLoadCell(int HX_VCC, int HX_DT, int HX_SCK) {
 }
 
 
-void MOST_MassBalance::initDisplay(){
+void MOST_MassBalance::initDisplay() {
   if (display && !isDisplayOn) { // display is not a NULL pointer.
-    display->init(DISPLAY_VCC);
+    display->init();
     isDisplayOn = 1;
   }
 }
@@ -371,7 +388,7 @@ void MOST_MassBalance::clearDisplay() {
 void MOST_MassBalance::shutdownDisplay() {
   // Turn the display off to save power (if there is a display).
   if (display && isDisplayOn) { // display is not a NULL pointer.
-    display->shutdown(DISPLAY_VCC);
+    display->shutdown();
     isDisplayOn = 0;
   }
 }
@@ -452,7 +469,7 @@ void MOST_MassBalance::calibrate() {
   double hxReadout = 0;
   
   // Fill the averaging queue.
-  for (int i = QUEUE_SIZE; i>0; i--) {
+  for (uint8_t i = hxQueue->getQueueSize(); i>0; i--) {
     // Add extra space to overwrite trailing digit when a place 
     // disappears (e.g. 10 --> 9, the 0 would be left on screen).
     printToDisplay("Avg rem: " + String(i) + " ", 1, 0);
@@ -482,6 +499,11 @@ void MOST_MassBalance::setUnits(String _units) {
   for (int i = 0; i < UNIT_WIDTH; i++) {
     EEPROM.put(CAL_UNITS_ADDR + sizeof(char)*i, units[i]);
   }
+}
+
+
+String MOST_MassBalance::getUnits() {
+  return units;
 }
 
 

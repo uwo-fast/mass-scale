@@ -43,6 +43,11 @@ DataFilter::~DataFilter() {
 }
 
 
+uint8_t DataFilter::getQueueSize() {
+  return n_taps;
+}
+
+
 void DataFilter::push(double val) {
   // Replace the oldest value with the newest value.
   data_queue[queue_idx] = val;

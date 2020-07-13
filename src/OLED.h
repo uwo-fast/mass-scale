@@ -1,5 +1,5 @@
-/*  LCD is a supporting class for MOST_MassBalance.
-      It acts as an interface with Liquid Crystal Displays by 
+/*  OLED is a supporting class for MOST_MassBalance.
+      It acts as an interface with Adafruits graphics library,
       implementing the abstract class Display, defined in 
       DisplayInterface.h.
       
@@ -41,18 +41,70 @@
 
 class OLED : virtual public Display {
   public:
-    Adafruit_SSD1306 *oled;
+    /**
+     * Constructor
+     *
+     * @param *_oled pointer to the object driving the display.
+     * @param _OLED_WIDTH, _OLED_HEIGHT number of rows of characters
+     *    (used by print)
+     * @param _OLED_ADDR address for I2C communication.
+     * @param vccPin specifies the pin used to power the display.
+     */
     OLED(Adafruit_SSD1306 *_oled,
          uint8_t _OLED_WIDTH=128,
          uint8_t _OLED_HEIGHT=64,
-         uint8_t _OLED_ADDR=0x3C);
+         uint8_t _OLED_ADDR=0x3C,
+         uint8_t vccPin=-1);
+        
+    /// Free Allocated memory.
     ~OLED();
-    void init(uint8_t vccPin);
-    void shutdown(uint8_t vccPin);
-    void print(String output, uint8_t row, uint8_t col);  
-    void clear();
+    
+    /**
+     * Turn on the display and initialize its driver.
+     *
+     * @param vccPin the pin used to power the display
+     */
+    void init(uint8_t _vccPin) override;
+        
+    /// Initialize using a known vccPin.
+    virtual void init() override;
+    
+    /**
+     * Turn off the display.
+     *
+     * @param vccPin the pin used to power the display
+     */
+    void shutdown(uint8_t _vccPin) override;
+        
+    /// Shutdown using a known vccPin.
+    virtual void shutdown() override;
+    
+    /**
+     * Print a string to the display, starting at a specific location.
+     *
+     * @param output the string to print
+     * @param row the vertical position to start at, measured by 
+     *    character (i.e. row 2 is shifted down the size of one mono-
+     *    spaced character from row 1).
+     * @param col the horizontal position to start at, measured in the
+     *    same manner as row.
+     */
+    void print(String output, uint8_t row, uint8_t col) override;
+    
+    /// Clear the display.
+    void clear() override;
+    
+    /**
+     * Set the vccPin.
+     *
+     * Implemented for backwards compatibility of MOST_MassBalance.
+     *
+     * @param _vccPin the pin used to power the display
+     */
+    void setVccPin(uint8_t _vccPin) override;
     
   private:
+    Adafruit_SSD1306 *oled;
     uint8_t OLED_WIDTH;
     uint8_t OLED_HEIGHT;
     uint8_t OLED_ADDR;
