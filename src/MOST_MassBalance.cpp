@@ -209,8 +209,18 @@ void MOST_MassBalance::zero() {
 
 void MOST_MassBalance::zeroSilent() {
   // Zero without serial response. Used for button-press and calibrate.
-  loadcell.tare(hxQueue->getQueueSize());
   clearTareSilent();
+  
+  // Generate a queue to get an average out of.
+  uint8_t queue_size = hxQueue->getQueueSize() * 2;
+  DataFilter zeroQueue = DataFilter(queue_size);
+  // Fill the averaging queue.
+  for (uint8_t i = queue_size*2; i>0; i--) {
+    zeroQueue.push(loadcell.read_average(HX_NUM_AVGS));
+    delay(200);
+  }
+  
+  loadcell.set_offset(zeroQueue.getAverage());
 }
 
 
