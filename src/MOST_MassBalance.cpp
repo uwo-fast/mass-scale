@@ -93,13 +93,17 @@ void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
   // Continuously update mass averaging window, slow down all else.
   // Initialize time tracker.
   static unsigned long lastRefresh = 1;
+  // Convert rate into period (ms). This is not static b/c report_rate
+  // could be changed in a future call to the function. 
+  double report_period = 1.0/report_rate * 1000.0;
   
   // Keep data moving through the averaging filter as fast as possible. 
   double mass = getMassAveraged();
   
   // Enforce report rate without hampering sample rate (sample rate 
   // depends on how much processing is done between each call.
-  if (millis() - lastRefresh > 1/report_rate * 1000) {
+  // This makes use of integer math to truncate values.
+  if (millis()/report_period - lastRefresh/report_period >= 1) {
     // Reset the time.
     lastRefresh = millis();
     
