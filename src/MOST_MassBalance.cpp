@@ -205,7 +205,7 @@ void MOST_MassBalance::zero() {
 
 void MOST_MassBalance::zeroSilent() {
   // Zero without serial response. Used for button-press and calibrate.
-  loadcell.tare(HX_NUM_AVGS);
+  loadcell.tare(hxQueue->getQueueSize());
   clearTareSilent();
 }
 
