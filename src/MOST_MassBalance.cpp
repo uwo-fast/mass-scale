@@ -95,7 +95,7 @@ void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
   static unsigned long lastRefresh = 1;
   // Convert rate into period (ms). This is not static b/c report_rate
   // could be changed in a future call to the function. 
-  double report_period = 1.0/report_rate * 1000.0;
+  int report_period = 1.0/report_rate * 1000.0;
   
   // Keep data moving through the averaging filter as fast as possible. 
   double mass = getMassAveraged();
