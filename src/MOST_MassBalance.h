@@ -20,6 +20,8 @@
       3.3.0 : Store data only with the owner. Add new argument lists to
               give the caller better control of the layout. Add 
               getUnits() to public API.
+      3.3.1 : Make zeroing an averaged action. Correct report_rate
+              behavior. 
       
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
@@ -158,7 +160,7 @@ class MOST_MassBalance {
     
   private:
     //-------------Values---------------------------------------------//
-    const String REV = "3.3.0";
+    const String REV = "3.3.1";
     
     // Configurable variables.
     uint8_t BTN_TARE;

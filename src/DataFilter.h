@@ -78,7 +78,7 @@ class DataFilter {
   private:
     double *data_queue;
     uint8_t n_taps;
-    uint8_t queue_idx;
+    uint8_t queue_idx = 0;
 };
 
 

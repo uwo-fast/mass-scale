@@ -20,6 +20,8 @@
       3.3.0 : Store data only with the owner. Add new argument lists to
               give the caller better control of the layout. Add 
               getUnits() to public API.
+      3.3.1 : Make zeroing an averaged action. Correct report_rate
+              behavior. 
 
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
@@ -93,13 +95,17 @@ void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
   // Continuously update mass averaging window, slow down all else.
   // Initialize time tracker.
   static unsigned long lastRefresh = 1;
+  // Convert rate into period (ms). This is not static b/c report_rate
+  // could be changed in a future call to the function. 
+  int report_period = 1.0/report_rate * 1000.0;
   
   // Keep data moving through the averaging filter as fast as possible. 
   double mass = getMassAveraged();
   
   // Enforce report rate without hampering sample rate (sample rate 
   // depends on how much processing is done between each call.
-  if (millis() - lastRefresh > 1/report_rate * 1000) {
+  // This makes use of integer math to truncate values.
+  if (millis()/report_period - lastRefresh/report_period >= 1) {
     // Reset the time.
     lastRefresh = millis();
     
@@ -205,8 +211,18 @@ void MOST_MassBalance::zero() {
 
 void MOST_MassBalance::zeroSilent() {
   // Zero without serial response. Used for button-press and calibrate.
-  loadcell.tare(HX_NUM_AVGS);
   clearTareSilent();
+  
+  // Generate a queue to get an average out of.
+  uint8_t queue_size = hxQueue->getQueueSize() * 2;
+  DataFilter zeroQueue = DataFilter(queue_size);
+  // Fill the averaging queue.
+  for (uint8_t i = queue_size*2; i>0; i--) {
+    zeroQueue.push(loadcell.read_average(HX_NUM_AVGS));
+    delay(200);
+  }
+  
+  loadcell.set_offset(zeroQueue.getAverage());
 }
 
 
