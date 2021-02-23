@@ -1,20 +1,20 @@
 /*  DigitalMassBalance uses a load cell to measure and report an object's mass.
-      This firmware is designed to meet SMA SCP 0499 Level #2 for scale serial 
-      communication. The command and response formats for serial communication 
+      This firmware is designed to meet SMA SCP 0499 Level #2 for scale serial
+      communication. The command and response formats for serial communication
       are documented in included files.
-      
-      The scale was designed by researchers in Michigan Technological 
+
+      The scale was designed by researchers in Michigan Technological
       University's MOST group <https://www.appropedia.org/Category:MOST>
-      
+
       REVISIONS:
       1.0.0 : Initial release - function scale with serial reporting.
       2.0.0 : First release up to SMA standards. Work to do on data filtering.
-      
+
     Copyright (C) 2020 Benjamin Hubbard
-      ! Note that external libraries included with this software are 
-        subject to their own licenses, included within their respective 
+      ! Note that external libraries included with this software are
+        subject to their own licenses, included within their respective
         folders.
-        
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -31,8 +31,10 @@
 */
 
 
-// Headers including a variety of definitions for the scale. These are separated
-// to help reduce the length of this script.
+// To actually use this example, the 'src' folder must be located in the same
+// folder as this file. Arduino won't accept code that's elsewhere in the file
+// tree unless it's properly installed.
+// (https://arduino.github.io/arduino-cli/sketch-specification/)
 #include "src\MOST_MassBalance.h"
 #include "src\OLED.h"
 #include "src\LCD.h"

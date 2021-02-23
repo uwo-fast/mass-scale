@@ -1,16 +1,16 @@
 /*  MOST_MassBalance is a library of drivers for a digital mass balance
-      
+
       This firmware is designed to meet SMA SCP 0499 Level #2 for scale
-      serial communication. The command and response formats for serial 
+      serial communication. The command and response formats for serial
       communication are documented in included files.
-      
-      The scale was designed by researchers in Michigan Technological 
+
+      The scale was designed by researchers in Michigan Technological
       University's MOST group <https://www.appropedia.org/Category:MOST>
-      
+
       REVISIONS:
       1.0.0 : Initial release - function scale with serial reporting.
       2.0.0 : First release up to SMA standards. Work to do on data
-              filtering.      
+              filtering.
       3.0.0 : Refactor all functionality into a library.
       3.0.1 : Move data handling into a separate class.
       3.1.0 : Add OLED interface.
@@ -18,25 +18,26 @@
       3.1.2 : Make getMass() public.
       3.2.0 : Add ArrayHelper namespace for interacting with arrays.
       3.3.0 : Store data only with the owner. Add new argument lists to
-              give the caller better control of the layout. Add 
+              give the caller better control of the layout. Add
               getUnits() to public API.
       3.3.1 : Make zeroing an averaged action. Correct report_rate
-              behavior. 
-      
+              behavior.
+      3.3.2 : Make report_rate behavior check millis() once per iteration.
+
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
     - When using Arduino Serial Monitor, switch to 'Both NL & CR' in
-      bottom right. When the scale first starts up, hit enter once to 
-      queue up a <LF> character, otherwise the first command will not 
+      bottom right. When the scale first starts up, hit enter once to
+      queue up a <LF> character, otherwise the first command will not
       meet com standards and return a ?
     - When using Putty, use Ctrl+J for LF, followed by command, followed
       by Ctrl+M or simply Enter for CR.
-      
+
     Copyright (C) 2020 Benjamin Hubbard
-      ! Note that external libraries included with this software are 
-        subject to their own licenses, included within their respective 
+      ! Note that external libraries included with this software are
+        subject to their own licenses, included within their respective
         folders.
-        
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -57,8 +58,8 @@
 
 
 // Main Arduino library needs to be explicitly included for libraries.
-#include <Arduino.h> 
-// Hard memory read/write. 
+#include <Arduino.h>
+// Hard memory read/write.
 #include <EEPROM.h>
 // Load cell amplifier.
 #include "HX711/src/HX711.h"
@@ -83,12 +84,12 @@ class MOST_MassBalance {
      * @param _cal_standard_units default units for calibration mass
      */
     MOST_MassBalance(Display *_display=nullptr,
-                     uint8_t display_vcc=5, 
+                     uint8_t display_vcc=5,
                      uint8_t btn_tare=8,
                      double _cal_standard_mass=100,
                      String _cal_standard_units="g",
                      uint8_t queue_size=10);
-                     
+
     /**
      * Constructor
      *
@@ -103,35 +104,35 @@ class MOST_MassBalance {
                      Display *_display=nullptr,
                      double _cal_standard_mass=100,
                      String _cal_standard_units="g");
-    
+
     /// Free allocated memory.
     ~MOST_MassBalance();
-    
+
     /**
      * Read data at top speed, read and write to Serial at fixed rate.
      *
      * @param report_rate rate in Hz at which to check the Serial buffer
-     *    for incoming commands and send output to the display and 
+     *    for incoming commands and send output to the display and
      *    Serial output
      */
-     
+
     void measureListenReportAtRate(double report_rate=1.0);
-    
+
     /**
      * Run a sequence of initializers for the mass balance.
-     * 
+     *
      * @param HX_VCC is the pin used to power the HX711
      * @param HX_DT is the pin used to receive data from the HX711
      * @param HX_SCK is the clock pin
      */
     void begin(uint8_t HX_VCC=4,
                uint8_t HX_DT=2,
-               uint8_t HX_SCK=3);    
-    
+               uint8_t HX_SCK=3);
+
     // Serial.
     /// Run the serial command receive/response sequence.
     void doSerial();
-    
+
     // Mass.
     /**
      * Run getHxReadout and scale it to mass using sensitivity.
@@ -145,7 +146,7 @@ class MOST_MassBalance {
      * @returns the average mass computed by the data handler
      */
     double getMassAveraged();
-    
+
     // Offsets.
     /// Zero the HX711 object and report new mass over Serial.
     void zero();
@@ -153,23 +154,23 @@ class MOST_MassBalance {
     void tare();
     /// Run clearTareSilent and report the new mass.
     void clearTare();
-    
+
     // Getters.
     /// @returns units string (3 characters).
     String getUnits();
-    
+
   private:
     //-------------Values---------------------------------------------//
-    const String REV = "3.3.1";
-    
+    const String REV = "3.3.2";
+
     // Configurable variables.
     uint8_t BTN_TARE;
     // Calibration standard.
     double cal_standard_mass;
     // Calibration standard units.
     String cal_standard_units;
-    
-    
+
+
     // Response characteristics.
     // Number of digits after the decimal.
     uint8_t precision = 3;
@@ -177,8 +178,8 @@ class MOST_MassBalance {
     uint8_t aboutIdx = 4;
     // Scale range to report (this scale is single-range).
     uint8_t range = 1;
-    
-    
+
+
     // Non-configurable variables.
     // Baud rate defined by SMA SCP 0499.
     #define BAUD 9600
@@ -195,7 +196,7 @@ class MOST_MassBalance {
     #define CAL_WAIT 3000
     // Threshold to begin calibration (to prevent premature measuring).
     #define CAL_THRESHOLD 20000
-    
+
     // Number of averages completed by HX711 library.
     #define HX_NUM_AVGS 1
 
@@ -203,8 +204,8 @@ class MOST_MassBalance {
     #define WT_WIDTH 10
     // Response block width for a unit.
     #define UNIT_WIDTH 3
-    
-    
+
+
     // Internal Variables.
     HX711 loadcell;
     DataFilter *hxQueue;
@@ -220,46 +221,46 @@ class MOST_MassBalance {
     String units = "  g";
     bool isContinuousReport = 0;
     bool isDisplayOn = 0;
-    
+
     // Non-printable ASCII characters.
     #define LF 0x0A
     #define CR 0x0D
     #define ESC 0x1B
     #define SPACE 0x20
-    
-    
+
+
     //-------------Functions------------------------------------------//
     // Kept private because the serial API serves as the interface.
     // Initialization.
     /// Initialize serial.
     void initSerial();
-    /** 
+    /**
      * Initialize HX711
      *
      * @param HX_VCC pin used to provide 5V power to the amplifier
      * @param HX_DT pin connected to HX711 DT pin
      * @param HX_SCK pin connected to HX711 SCK pin
-     */    
+     */
     void initLoadCell(uint8_t HX_VCC, uint8_t HX_DT, uint8_t HX_SCK);
     /// Call the display's initialization sequence.
     void initDisplay();
     /// Reset the data handler's queue to all zeros.
     void initQueue();
-    
+
     // Offsets.
-    /// Zero the HX711 without any Serial output. 
+    /// Zero the HX711 without any Serial output.
     void zeroSilent();
-    
+
     /// Apply current mass readout to the locally managed tareWeight.
     void tareSilent();
     /// Reset tareWeight to zero .
     void clearTareSilent();
-    
+
     // Mass.
     /**
      * Read the current measurement from the HX711.
      *
-     * Does not interact with the data handler (the value is not added 
+     * Does not interact with the data handler (the value is not added
      * to the queue).
      *
      * @returns 24-bit readout from the HX711
@@ -271,20 +272,20 @@ class MOST_MassBalance {
      * @returns the average value calculated by the data handler
      */
     double getHxReadoutAveraged();
-    
+
     // Input.
-    /** 
+    /**
      * Check for a button press on btn_tare and respond to it
-     * 
+     *
      * Button presses initiate a tare action. Button holds initiate a
      * calibration sequence.
      */
     void listenForButtonInput();
-    
+
     // Output.
     /// Report the current tareWeight over Serial.
     void reportTare();
-    /** 
+    /**
      * Report the instantaneous mass (getMass) over Serial.
      *
      * @returns the mass to allow the same value to be displayed
@@ -316,7 +317,7 @@ class MOST_MassBalance {
      * Print a string to the display, starting at a specific location.
      *
      * @param output the string to print
-     * @param row the vertical position to start at, measured by 
+     * @param row the vertical position to start at, measured by
      *    character (i.e. row 2 is shifted down the size of one mono-
      *    spaced character from row 1).
      * @param col the horizontal position to start at, measured in the
@@ -329,7 +330,7 @@ class MOST_MassBalance {
     void shutdownDisplay();
     /// Report the mass to be used for calibration over Serial.
     void reportCalibrationMass();
-    
+
     // Sensitivity.
     /// Read the sensitivity from EEPROM (hard memory).
     void getSensitivity();
@@ -341,7 +342,7 @@ class MOST_MassBalance {
     void calibrate();
     /// Set the units used on the display and write them to EEPROM.
     void setUnits(String units);
-    
+
     // Helpers.
     /**
      * Check if the mass being reported is net or gross.
@@ -352,7 +353,7 @@ class MOST_MassBalance {
     String getNetOrGross();
     /// Send the Arduino back to setup.
     void softReset();
-    
+
     // Serial.
     /**
      * Read a command in from the Serial buffer.
@@ -371,6 +372,6 @@ class MOST_MassBalance {
     void doCommand(int *cmd, int startIdx, int endIdx);
 
 };
-    
-    
+
+
 #endif

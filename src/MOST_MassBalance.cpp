@@ -1,16 +1,16 @@
 /*  MOST_MassBalance is a library of drivers for a digital mass balance
-      
+
       This firmware is designed to meet SMA SCP 0499 Level #2 for scale
-      serial communication. The command and response formats for serial 
+      serial communication. The command and response formats for serial
       communication are documented in included files.
-      
-      The scale was designed by researchers in Michigan Technological 
+
+      The scale was designed by researchers in Michigan Technological
       University's MOST group <https://www.appropedia.org/Category:MOST>
-      
+
       REVISIONS:
       1.0.0 : Initial release - function scale with serial reporting.
       2.0.0 : First release up to SMA standards. Work to do on data
-              filtering.      
+              filtering.
       3.0.0 : Refactor all functionality into a library.
       3.0.1 : Move data handling into a separate class.
       3.1.0 : Add OLED interface.
@@ -18,25 +18,26 @@
       3.1.2 : Make getMass() public.
       3.2.0 : Add ArrayHelper namespace for interacting with arrays.
       3.3.0 : Store data only with the owner. Add new argument lists to
-              give the caller better control of the layout. Add 
+              give the caller better control of the layout. Add
               getUnits() to public API.
       3.3.1 : Make zeroing an averaged action. Correct report_rate
-              behavior. 
+              behavior.
+      3.3.2 : Make report_rate behavior check millis() once per iteration.
 
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
     - When using Arduino Serial Monitor, switch to 'Both NL & CR' in
-      bottom right. When the scale first starts up, hit enter once to 
-      queue up a <LF> character, otherwise the first command will not 
+      bottom right. When the scale first starts up, hit enter once to
+      queue up a <LF> character, otherwise the first command will not
       meet com standards and return a ?
     - When using Putty, use Ctrl+J for LF, followed by command, followed
       by Ctrl+M or simply Enter for CR.
-    
+
     Copyright (C) 2020 Benjamin Hubbard
-      ! Note that external libraries included with this software are 
-        subject to their own licenses, included within their respective 
+      ! Note that external libraries included with this software are
+        subject to their own licenses, included within their respective
         folders.
-        
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -48,7 +49,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see 
+    along with this program.  If not, see
     <https://www.gnu.org/licenses/>.
 */
 
@@ -93,32 +94,35 @@ MOST_MassBalance::~MOST_MassBalance() {
 
 void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
   // Continuously update mass averaging window, slow down all else.
-  // Initialize time tracker.
-  static unsigned long lastRefresh = 1;
+
+  unsigned long currentTime = millis();
+
+  // Initialize time tracker (only happens once).
+  static unsigned long lastRefresh = currentTime;
+
   // Convert rate into period (ms). This is not static b/c report_rate
-  // could be changed in a future call to the function. 
+  // could be changed in a future call to the function.
   int report_period = 1.0/report_rate * 1000.0;
-  
-  // Keep data moving through the averaging filter as fast as possible. 
+
+  // Keep data moving through the averaging filter as fast as possible.
   double mass = getMassAveraged();
-  
-  // Enforce report rate without hampering sample rate (sample rate 
+
+  // Enforce report rate without hampering sample rate (sample rate
   // depends on how much processing is done between each call.
-  // This makes use of integer math to truncate values.
-  if (millis()/report_period - lastRefresh/report_period >= 1) {
+  if (currentTime - lastRefresh > report_period) {
     // Reset the time.
-    lastRefresh = millis();
-    
+    lastRefresh += report_period;
+
     // Listen for input over serial.
     doSerial();
-    
+
     if (isContinuousReport) {
       // Report to serial and update 'mass' so the display matches.
       mass = reportMassAveraged();
     }
-    
+
     // Simple scale functionality. Note that placement of button
-    // listener requires an extended button press. Assuming a report 
+    // listener requires an extended button press. Assuming a report
     // rate of at least 1 Hz, this should not be an issue.
     displayMass(mass);
     listenForButtonInput();
@@ -129,7 +133,7 @@ void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
 //-----------------INITIALIZATION functions---------------------------//
 void MOST_MassBalance::begin(uint8_t HX_VCC, uint8_t HX_DT, uint8_t HX_SCK) {
   // Run all initialization functions.
-  // Initialization serial output is the only non-standard output in 
+  // Initialization serial output is the only non-standard output in
   // this library.
   initSerial();
   initLoadCell(HX_VCC, HX_DT, HX_SCK);
@@ -144,7 +148,7 @@ void MOST_MassBalance::begin(uint8_t HX_VCC, uint8_t HX_DT, uint8_t HX_SCK) {
 void MOST_MassBalance::initSerial() {
   // Initialize the serial connection.
   Serial.begin(BAUD);
-  
+
   while(!Serial) {
     // Wait for serial to initialize.
   } // Serial initialized.
@@ -156,17 +160,17 @@ void MOST_MassBalance::initLoadCell(uint8_t HX_VCC,
                                     uint8_t HX_SCK) {
   // Turn on HX711 and read sensitivity from memory.
   Serial.print(F("\nInitializing HX711..."));
-  
+
   // Turn on the HX711 power supply.
   pinMode(HX_VCC, OUTPUT);
   digitalWrite(HX_VCC, HIGH);
-  
+
   // Give it time to power on.
   delay(500);
-  
+
   // Initialize the HX711.
   loadcell.begin(HX_DT, HX_SCK);
-  
+
   // Wait until it's ready.
   bool is_ready = false;
   int num_retries = 3;
@@ -176,13 +180,13 @@ void MOST_MassBalance::initLoadCell(uint8_t HX_VCC,
     Serial.print(F("..."));
     is_ready = loadcell.wait_ready_retry(num_retries, wait_delay);
   }
-  
+
   // Give the HX711 a chance to finish initializing.
   delay(2000);
-  
+
   // Zero the scale (set the offset on data returned by the HX711).
   zeroSilent();
-  
+
   Serial.print(F("HX711 Initialized!\r\n\r"));
 }
 
@@ -199,7 +203,7 @@ void MOST_MassBalance::initQueue() {
   // Set averaging window size and fill with zeros.
   hxQueue->fill(0);
 }
-    
+
 
 //-----------------ZERO Functions-------------------------------------//
 void MOST_MassBalance::zero() {
@@ -212,7 +216,7 @@ void MOST_MassBalance::zero() {
 void MOST_MassBalance::zeroSilent() {
   // Zero without serial response. Used for button-press and calibrate.
   clearTareSilent();
-  
+
   // Generate a queue to get an average out of.
   uint8_t queue_size = hxQueue->getQueueSize() * 2;
   DataFilter zeroQueue = DataFilter(queue_size);
@@ -221,7 +225,7 @@ void MOST_MassBalance::zeroSilent() {
     zeroQueue.push(loadcell.read_average(HX_NUM_AVGS));
     delay(200);
   }
-  
+
   loadcell.set_offset(zeroQueue.getAverage());
 }
 
@@ -266,7 +270,7 @@ double MOST_MassBalance::getHxReadoutAveraged() {
   // Interface with the data handler and return an average raw value.
   // Place the current mass (24-bit unscaled number) in the queue.
   hxQueue->push(getHxReadout());
-  
+
   return hxQueue->getAverage();
 }
 
@@ -293,19 +297,19 @@ void MOST_MassBalance::listenForButtonInput() {
       // Give the user an indication of detection on the display.
       // TODO: Make these numbers mean something.
       printToDisplay(".", 1, 15);
-      
+
       while (digitalRead(BTN_TARE) == 0) {  // Button is pressed.
         // Wait for button release.
       } // Button is released.
-      
+
       // Clear the '.' indicator once the button is released.
       printToDisplay(" ", 1, 15);
-      
+
       // Check when the button was released.
       unsigned long time_of_release = millis();
-      
+
       // Behavior is determined by length of button press.
-      if (time_of_release - time_of_press < CAL_WAIT) { 
+      if (time_of_release - time_of_press < CAL_WAIT) {
         // Button was 'pressed', requesting a tare.
         // Use zero to simulate tare because there is no way to clear
         // tare with the button.
@@ -358,11 +362,11 @@ void MOST_MassBalance::reportSmaFormat(double _mass,
   } else {
     scale_status = " ";
   }
-  
+
   // Size and string-ify the mass to report.
   String massStr = ArrayHelper::rightJustify(String(_mass, precision),
                                              WT_WIDTH);
-  
+
   // SMA formatted response.
   String response = "\n";           // <LF>
   response += scale_status;         // <s>
@@ -420,12 +424,12 @@ void MOST_MassBalance::reportCalibrationMass() {
 void MOST_MassBalance::getSensitivity() {
   // Fetch the stored sensitivity value from memory.
   Serial.print(F("\nReading sensitivity from memory..."));
-  
+
   // The calibration value is stored with an indicator character - check
   // for it.
   char cal_check;
   EEPROM.get(CAL_SIGNATURE_ADDR, cal_check);
-  
+
   if (cal_check != CAL_SIGNATURE) {
     // The expected character is not there.
     Serial.print(F("No sensitivity stored in memory.\r"));
@@ -436,7 +440,7 @@ void MOST_MassBalance::getSensitivity() {
       EEPROM.get(CAL_UNITS_ADDR + sizeof(char)*i, units[i]);
     }
   }
-  
+
   reportSensitivity();
 }
 
@@ -450,7 +454,7 @@ void MOST_MassBalance::setSensitivity() {
 
 void MOST_MassBalance::reportSensitivity() {
   // Report sensitivity over serial (only done during startup).
-  Serial.print("\nSensitivity: " + String(sensitivity, precision) + 
+  Serial.print("\nSensitivity: " + String(sensitivity, precision) +
     " div/" + units + "\r\n\r");
 }
 
@@ -460,11 +464,11 @@ void MOST_MassBalance::calibrate() {
   // Tell the user what mass to use.
   printToDisplay("Cal w/ " + String(cal_standard_mass, precision)
     + cal_standard_units, 0, 0);
-    
+
   // Ensure the scale is zeroed.
   clearTareSilent();
   zeroSilent();
-  
+
   // Wait for the mass to get added (no use averaging with no weight on
   // the scale).
   printToDisplay("Add mass...", 1, 0);
@@ -476,32 +480,32 @@ void MOST_MassBalance::calibrate() {
       return;
     }
   } // Mass apparently added.
-  
+
   // Allow the loadcell to settle.
   delay(1000);
-  
+
   // Clear the averaging queue.
   initQueue();
   double hxReadout = 0;
-  
+
   // Fill the averaging queue.
   for (uint8_t i = hxQueue->getQueueSize(); i>0; i--) {
-    // Add extra space to overwrite trailing digit when a place 
+    // Add extra space to overwrite trailing digit when a place
     // disappears (e.g. 10 --> 9, the 0 would be left on screen).
     printToDisplay("Avg rem: " + String(i) + " ", 1, 0);
     hxReadout = getHxReadoutAveraged();
     delay(1000);
   }
-  
+
   // Determine the new sensitivity.
   sensitivity = hxReadout / cal_standard_mass;
-  
+
   // Save the sensitivity to hard memory for next time.
   setSensitivity();
-  
+
   // Overwrite units with the calibration standard units.
   setUnits(cal_standard_units);
-  
+
   // Report an instantaneous mass so the user can see if the calibration
   // was successful.
   clearDisplay();
@@ -535,7 +539,7 @@ String MOST_MassBalance::getNetOrGross() {
 
 
 void MOST_MassBalance::softReset() {
-  // Reset the software. 
+  // Reset the software.
   // This seems to jump back to setup(), but not completely reset the
   // Arduino.
   asm volatile (" jmp 0");
@@ -556,31 +560,31 @@ void MOST_MassBalance::doSerial() {
   }
   // Determine how many characters are waiting.
   int len = Serial.available();
-  
+
   // Initialize an array to hold the command.
   int cmd[len];
 
   // Fill up cmd.
   receiveCommand(cmd, len);
-  
+
   // Check for abort command.
   int escIdx = ArrayHelper::findInArray(cmd, ESC, 0, len);
   if (escIdx >= 0) {  // If there's an escape character, reset.
     softReset();
   }
-  
+
   // Parse the command for the <LF> and <CR>. The command starts one
   // char beyond the LF, and ends with the CR.
   int startIdx = ArrayHelper::findInArray(cmd, LF, 0, len) + 1;
   int endIdx = ArrayHelper::findInArray(cmd, CR, startIdx, len);
-  
-  // Check for errors. Since we start after the LF, minimum index is 1. 
+
+  // Check for errors. Since we start after the LF, minimum index is 1.
   // Note that findInArray returns -1 if it cannot find the character.
   if (startIdx < 1 || endIdx < 1) {
     Serial.println(F("\n?\r"));
     return;
   }
-  
+
   // Execute the command.
   doCommand(cmd, startIdx, endIdx);
 }
@@ -589,10 +593,10 @@ void MOST_MassBalance::doSerial() {
 // Note that arrays are pointers, so just pass in the array's variable.
 // TODO: make this accommodate commands that come character by character.
 //       This can be accomplished by clearing command in when receiving
-//       a LF, but requires preallocating potentially too much memory for a 
+//       a LF, but requires preallocating potentially too much memory for a
 //       command. Can be accomplished by peeking for a <CR>. Could have
 //       timing issues. Maybe watch the change in Serial.available().
-void MOST_MassBalance::receiveCommand(int *cmd, int len) {  
+void MOST_MassBalance::receiveCommand(int *cmd, int len) {
   // Read everything but the last character into the cmd array.
   // The last character may be an LF, which would lead the next command.
   for (int i = 0; i < len-1; i++) {
@@ -601,7 +605,7 @@ void MOST_MassBalance::receiveCommand(int *cmd, int len) {
 
   // If the next guy is <LF>, leave 'er alone (this accommodates Arduino
   // Serial Monitor behavior).
-  // If not, add it to the cmd array (could be a CR from PuTTY, or a 
+  // If not, add it to the cmd array (could be a CR from PuTTY, or a
   // single character from terminal without local echo/line editing on.
   char last = Serial.peek();
   if (last != LF){
@@ -613,15 +617,15 @@ void MOST_MassBalance::receiveCommand(int *cmd, int len) {
 
 void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
   // Interpret the requested action and execute.
-  // By the SMA standard, the first character indicates the function. 
+  // By the SMA standard, the first character indicates the function.
   // The scale should not accept a command if it doesn't match the
-  // syntax exactly. (e.g. <LF> wa <CR> should not execute the 
+  // syntax exactly. (e.g. <LF> wa <CR> should not execute the
   // <LF> w <CR> command.)
   // To combat this, interpret commands by length.
   // First, cancel continuous reporting.
   isContinuousReport = 0;
   int cmdLength = endIdx - startIdx;
-  
+
   switch (cmdLength) {
     case 1:   // Single character commands.
       switch ((char) cmd[startIdx]) {
@@ -629,24 +633,24 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
         case 'W':
           reportMassAveraged();
           break;
-          
+
         case 'z': // Zero request.
         case 'Z':
           zero();
           break;
-          
+
         case 'd': // Run diagnostics.
         case 'D':
           // TODO: Implement actual diagnostics.
           Serial.print(F("\n    \r"));
           break;
-          
+
         case 'a': // About (first row).
         case 'A':
           aboutIdx = 0;
           Serial.print(F("\nSMA:2/1.0\r"));
           break;
-          
+
         case 'b': // aBout (scrolling).
         case 'B':
           switch (aboutIdx) {
@@ -668,33 +672,33 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
           }
           aboutIdx++;
           break;
-          
+
         case 'r': // Continuous reporting request.
         case 'R':
           isContinuousReport = 1;
           break;
-          
+
         case 't': // Tare request.
         case 'T':
           tare();
           break;
-          
+
         case 'c': // Clear tare.
         case 'C':
           clearTare();
           break;
-          
+
         case 'm': // Return the current tare weight.
         case 'M':
           reportTare();
           break;
-          
+
         default:  // Unknown command.
           Serial.print(F("\n?\r"));
           break;
       } // End of single character commands.
       break;
-      
+
     case 2: // 2 character commands.
       // Command will be an X followed by a character.
       switch ((char) cmd[startIdx]) {
@@ -707,7 +711,7 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
               reportCalibrationMass();
               calibrate();
               break;
-            
+
             case 'l': // Toggle LCD power.
             case 'L':
               if (isDisplayOn) {
@@ -716,7 +720,7 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
                 initDisplay();
               }
               break;
-              
+
             case 'p': // Toggle output precision.
             case 'P':
               precision += 1;
@@ -724,7 +728,7 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
                 precision = 0;
               }
               break;
-              
+
             case '?': // Tell the user what commands are available.
               Serial.print(F("\nSMA SCP 0499 Serial Protocol\r"));
               Serial.print(F("\nAll cmds: <LF>cmd<CR>\r"));
@@ -745,20 +749,20 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
               Serial.print(F("\nxc######.###uuu : Calibrate with with mass and new units (needs 3 characters)\r"));
               // Give time for everything to send.
               Serial.flush();
-              break;  
-              
+              break;
+
             default:  // Unrecognized custom command.
               Serial.print(F("\n?\r"));
               break;
           } // End of custom commands.
           break;
-          
+
         default:  // Unrecognized 2 character command.
           Serial.print(F("\n?\r"));
           break;
-      } // End of 2 character commands.          
+      } // End of 2 character commands.
       break;
-      
+
     case 12:  // Command with numeric input (10 digits).
     case 15:  // Command with numeric input and units (3 add'l digits).
       // Commands will be an x, character, then 10 character number
@@ -776,27 +780,27 @@ void MOST_MassBalance::doCommand(int *cmd, int startIdx, int endIdx) {
               for (int i = 0; i < WT_WIDTH; i++) {
                 calStandard += String((char) cmd[startIdx + 2 + i]);
               }
-              
+
               // Read the units, if provided.
               String _units = "";
               for (int i = 0; i < cmdLength-WT_WIDTH-2; i++) {
                 _units += String((char) cmd[startIdx + 2 + WT_WIDTH + i]);
               }
-              
+
               if (_units != "") {
                 cal_standard_units = ArrayHelper::rightJustify(_units, 3);
               }
-              
+
               // BUG: there seems to be an overflow issue for large inputs.
-              // BUG: toDouble() only returns two decimal points of 
+              // BUG: toDouble() only returns two decimal points of
               //      precision.
               cal_standard_mass = calStandard.toDouble();
-              
+
               reportCalibrationMass();
               calibrate();
               break;
             }
-            
+
             default:  // Unrecognized custom, numeric input command.
               Serial.print(F("\n?\r"));
           } // End of custom commands.

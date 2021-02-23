@@ -3,18 +3,18 @@
       use of a display. Displays may contain other methods for added
       functionality external to MOST_MassBalance, but MOST_MassBalance
       can only access methods defined in this interface.
-      
-      Since extended functionality is allowed, the Display is 
-      initialized by the caller and provided to MOST_MassBalance.     
-      
-      The scale was designed by researchers in Michigan Technological 
+
+      Since extended functionality is allowed, the Display is
+      initialized by the caller and provided to MOST_MassBalance.
+
+      The scale was designed by researchers in Michigan Technological
       University's MOST group <https://www.appropedia.org/Category:MOST>
-      
+
     Copyright (C) 2020 Benjamin Hubbard
-      ! Note that external libraries included with this software are 
-        subject to their own licenses, included within their respective 
+      ! Note that external libraries included with this software are
+        subject to their own licenses, included within their respective
         folders.
-        
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -33,5 +33,5 @@
 #include "DisplayInterface.h"
 
 
-// Implement the destructor. 
+// Implement the destructor.
 Display::~Display() {}

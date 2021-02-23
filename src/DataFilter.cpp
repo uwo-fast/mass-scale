@@ -1,15 +1,15 @@
 /*  DataFilter is a supporting class for MOST_MassBalance.
       It facilitates the management of data to be filtered, whether by
       averaging, a low-pass filter, or some other method.
-      
-      This code was designed by researchers in Michigan Technological 
+
+      This code was designed by researchers in Michigan Technological
       University's MOST group <https://www.appropedia.org/Category:MOST>
-      
+
     Copyright (C) 2020 Benjamin Hubbard
-      ! Note that external libraries included with this software are 
-        subject to their own licenses, included within their respective 
+      ! Note that external libraries included with this software are
+        subject to their own licenses, included within their respective
         folders.
-        
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
