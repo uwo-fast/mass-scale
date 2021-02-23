@@ -1,15 +1,15 @@
 /*  ArrayHelper is a library of functions that interact with arrays.
 
       Specifically designed for use by the MOST_MassBalance library.
-      
-      The software was designed by researchers in Michigan Technological 
+
+      The software was designed by researchers in Michigan Technological
       University's MOST group <https://www.appropedia.org/Category:MOST>
-    
+
     Copyright (C) 2020 Benjamin Hubbard
-      ! Note that external libraries included with this software are 
-        subject to their own licenses, included within their respective 
+      ! Note that external libraries included with this software are
+        subject to their own licenses, included within their respective
         folders.
-        
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -21,7 +21,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see 
+    along with this program.  If not, see
     <https://www.gnu.org/licenses/>.
 */
 
@@ -41,13 +41,13 @@ int ArrayHelper::findInArray(int *array,
     i++;
     // Read a character from the array.
     c = array[i];
-    
+
     // Don't go looking where there is nothing to be found.
     if (i > endSearch) {
       return -1;
     }
   } while (c != query);
-  
+
   return i;
 }
 
@@ -63,6 +63,6 @@ String ArrayHelper::rightJustify(String str, int width) {
   for (int i = 0; i < numWhtSpc; i++) {
     str = " " + str;
   }
-  
+
   return str;
 }

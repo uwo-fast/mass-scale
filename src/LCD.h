@@ -1,19 +1,19 @@
 /*  LCD is a supporting class for MOST_MassBalance.
-      It acts as an interface with Liquid Crystal Displays by 
-      implementing the abstract class Display, defined in 
+      It acts as an interface with Liquid Crystal Displays by
+      implementing the abstract class Display, defined in
       DisplayInterface.h.
-      
+
       Dependencies: The LiquidCrystal library is built-in as of 1.8.6,
                     so no libraries need to be installed for this.
-      
-      The scale was designed by researchers in Michigan Technological 
+
+      The scale was designed by researchers in Michigan Technological
       University's MOST group <https://www.appropedia.org/Category:MOST>
-      
+
     Copyright (C) 2020 Benjamin Hubbard
-      ! Note that external libraries included with this software are 
-        subject to their own licenses, included within their respective 
+      ! Note that external libraries included with this software are
+        subject to their own licenses, included within their respective
         folders.
-        
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -52,45 +52,45 @@ class LCD : virtual public Display {
         uint8_t _LCD_ROWS=2,
         uint8_t _LCD_COLS=16,
         uint8_t _vccPin=-1);
-        
+
     /// Free Allocated memory.
     ~LCD();
-    
+
     /**
      * Turn on the display and initialize its driver.
      *
      * @param vccPin the pin used to power the display
      */
     void init(uint8_t _vccPin) override;
-        
+
     /// Initialize using a known vccPin.
     virtual void init() override;
-    
+
     /**
      * Turn off the display.
      *
      * @param vccPin the pin used to power the display
      */
     void shutdown(uint8_t _vccPin) override;
-        
+
     /// Shutdown using a known vccPin.
     virtual void shutdown() override;
-    
+
     /**
      * Print a string to the display, starting at a specific location.
      *
      * @param output the string to print
-     * @param row the vertical position to start at, measured by 
+     * @param row the vertical position to start at, measured by
      *    character (i.e. row 2 is shifted down the size of one mono-
      *    spaced character from row 1).
      * @param col the horizontal position to start at, measured in the
      *    same manner as row.
      */
     void print(String output, uint8_t row, uint8_t col) override;
-    
+
     /// Clear the display.
     void clear() override;
-    
+
     /**
      * Set the vccPin.
      *
@@ -99,7 +99,7 @@ class LCD : virtual public Display {
      * @param _vccPin the pin used to power the display
      */
     void setVccPin(uint8_t _vccPin) override;
-    
+
   private:
     LiquidCrystal *lcd;
     uint8_t LCD_ROWS;
