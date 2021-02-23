@@ -23,6 +23,7 @@
       3.3.1 : Make zeroing an averaged action. Correct report_rate
               behavior. 
       
+      3.3.2 : Make report_rate behavior check millis() once per iteration.
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
     - When using Arduino Serial Monitor, switch to 'Both NL & CR' in
@@ -162,6 +163,7 @@ class MOST_MassBalance {
     //-------------Values---------------------------------------------//
     const String REV = "3.3.1";
     
+    const String REV = "3.3.2";
     // Configurable variables.
     uint8_t BTN_TARE;
     // Calibration standard.

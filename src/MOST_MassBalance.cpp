@@ -22,6 +22,7 @@
               getUnits() to public API.
       3.3.1 : Make zeroing an averaged action. Correct report_rate
               behavior. 
+      3.3.2 : Make report_rate behavior check millis() once per iteration.
 
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
@@ -93,8 +94,12 @@ MOST_MassBalance::~MOST_MassBalance() {
 
 void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
   // Continuously update mass averaging window, slow down all else.
-  // Initialize time tracker.
-  static unsigned long lastRefresh = 1;
+  
+  unsigned long currentTime = millis();
+  
+  // Initialize time tracker (only happens once).
+  static unsigned long lastRefresh = currentTime;
+  
   // Convert rate into period (ms). This is not static b/c report_rate
   // could be changed in a future call to the function. 
   int report_period = 1.0/report_rate * 1000.0;
@@ -104,10 +109,9 @@ void MOST_MassBalance::measureListenReportAtRate(double report_rate) {
   
   // Enforce report rate without hampering sample rate (sample rate 
   // depends on how much processing is done between each call.
-  // This makes use of integer math to truncate values.
-  if (millis()/report_period - lastRefresh/report_period >= 1) {
+  if (currentTime - lastRefresh > report_period) {
     // Reset the time.
-    lastRefresh = millis();
+    lastRefresh += report_period;
     
     // Listen for input over serial.
     doSerial();
