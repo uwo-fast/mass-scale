@@ -133,6 +133,17 @@ class MOST_MassBalance {
                uint8_t HX_DT=2,
                uint8_t HX_SCK=3);
 
+
+    /**
+     * Start up for use by another program.
+     *
+     * Leaves serial and display dead, starts up load cell and averaging
+     * filter.
+     */
+    void beginBackground(uint8_t HX_VCC=4,
+                         uint8_t HX_DT=2,
+                         uint8_t HX_SCK=3);
+
     // Serial.
     /// Run the serial command receive/response sequence.
     void doSerial();
@@ -157,6 +168,16 @@ class MOST_MassBalance {
     void tare();
     /// Run clearTareSilent and report the new mass.
     void clearTare();
+    /// Zero the HX711 without any Serial output.
+    void zeroSilent();
+    /// Apply current mass readout to the locally managed tareWeight.
+    void tareSilent();
+    /// Reset tareWeight to zero .
+    void clearTareSilent();
+
+    // Sensitivity.
+    /// Run through a series of steps to calibrate the load cell.
+    void calibrate();
 
     // Getters.
     /// @returns units string (3 characters).
@@ -250,15 +271,6 @@ class MOST_MassBalance {
     /// Reset the data handler's queue to all zeros.
     void initQueue();
 
-    // Offsets.
-    /// Zero the HX711 without any Serial output.
-    void zeroSilent();
-
-    /// Apply current mass readout to the locally managed tareWeight.
-    void tareSilent();
-    /// Reset tareWeight to zero .
-    void clearTareSilent();
-
     // Mass.
     /**
      * Read the current measurement from the HX711.
@@ -341,8 +353,6 @@ class MOST_MassBalance {
     void setSensitivity();
     /// Report the sensitivity over Serial.
     void reportSensitivity();
-    /// Run through a series of steps to calibrate the load cell.
-    void calibrate();
     /// Set the units used on the display and write them to EEPROM.
     void setUnits(String units);
 

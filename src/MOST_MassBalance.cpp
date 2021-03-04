@@ -136,12 +136,19 @@ void MOST_MassBalance::begin(uint8_t HX_VCC, uint8_t HX_DT, uint8_t HX_SCK) {
   // Initialization serial output is the only non-standard output in
   // this library.
   initSerial();
-  initLoadCell(HX_VCC, HX_DT, HX_SCK);
   initDisplay();
-  getSensitivity();
-  initQueue();
+  beginBackground(HX_VCC, HX_DT, HX_SCK);
   pinMode(BTN_TARE, INPUT_PULLUP);
   Serial.print(F("\nUse <LF>X?<CR> to view serial commands\r"));
+}
+
+
+void MOST_MassBalance::beginBackground(uint8_t HX_VCC,
+                                       uint8_t HX_DT,
+                                       uint8_t HX_SCK) {
+  initLoadCell(HX_VCC, HX_DT, HX_SCK);
+  getSensitivity();
+  initQueue();
 }
 
 
