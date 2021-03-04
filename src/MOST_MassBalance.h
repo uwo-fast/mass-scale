@@ -93,9 +93,10 @@ class MOST_MassBalance {
     /**
      * Constructor
      *
+     * @param queue_size the lenght of the averaging filter for measurements
+     * @param btn_tare the pin in pullup mode to measure tare button
      * @param _display instance of a DisplayInterface child, used to
      *    manage the display output
-     * @param btn_tare the pin in pullup mode to measure tare button
      * @param _cal_standard_mass default mass used for calibration
      * @param _cal_standard_units default units for calibration mass
      */
@@ -121,6 +122,9 @@ class MOST_MassBalance {
     /**
      * Run a sequence of initializers for the mass balance.
      *
+     * Starts up Serial, HX711, display, reads sensitivity from memory,
+     * starts up the averaging filter, and preps the tare button.
+     *
      * @param HX_VCC is the pin used to power the HX711
      * @param HX_DT is the pin used to receive data from the HX711
      * @param HX_SCK is the clock pin
@@ -134,14 +138,13 @@ class MOST_MassBalance {
     void doSerial();
 
     // Mass.
-    /**
-     * Run getHxReadout and scale it to mass using sensitivity.
-     *
-     * @returns the instantaneous mass from the HX711
-     */
+    /// @returns the instantaneous mass from the HX711
     double getMass();
+
     /**
-     * Run getHxReadoutAveraged and scale it to mass using sensitivity.
+     * Read a new data point into averaging filter and return average mass.
+     *
+     * Value is scaled to a mass using sensitivity, and offset by the tare.
      *
      * @returns the average mass computed by the data handler
      */
