@@ -23,6 +23,9 @@
       3.3.1 : Make zeroing an averaged action. Correct report_rate
               behavior.
       3.3.2 : Make report_rate behavior check millis() once per iteration.
+      3.4.0 : Add to the public API to allow use as a background process. This
+              removes access to any physical interface, but serial output may
+              still be generated.
 
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
@@ -93,9 +96,10 @@ class MOST_MassBalance {
     /**
      * Constructor
      *
+     * @param queue_size the lenght of the averaging filter for measurements
+     * @param btn_tare the pin in pullup mode to measure tare button
      * @param _display instance of a DisplayInterface child, used to
      *    manage the display output
-     * @param btn_tare the pin in pullup mode to measure tare button
      * @param _cal_standard_mass default mass used for calibration
      * @param _cal_standard_units default units for calibration mass
      */
@@ -121,6 +125,9 @@ class MOST_MassBalance {
     /**
      * Run a sequence of initializers for the mass balance.
      *
+     * Starts up Serial, HX711, display, reads sensitivity from memory,
+     * starts up the averaging filter, and preps the tare button.
+     *
      * @param HX_VCC is the pin used to power the HX711
      * @param HX_DT is the pin used to receive data from the HX711
      * @param HX_SCK is the clock pin
@@ -129,19 +136,29 @@ class MOST_MassBalance {
                uint8_t HX_DT=2,
                uint8_t HX_SCK=3);
 
+
+    /**
+     * Start up for use by another program.
+     *
+     * Leaves serial and display dead, starts up load cell and averaging
+     * filter.
+     */
+    void beginBackground(uint8_t HX_VCC=4,
+                         uint8_t HX_DT=2,
+                         uint8_t HX_SCK=3);
+
     // Serial.
     /// Run the serial command receive/response sequence.
     void doSerial();
 
     // Mass.
-    /**
-     * Run getHxReadout and scale it to mass using sensitivity.
-     *
-     * @returns the instantaneous mass from the HX711
-     */
+    /// @returns the instantaneous mass from the HX711
     double getMass();
+
     /**
-     * Run getHxReadoutAveraged and scale it to mass using sensitivity.
+     * Read a new data point into averaging filter and return average mass.
+     *
+     * Value is scaled to a mass using sensitivity, and offset by the tare.
      *
      * @returns the average mass computed by the data handler
      */
@@ -154,6 +171,16 @@ class MOST_MassBalance {
     void tare();
     /// Run clearTareSilent and report the new mass.
     void clearTare();
+    /// Zero the HX711 without any Serial output.
+    void zeroSilent();
+    /// Apply current mass readout to the locally managed tareWeight.
+    void tareSilent();
+    /// Reset tareWeight to zero .
+    void clearTareSilent();
+
+    // Sensitivity.
+    /// Run through a series of steps to calibrate the load cell.
+    void calibrate();
 
     // Getters.
     /// @returns units string (3 characters).
@@ -161,7 +188,7 @@ class MOST_MassBalance {
 
   private:
     //-------------Values---------------------------------------------//
-    const String REV = "3.3.2";
+    const String REV = "3.4.0";
 
     // Configurable variables.
     uint8_t BTN_TARE;
@@ -247,15 +274,6 @@ class MOST_MassBalance {
     /// Reset the data handler's queue to all zeros.
     void initQueue();
 
-    // Offsets.
-    /// Zero the HX711 without any Serial output.
-    void zeroSilent();
-
-    /// Apply current mass readout to the locally managed tareWeight.
-    void tareSilent();
-    /// Reset tareWeight to zero .
-    void clearTareSilent();
-
     // Mass.
     /**
      * Read the current measurement from the HX711.
@@ -338,8 +356,6 @@ class MOST_MassBalance {
     void setSensitivity();
     /// Report the sensitivity over Serial.
     void reportSensitivity();
-    /// Run through a series of steps to calibrate the load cell.
-    void calibrate();
     /// Set the units used on the display and write them to EEPROM.
     void setUnits(String units);
 
