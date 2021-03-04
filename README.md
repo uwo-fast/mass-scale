@@ -19,6 +19,10 @@ on the scale (including the concluded precision of the scale). The OSF
 repository includes all of the necessary design files, in editable
 (e.g. FreeCAD) and published (e.g. STL) formats.
 
+To use as a load cell handler in the background of another program, include
+`MOST_MassBalance.h` and use `beginBackground()` to initialize. To keep data
+flowing through the averaging filter (queue), run `getMassAveraged()`.
+
 This was developed by researchers at Michigan Technological University in the
 [Michigan Open Sustainability Technology (MOST)](https://www.appropedia.org/MOST)
 group.

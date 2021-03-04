@@ -23,6 +23,9 @@
       3.3.1 : Make zeroing an averaged action. Correct report_rate
               behavior.
       3.3.2 : Make report_rate behavior check millis() once per iteration.
+      3.4.0 : Add to the public API to allow use as a background process. This
+              removes access to any physical interface, but serial output may
+              still be generated.
 
     A NOTE ON SERIAL COMMUNICATION:
     - All commands are straddled by a newline \n and carriage return \r.
@@ -185,7 +188,7 @@ class MOST_MassBalance {
 
   private:
     //-------------Values---------------------------------------------//
-    const String REV = "3.3.2";
+    const String REV = "3.4.0";
 
     // Configurable variables.
     uint8_t BTN_TARE;
