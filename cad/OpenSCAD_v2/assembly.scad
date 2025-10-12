@@ -25,22 +25,32 @@ length_platter = test_length + test_wall_thickness_platter * 2;
 width_platter = test_width + test_wall_thickness_platter * 2;
 test_allowance_platter = 0.2;
 
+// Show the platter and enclosure
+show_platter = true;
+show_enclosure = true;
+
 // Show cross section view for testing
-show_platter_cross_section = true;
-show_enclosure_cross_section = true;
+show_platter_cross_section = false;
+show_enclosure_cross_section = false;
 
-cross_section(show_platter_cross_section)
-  platter(
-    length=length_platter + test_allowance_platter * 2, width=width_platter + test_allowance_platter * 2, height=test_height_platter, corner_radius=test_corner_radius,
-    wall_thickness=test_wall_thickness_platter, top_thickness=test_top_thickness
-  );
+// ---------------------------------------------------------------
 
-translate([test_wall_thickness_platter + test_allowance_platter, test_wall_thickness_platter + test_allowance_platter, test_wall_thickness_platter + test_allowance_platter])
-  cross_section(show_enclosure_cross_section)
-    enclosure(
-      length=test_length, width=test_width, height=test_height, corner_radius=test_corner_radius,
-      wall_thickness=test_wall_thickness, top_thickness=test_top_thickness, bevel_angle=test_bevel_angle
+if (show_platter)
+  cross_section(show_platter_cross_section)
+    platter(
+      length=length_platter + test_allowance_platter * 2, width=width_platter + test_allowance_platter * 2, height=test_height_platter, corner_radius=test_corner_radius,
+      wall_thickness=test_wall_thickness_platter, top_thickness=test_top_thickness
     );
+
+if (show_enclosure)
+  translate([test_wall_thickness_platter + test_allowance_platter, test_wall_thickness_platter + test_allowance_platter, test_wall_thickness_platter + test_allowance_platter])
+    cross_section(show_enclosure_cross_section)
+      enclosure(
+        length=test_length, width=test_width, height=test_height, corner_radius=test_corner_radius,
+        wall_thickness=test_wall_thickness, top_thickness=test_top_thickness, bevel_angle=test_bevel_angle
+      );
+
+// ---------------------------------------------------------------
 
 // Helper module to show cross section
 module cross_section(show) {
