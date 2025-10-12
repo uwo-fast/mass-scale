@@ -20,7 +20,7 @@ test_bevel_angle = 35;
 
 // dimensions of the platter
 test_height_platter = 4;
-test_wall_thickness_platter =3;
+test_wall_thickness_platter = 3;
 length_platter = test_length + test_wall_thickness_platter * 2;
 width_platter = test_width + test_wall_thickness_platter * 2;
 test_allowance_platter = 0.2;
