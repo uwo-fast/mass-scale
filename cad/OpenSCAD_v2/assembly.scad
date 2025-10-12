@@ -12,15 +12,15 @@ test_height = 30;
 test_corner_radius = 15;
 
 // thickness of the walls and top
-test_wall_thickness = 2;
-test_top_thickness = 2;
+test_wall_thickness = 3;
+test_top_thickness = 3;
 
 // angle of the front bevel
 test_bevel_angle = 35;
 
 // dimensions of the platter
 test_height_platter = 4;
-test_wall_thickness_platter = 2;
+test_wall_thickness_platter =3;
 length_platter = test_length + test_wall_thickness_platter * 2;
 width_platter = test_width + test_wall_thickness_platter * 2;
 test_allowance_platter = 0.2;
