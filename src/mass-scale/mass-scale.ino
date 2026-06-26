@@ -46,28 +46,33 @@ void initLoadCell()
 	delay(500);
 
 	loadcell.begin(hx_dt, hx_sck);
-	loadcell.tare(20);
+
+	// Wait for the HX711 to be ready; the first reads after power-on are
+	// otherwise garbage.
+	while (!loadcell.wait_ready_retry(3, 200))
+		Serial.println("Waiting for HX711...");
 	Serial.println("HX711 Initialized!");
+
+	// Load the calibration (sensitivity) from EEPROM if a valid signature is
+	// present, otherwise fall back to the compiled-in default.
 	Serial.println("Loading calibration...");
-
-	loadcell.set_offset(default_offset);
-
 	EEPROM.get(cal_sig_addr, cal_check);
 	if (cal_check == cal_sig)
 	{
 		EEPROM.get(cal_val_addr, cal_val);
-		Serial.print("Calibration value: ");
-		cal_val = default_scale;
-		Serial.print(cal_val);
-		Serial.println(" div/" + units);
-		loadcell.set_scale(cal_val);
+		Serial.print("Stored calibration: ");
 	}
 	else
 	{
-		Serial.println("No stored calibration, defaulting to:");
-		Serial.print(default_scale);
-		loadcell.set_scale(default_scale);
+		cal_val = default_scale;
+		Serial.print("No stored calibration, default: ");
 	}
+	Serial.print(cal_val, num_digits);
+	Serial.println(" div/" + units);
+	loadcell.set_scale(cal_val);
+
+	// Zero the scale at boot. This also captures the platter as tare weight.
+	loadcell.tare(20);
 	delay(500);
 }
 
@@ -171,7 +176,10 @@ void startCalibrationLoop()
 
 				if (weight > 0)
 				{
-					float rawValueAtWeight = loadcell.get_units(hx_cal_num_avgs);
+					// Use the raw, tare-subtracted reading (not get_units, which
+					// would divide by the previous scale) so the new sensitivity
+					// is computed from counts per gram.
+					float rawValueAtWeight = loadcell.get_value(hx_cal_num_avgs);
 					sensitivity = rawValueAtWeight / weight;
 					Serial.print("Calculated sensitivity: ");
 					Serial.println(sensitivity, num_digits);
