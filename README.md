@@ -1,4 +1,4 @@
-# OS_Nano_Balance
+# Mass Scale — 3D-Printable Digital Balance
 
 Firmware and design files for a digital mass balance with 3D printable components.
 ([Project Page](https://www.appropedia.org/3-D_Printable_Digital_Balance))
@@ -7,15 +7,16 @@ This balance is powered and controlled by an Arduino Nano.
 Using the digital I/O pins, the Nano powers and reads information from an HX711
 32-bit load cell amplifier.
 The readout from this loadcell can be calibrated using a standard mass.
-Calibration mode is entered using a push button.
+Calibration is performed over the serial connection (see [Calibrate](#calibrate)).
 The calibrated value is distributed via two media: Serial and an LCD display.
 When connected to the Nano over serial (115200 baud), the raw (tared) and calibrated
 readout are displayed.
-Depending on the SSH client in use, this data can be logged and plotted -
+Depending on the serial client in use, this data can be logged and plotted -
 primarily for scientific uses.
 When an LCD is included in the system, the calibrated value is displayed with units.
 
-An improvement of [brhubbar / OS_Nano_Balance](https://github.com/brhubbar/OS_Nano_Balance) and [].
+A rewrite of [brhubbar / OS_Nano_Balance](https://github.com/brhubbar/OS_Nano_Balance)
+with a serial-driven calibration workflow.
 
 ## Power
 
@@ -81,28 +82,41 @@ HX711 only requires 1.5 mA.
 - SCK --> D3
 - VCC --> D4
 
-**Buttons --> Arduino:**
+**Button --> Arduino:**
 
-- GND --> Cal --> D7
 - GND --> Tare --> D8
+
+Calibration no longer uses a button; it is driven over serial (see
+[Calibrate](#calibrate)).
 
 ## Firmware
 
-The firmware sends a readout to the Serial Monitor for interaction.
-Arduino's Serial Plotter can be used to get a live readout of changing mass on
-the balance.
+The sketch is in `src/mass-scale/`. It sends a readout to the Serial Monitor at
+115200 baud and accepts single-line commands; Arduino's Serial Plotter can be
+used to get a live readout of changing mass on the balance.
+
+### Dependencies
+
+- [bogde/HX711](https://github.com/bogde/HX711) — install via the Arduino
+  Library Manager (or `lib_deps` in PlatformIO).
+- `LiquidCrystal` and `EEPROM` ship with the Arduino AVR core.
 
 ### Tare
 
-To tare, simply hit the tare button (on pin 8). This will zero the output.
+To tare (zero the output), press the tare button (on pin 8) or send `t` over
+serial.
 
 ### Calibrate
 
-To calibrate, hit the calibrate button (on pin 7).
-This will send the scale into its calibrate state.
-You may tare the scale while in calibration state.
-The scale will take several averages and then calculate a new sensitivity.
-At this time, the device is set to calibrate with 0.2359 kg, the mass of 1 US Cup of water.
+Calibration is interactive over serial:
+
+1. Send `c` to enter calibration.
+2. With nothing on the platter, send `u00` to zero it.
+3. Place a known mass on the platter and send `aXY`, where `XY` is the mass in
+   grams (e.g. `a50` for 50 g).
+
+The firmware computes a new sensitivity from the raw reading and the known mass,
+applies it, and stores it in EEPROM so it persists across power cycles.
 
 ## Data Logging
 
