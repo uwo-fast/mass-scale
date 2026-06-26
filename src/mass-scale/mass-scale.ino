@@ -31,7 +31,9 @@ const int btn_tare = 8;
 // Readouts
 double val;
 float mass;
-int num_digits = 6;
+int num_digits = 6;	   // precision for printing the calibration value
+const int disp_decimals = 2; // decimal places shown for the mass readout
+// TODO (wishlist): adapt disp_decimals to the load cell resolution / scale.
 
 // Non-blocking timing for events
 unsigned long previousMillis = 0;
@@ -106,6 +108,7 @@ void setup()
 
 void loop()
 {
+	// Poll serial commands every iteration so they stay responsive.
 	if (Serial.available())
 	{
 		String input = Serial.readStringUntil('\n');
@@ -125,31 +128,43 @@ void loop()
 		}
 	}
 
-	// Regular weight reading and display
-	val = loadcell.get_units(hx_num_avgs);
-	mass = val;
-
-	// Calculate the number of decimal places to show
-	int digits = getDecimalPlaces(mass);
-
-	// Display on serial
-	Serial.print("Raw value: ");
-	Serial.print(val);
-	Serial.print(", Mass: ");
-	Serial.print(mass, digits);
-	Serial.println(" " + units);
-
-	// LCD display
-	lcd.clear();
-	lcd.home();
-	lcd.print(mass, digits);
-	lcd.print(" " + units);
-
-	// Optional: Tare button functionality
+	// Poll the tare button every iteration.
 	if (digitalRead(btn_tare) == LOW)
 	{
 		Serial.println("Taring...");
 		loadcell.tare(20);
+	}
+
+	// Throttle the measurement and display to `interval` ms.
+	unsigned long currentMillis = millis();
+	if (currentMillis - previousMillis >= interval)
+	{
+		previousMillis = currentMillis;
+		updateReadout();
+	}
+}
+
+// Read once and report both the raw (tare-subtracted) value and the calibrated
+// mass, on serial and on the LCD if present.
+void updateReadout()
+{
+	val = loadcell.get_value(hx_num_avgs);	// raw, tare-subtracted
+	mass = (float)(val / loadcell.get_scale()); // calibrated mass
+
+	Serial.print("Raw: ");
+	Serial.print(val);
+	Serial.print(", Mass: ");
+	Serial.print(mass, disp_decimals);
+	Serial.println(" " + units);
+
+	if (isLCD)
+	{
+		// Overwrite a fixed-width line instead of lcd.clear() to avoid flicker.
+		String line = String(mass, disp_decimals) + " " + units;
+		while (line.length() < (unsigned int)lcd_cols)
+			line += " ";
+		lcd.setCursor(0, 0);
+		lcd.print(line);
 	}
 }
 
@@ -199,13 +214,4 @@ void startCalibrationLoop()
 			}
 		}
 	}
-}
-
-// Function to automatically adjust decimal places
-int getDecimalPlaces(double number)
-{
-	String numStr = String(number, 8);
-	numStr.trim();
-	int decimalPos = numStr.indexOf('.');
-	return decimalPos == -1 ? 0 : numStr.length() - decimalPos - 1;
 }
