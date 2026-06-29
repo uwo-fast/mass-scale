@@ -55,7 +55,7 @@ module enclosure(length, width, height, corner_radius, wall_thickness, bevel_ang
   body(minkowskiDim, oDim, iDim, wall_thickness, bevel_angle);
 
   // front bevel
-  front_bevel(minkowskiDim, oDim, wall_thickness, bevel_angle);
+  //front_bevel(minkowskiDim, oDim, wall_thickness, bevel_angle);
 }
 
 lip_gap = 0.8;
@@ -65,43 +65,45 @@ module body(minkowskiDim, oDim, iDim, wall_thickness, bevel_angle) {
   union() {
     difference() {
 
-      translate([minkowskiDim[0], minkowskiDim[1], 0])
-        difference() {
+      difference() {
 
-          // Main body
-          minkowski() {
-            translate([0, 0, 0])
-              cube(oDim - minkowskiDim * 2, center=false);
-            cylinder(r=minkowskiDim[0], h=1);
-          }
-
-          // Hollow out the inside
-          minkowski() {
-            translate([wall_thickness, wall_thickness, wall_thickness])
-              cube(iDim - minkowskiDim * 2, center=false);
-            cylinder(r=minkowskiDim[0], h=1);
-          }
+        // Main body
+        minkowski() {
+          translate([0, 0, oDim[2] / 2])
+            cube(oDim - minkowskiDim * 2, center=true);
+          cylinder(r=minkowskiDim[0], h=1);
         }
 
+        // Hollow out the inside
+        minkowski() {
+          translate([0, 0, wall_thickness + oDim[2] / 2])
+            cube(iDim - minkowskiDim * 2, center=true);
+          cylinder(r=minkowskiDim[0], h=1);
+        }
+      }
+
       // Slice off top for a consistent height post-minkowski
-      translate([-z_fight, -z_fight, oDim[2]])
-        cube([oDim[0] + z_fight * 2, oDim[1] + z_fight * 2, oDim[2] * 2], center=false);
+      translate([-z_fight, -z_fight, oDim[2] * 1.5])
+        cube([oDim[0] * 2, oDim[1] * 2, oDim[2]], center=true);
 
       // Front bevel cut off
-      translate([0, -z_fight / 2, wall_thickness])
+      translate([-oDim[0] / 2, 0, wall_thickness])
         rotate([0, -bevel_angle, 0])
-          cube([oDim[2] * 2, oDim[1] + z_fight, oDim[2] * 2], center=false);
+          translate([oDim[2], 0, oDim[2]])
+            cube([oDim[2] * 2, oDim[1] + z_fight, oDim[2] * 2], center=true);
     }
+    for (i = [0, 1])
+      mirror([0, i, 0]) {
+        translate([-oDim[1] / 3, wall_thickness - oDim[1] / 2, oDim[2] - wall_thickness - lip_gap])
+          rotate([0, 90, 0])
+            linear_extrude(height=oDim[1] * 2 / 3)
+              polygon(points=[[0, 0], [wall_thickness, 0], [0, wall_thickness]]);
 
-    translate([oDim[1] / 2, wall_thickness, oDim[2] - wall_thickness - lip_gap])
-      rotate([0, 90, 0])
-        linear_extrude(height=oDim[1] * 2 / 3)
-          polygon(points=[[0, 0], [wall_thickness, 0], [0, wall_thickness]]);
-
-    translate([oDim[1] / 2 + oDim[1] * 2 / 3, wall_thickness, oDim[2] - wall_thickness])
-      rotate([0, 270, 0])
-        linear_extrude(height=oDim[1] * 2 / 3)
-          polygon(points=[[0, 0], [wall_thickness, 0], [0, wall_thickness]]);
+        translate([oDim[1] / 3, wall_thickness - oDim[1] / 2, oDim[2] - wall_thickness])
+          rotate([0, 270, 0])
+            linear_extrude(height=oDim[1] * 2 / 3)
+              polygon(points=[[0, 0], [wall_thickness, 0], [0, wall_thickness]]);
+      }
   }
 }
 
