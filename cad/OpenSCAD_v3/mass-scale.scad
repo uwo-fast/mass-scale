@@ -17,33 +17,38 @@ test_wall_thickness = 3;
 // angle of the front bevel
 test_bevel_angle = 35;
 
-// Show the platter and enclosure
+// Show the enclosure and lid for testing
 show_enclosure = true;
+show_lid = true;
 
 // Show cross section view for testing
-show_enclosure_cross_section = false;
+show_cross_section = false;
 
 // ---------------------------------------------------------------
 
 if (show_enclosure)
-  cross_section(show_enclosure_cross_section)
+  cross_section(show_cross_section)
     enclosure(
-      length=test_length, width=test_width, height=test_height, corner_radius=test_corner_radius,
-      wall_thickness=test_wall_thickness, bevel_angle=test_bevel_angle
+      length=test_length,
+      width=test_width,
+      height=test_height,
+      corner_radius=test_corner_radius,
+      wall_thickness=test_wall_thickness,
+      bevel_angle=test_bevel_angle
+    );
+
+if (show_lid)
+  cross_section(show_cross_section)
+    lid(
+      length=test_length,
+      width=test_width,
+      height=test_height,
+      corner_radius=test_corner_radius,
+      wall_thickness=test_wall_thickness,
+      bevel_angle=test_bevel_angle
     );
 
 // ---------------------------------------------------------------
-
-// TODO: make these parameters through a look up table scheme or similar for different LCD sizes
-// LCD dimensions and hole placements
-lcd_height = 24.5;
-lcd_width = 71.5;
-lcd_backlight_depth = 3;
-lcd_backlight_width = 8;
-lcd_backlight_height = 18;
-lcd_holes_height_dist = 30;
-lcd_holes_width_dist = 74.5;
-lcd_hole_diameter = 3.1;
 
 module enclosure(length, width, height, corner_radius, wall_thickness, bevel_angle) {
 
@@ -54,8 +59,8 @@ module enclosure(length, width, height, corner_radius, wall_thickness, bevel_ang
   // main body
   body(minkowskiDim, oDim, iDim, wall_thickness, bevel_angle);
 
-  // front bevel
-  //front_bevel(minkowskiDim, oDim, wall_thickness, bevel_angle);
+  // // front bevel
+  front_bevel(minkowskiDim, oDim, wall_thickness, bevel_angle);
 }
 
 lip_gap = 0.8;
@@ -82,64 +87,119 @@ module body(minkowskiDim, oDim, iDim, wall_thickness, bevel_angle) {
         }
       }
 
-      // Slice off top for a consistent height post-minkowski
-      translate([-z_fight, -z_fight, oDim[2] * 1.5])
-        cube([oDim[0] * 2, oDim[1] * 2, oDim[2]], center=true);
-
       // Front bevel cut off
       translate([-oDim[0] / 2, 0, wall_thickness])
         rotate([0, -bevel_angle, 0])
           translate([oDim[2], 0, oDim[2]])
             cube([oDim[2] * 2, oDim[1] + z_fight, oDim[2] * 2], center=true);
-    }
-    for (i = [0, 1])
-      mirror([0, i, 0]) {
-        translate([-oDim[1] / 3, wall_thickness - oDim[1] / 2, oDim[2] - wall_thickness - lip_gap])
-          rotate([0, 90, 0])
-            linear_extrude(height=oDim[1] * 2 / 3)
-              polygon(points=[[0, 0], [wall_thickness, 0], [0, wall_thickness]]);
 
-        translate([oDim[1] / 3, wall_thickness - oDim[1] / 2, oDim[2] - wall_thickness])
-          rotate([0, 270, 0])
-            linear_extrude(height=oDim[1] * 2 / 3)
-              polygon(points=[[0, 0], [wall_thickness, 0], [0, wall_thickness]]);
-      }
+      // Slice off top for a consistent height post-minkowski
+      translate([-z_fight, -z_fight, oDim[2] * 1.5])
+        cube([oDim[0] * 2, oDim[1] * 2, oDim[2]], center=true);
+
+      // Cut out guides for lid to slide into
+      for (i = [0, 1])
+        mirror([0, i, 0])
+          translate([oDim[0] / 4 - minkowskiDim[0], oDim[1] / 2 - wall_thickness, oDim[2] - wall_thickness])
+            rotate([0, 90, 0])
+              cylinder(h=oDim[0] / 2, d=wall_thickness, center=true);
+    }
   }
 }
 
 module front_bevel(minkowskiDim, oDim, wall_thickness, bevel_angle) {
 
+  // TODO: make these parameters through a look up table scheme or similar for different LCD sizes
+  // LCD dimensions and hole placements
+  lcd_height = 24.5;
+  lcd_width = 71.5;
+  lcd_backlight_depth = 3;
+  lcd_backlight_width = 8;
+  lcd_backlight_height = 18;
+  lcd_holes_height_dist = 30;
+  lcd_holes_width_dist = 74.5;
+  lcd_hole_diameter = 3.1;
+
   difference() {
 
     // Front bevel face
     intersection() {
-      translate([minkowskiDim[0], minkowskiDim[1], 0])
+      // Main body
+      minkowski() {
+        translate([0, 0, oDim[2] / 2])
+          cube(oDim - minkowskiDim * 2, center=true);
+        cylinder(r=minkowskiDim[0], h=1);
+      }
+
+      // Front bevel cut off
+      translate([-oDim[0] / 2, 0, wall_thickness])
+        rotate([0, -bevel_angle, 0])
+          translate([oDim[2], 0, wall_thickness / 2])
+            cube([oDim[2] * 2, oDim[1], wall_thickness], center=true);
+    }
+
+    // Slice off top for a consistent height post-minkowski
+    translate([-z_fight, -z_fight, oDim[2] * 1.5])
+      cube([oDim[0] * 2, oDim[1] * 2, oDim[2]], center=true);
+
+    // LCD cut out on bevel
+    translate([-oDim[0] / 2 + oDim[2] - wall_thickness, 0, wall_thickness * 2])
+      rotate([0, -bevel_angle, 0])
+        translate([0, 0, wall_thickness])
+          cube([lcd_height, lcd_width, oDim[2]], center=true);
+
+    // LCD cut out on bevel
+    translate([-oDim[0] / 2 + oDim[2] - wall_thickness, 0, wall_thickness * 2])
+      rotate([0, -bevel_angle, 0])
+        translate([0, 0, 0])
+          cube([lcd_height, lcd_width + lcd_backlight_width, oDim[2]], center=true);
+
+    // LCD cut out on bevel
+    translate([-oDim[0] / 2 + oDim[2] - wall_thickness, 0, wall_thickness * 2])
+      rotate([0, -bevel_angle, 0])for (x = [-1, 1], y = [-1, 1]) {
+        translate([x * lcd_holes_height_dist / 2, y * lcd_holes_width_dist / 2, 0])
+          cylinder(h=oDim[2] * 2, r=lcd_hole_diameter / 2, $fn=16);
+      }
+  }
+}
+
+lid_allowance = 0.2;
+
+module lid(length, width, height, corner_radius, wall_thickness, bevel_angle) {
+
+  minkowskiDim = [corner_radius, corner_radius, 0];
+  oDim = [length, width, height];
+  iDim = oDim - [wall_thickness * 2, wall_thickness * 2, 0];
+
+  union() {
+
+    difference() {
+
+      // Lid body
+      translate([0, 0, oDim[2]])
         minkowski() {
-          cube(oDim - minkowskiDim * 2);
+          translate([0, 0, wall_thickness / 2])
+            cube([oDim[0], oDim[1], wall_thickness] - minkowskiDim * 2, center=true);
           cylinder(r=minkowskiDim[0], h=1);
         }
 
-      rotate([0, -bevel_angle, 0])
-        translate([0, 0, wall_thickness * cos(bevel_angle)])
-          cube([oDim[2] * 2, oDim[1], wall_thickness]);
+      // Front bevel cut off
+      translate([-oDim[0] / 2 - wall_thickness, 0, wall_thickness])
+        rotate([0, -bevel_angle, 0])
+          translate([oDim[2], 0, oDim[2]])
+            cube([oDim[2] * 2, oDim[1] + z_fight, oDim[2] * 2], center=true);
     }
 
-    // LCD cut out on bevel
-    translate([lcd_height / 2, (oDim[1] - lcd_width) / 2, wall_thickness * 2])
-      rotate([0, -bevel_angle, 0])
-        cube([lcd_height, lcd_width, oDim[2]]);
-
-    // LCD cut out on bevel
-    translate([lcd_backlight_height * 3 / 4, (oDim[1] - lcd_width - lcd_backlight_width) / 2, wall_thickness + lcd_backlight_height / 4])
-      rotate([0, -bevel_angle, 0])
-        cube([lcd_backlight_height, lcd_width + lcd_backlight_width, wall_thickness + 0.4 + lcd_backlight_depth]);
-
-    // LCD cut out on bevel
-    translate([lcd_height / 2, (oDim[1] - lcd_width) / 2, wall_thickness * 2])
-      rotate([0, -bevel_angle, 0])for (x = [-1, 1], y = [-1, 1]) {
-        translate([lcd_height / 2 + x * lcd_holes_height_dist / 2, lcd_width / 2 + y * lcd_holes_width_dist / 2, wall_thickness * 0])
-          cylinder(h=oDim[2] * 2, r=lcd_hole_diameter / 2, $fn=16);
-      }
+    // Create slide guides
+    for (i = [0, 1])
+      mirror([0, i, 0])
+        translate([oDim[0] / 4 - minkowskiDim[0], oDim[1] / 2 - wall_thickness, oDim[2] - wall_thickness])
+          rotate([0, 90, 0])
+            union() {
+              cylinder(h=oDim[0] / 2, d=wall_thickness, center=true);
+              translate([-wall_thickness / 2, -wall_thickness / 2, 0])
+                cube([wall_thickness * 2, wall_thickness, oDim[0] / 2], center=true);
+            }
   }
 }
 
