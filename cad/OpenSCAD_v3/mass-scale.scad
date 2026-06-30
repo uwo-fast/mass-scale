@@ -19,7 +19,7 @@ test_bevel_angle = 35;
 
 // Show the enclosure and lid for testing
 show_enclosure = true;
-show_lid = true;
+show_lid = false;
 
 // Show cross section view for testing
 show_cross_section = false;
@@ -100,10 +100,21 @@ module body(minkowskiDim, oDim, iDim, wall_thickness, bevel_angle) {
       // Cut out guides for lid to slide into
       for (i = [0, 1])
         mirror([0, i, 0])
-          translate([oDim[0] / 4 - minkowskiDim[0], oDim[1] / 2 - wall_thickness, oDim[2] - wall_thickness])
+          translate([-minkowskiDim[0], oDim[1] / 2 - wall_thickness, oDim[2] - wall_thickness])
             rotate([0, 90, 0])
-              cylinder(h=oDim[0] / 2, d=wall_thickness, center=true);
+              cylinder(h=oDim[0], d=wall_thickness, center=true);
+
+      // Cut out pockets for guides to go thru
+      translate([-oDim[0] / 4, 0, oDim[2] - wall_thickness / 2])
+        cube([oDim[0] / 2, oDim[1] - wall_thickness, wall_thickness + z_fight], center=true);
     }
+
+    // Latch post in guide channel to allow for locking the lid in place
+    for (i = [0, 1])
+      mirror([0, i, 0])
+
+        translate([oDim[1] / 4 - wall_thickness / 2, oDim[1] / 2 - wall_thickness / 2, oDim[2] - wall_thickness])
+          cylinder(h=wall_thickness, d=wall_thickness / 2, center=true);
   }
 }
 
@@ -193,12 +204,12 @@ module lid(length, width, height, corner_radius, wall_thickness, bevel_angle) {
     // Create slide guides
     for (i = [0, 1])
       mirror([0, i, 0])
-        translate([oDim[0] / 4 - minkowskiDim[0], oDim[1] / 2 - wall_thickness, oDim[2] - wall_thickness])
+        translate([oDim[0] * 3 / 8 - minkowskiDim[0], oDim[1] / 2 - wall_thickness, oDim[2] - wall_thickness])
           rotate([0, 90, 0])
             union() {
-              cylinder(h=oDim[0] / 2, d=wall_thickness, center=true);
+              cylinder(h=oDim[0] / 4, d=wall_thickness, center=true);
               translate([-wall_thickness / 2, -wall_thickness / 2, 0])
-                cube([wall_thickness * 2, wall_thickness, oDim[0] / 2], center=true);
+                cube([wall_thickness * 2, wall_thickness, oDim[0] / 4], center=true);
             }
   }
 }
