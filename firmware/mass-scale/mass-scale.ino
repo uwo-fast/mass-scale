@@ -28,8 +28,8 @@
 const int hx_dt = 2;
 const int hx_sck = 3;
 const int hx_vcc = 4;
-const int hx_num_avgs = 1;
-const int hx_cal_num_avgs = 10;
+const int hx_num_avgs = 3;
+const int hx_cal_num_avgs = 15;
 HX711 loadcell;
 
 // LCD setup
