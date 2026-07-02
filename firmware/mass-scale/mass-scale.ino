@@ -239,6 +239,17 @@ void startCalibrationLoop()
 					// is computed from counts per gram.
 					float rawValueAtWeight = loadcell.get_value(hx_cal_num_avgs);
 					sensitivity = rawValueAtWeight / weight;
+
+					// Reject a non-finite or near-zero sensitivity, which
+					// happens if no weight was actually placed or the cell is
+					// disconnected. A zero scale would later divide the mass
+					// reading to infinity.
+					if (!isfinite(sensitivity) || fabs(sensitivity) < 1e-6)
+					{
+						Serial.println("Reading too small; is the weight on the scale? Try again.");
+						continue;
+					}
+
 					Serial.print("Calculated sensitivity: ");
 					Serial.println(sensitivity, num_digits);
 
