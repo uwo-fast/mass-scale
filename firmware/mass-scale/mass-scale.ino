@@ -193,6 +193,19 @@ void loop()
 // mass, on serial and on the LCD if present.
 void updateReadout()
 {
+	// Skip this cycle if the HX711 is not responding, rather than letting
+	// get_value() block indefinitely on a dropped DT/SCK connection.
+	if (!loadcell.wait_ready_timeout(200))
+	{
+		Serial.println("HX711 not responding");
+		if (isLCD)
+		{
+			lcd.setCursor(0, 0);
+			lcd.print("HX711 error     ");
+		}
+		return;
+	}
+
 	val = loadcell.get_value(hx_num_avgs);	// raw, tare-subtracted
 	mass = (float)(val / loadcell.get_scale()); // calibrated mass
 
