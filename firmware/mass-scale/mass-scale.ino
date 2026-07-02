@@ -48,6 +48,12 @@ float sensitivity;
 // Input pins
 const int btn_tare = 8;
 
+// Tare button debounce (active-low with internal pull-up)
+const unsigned long btn_debounce_ms = 50;
+int btn_reading = HIGH;	  // last raw sample
+int btn_state = HIGH;	  // last debounced (stable) state
+unsigned long btn_changed = 0; // millis() of last raw change
+
 // Readouts
 double val;
 float mass;
@@ -89,6 +95,14 @@ void initLoadCell()
 		cal_val = default_scale;
 		Serial.print("No stored calibration, default: ");
 	}
+
+	// Guard against a corrupt or zero stored value; a zero scale would
+	// divide the mass reading to infinity.
+	if (!isfinite(cal_val) || fabs(cal_val) < 1e-6)
+	{
+		cal_val = default_scale;
+		Serial.print("(invalid, using default) ");
+	}
 	Serial.print(cal_val, num_digits);
 	Serial.println(" div/" + units);
 	loadcell.set_scale(cal_val);
@@ -113,9 +127,8 @@ void initLCD()
 void setup()
 {
 	Serial.begin(115200);
-	while (!Serial)
-	{
-	}
+	// Do not wait on `Serial`: the scale must run standalone (no host, e.g.
+	// on battery). On native-USB boards a blocking wait would hang here.
 
 	initLoadCell();
 	if (isLCD)
@@ -143,16 +156,27 @@ void loop()
 		else if (input == "c")
 		{
 			// Start calibration
-			Serial.println("Calibration started. Send 'u00' when unloaded.");
+			Serial.println("Calibration started. Send 'u00' when unloaded, or 'x' to abort.");
 			startCalibrationLoop();
 		}
 	}
 
-	// Poll the tare button every iteration.
-	if (digitalRead(btn_tare) == LOW)
+	// Poll the tare button every iteration, debounced. Act only on the
+	// press edge (HIGH->LOW) so holding the button does not re-tare.
+	int reading = digitalRead(btn_tare);
+	if (reading != btn_reading)
 	{
-		Serial.println("Taring...");
-		loadcell.tare(20);
+		btn_reading = reading;
+		btn_changed = millis();
+	}
+	if (millis() - btn_changed > btn_debounce_ms && reading != btn_state)
+	{
+		btn_state = reading;
+		if (btn_state == LOW)
+		{
+			Serial.println("Taring...");
+			loadcell.tare(20);
+		}
 	}
 
 	// Throttle the measurement and display to `interval` ms.
@@ -168,6 +192,19 @@ void loop()
 // mass, on serial and on the LCD if present.
 void updateReadout()
 {
+	// Skip this cycle if the HX711 is not responding, rather than letting
+	// get_value() block indefinitely on a dropped DT/SCK connection.
+	if (!loadcell.wait_ready_timeout(200))
+	{
+		Serial.println("HX711 not responding");
+		if (isLCD)
+		{
+			lcd.setCursor(0, 0);
+			lcd.print("HX711 error     ");
+		}
+		return;
+	}
+
 	val = loadcell.get_value(hx_num_avgs);	// raw, tare-subtracted
 	mass = (float)(val / loadcell.get_scale()); // calibrated mass
 
@@ -197,11 +234,17 @@ void startCalibrationLoop()
 			String userInput = Serial.readStringUntil('\n');
 			userInput.trim();
 
-			if (userInput == "u00")
+			if (userInput == "x")
+			{
+				// Abort without changing the stored calibration.
+				Serial.println("Calibration aborted.");
+				return;
+			}
+			else if (userInput == "u00")
 			{
 				// Unloaded at 0g
 				loadcell.tare(20);
-				Serial.println("Unloaded. Now place a known weight and send 'aXY' (e.g., 'a50' for 50g).");
+				Serial.println("Unloaded. Now place a known weight and send 'aXY' (e.g., 'a50' for 50g). Send 'x' to abort.");
 			}
 			else if (userInput.startsWith("a"))
 			{
@@ -216,6 +259,17 @@ void startCalibrationLoop()
 					// is computed from counts per gram.
 					float rawValueAtWeight = loadcell.get_value(hx_cal_num_avgs);
 					sensitivity = rawValueAtWeight / weight;
+
+					// Reject a non-finite or near-zero sensitivity, which
+					// happens if no weight was actually placed or the cell is
+					// disconnected. A zero scale would later divide the mass
+					// reading to infinity.
+					if (!isfinite(sensitivity) || fabs(sensitivity) < 1e-6)
+					{
+						Serial.println("Reading too small; is the weight on the scale? Try again.");
+						continue;
+					}
+
 					Serial.print("Calculated sensitivity: ");
 					Serial.println(sensitivity, num_digits);
 
