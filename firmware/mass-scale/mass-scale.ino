@@ -48,6 +48,12 @@ float sensitivity;
 // Input pins
 const int btn_tare = 8;
 
+// Tare button debounce (active-low with internal pull-up)
+const unsigned long btn_debounce_ms = 50;
+int btn_reading = HIGH;	  // last raw sample
+int btn_state = HIGH;	  // last debounced (stable) state
+unsigned long btn_changed = 0; // millis() of last raw change
+
 // Readouts
 double val;
 float mass;
@@ -148,11 +154,22 @@ void loop()
 		}
 	}
 
-	// Poll the tare button every iteration.
-	if (digitalRead(btn_tare) == LOW)
+	// Poll the tare button every iteration, debounced. Act only on the
+	// press edge (HIGH->LOW) so holding the button does not re-tare.
+	int reading = digitalRead(btn_tare);
+	if (reading != btn_reading)
 	{
-		Serial.println("Taring...");
-		loadcell.tare(20);
+		btn_reading = reading;
+		btn_changed = millis();
+	}
+	if (millis() - btn_changed > btn_debounce_ms && reading != btn_state)
+	{
+		btn_state = reading;
+		if (btn_state == LOW)
+		{
+			Serial.println("Taring...");
+			loadcell.tare(20);
+		}
 	}
 
 	// Throttle the measurement and display to `interval` ms.
