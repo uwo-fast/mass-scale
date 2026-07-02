@@ -95,6 +95,14 @@ void initLoadCell()
 		cal_val = default_scale;
 		Serial.print("No stored calibration, default: ");
 	}
+
+	// Guard against a corrupt or zero stored value; a zero scale would
+	// divide the mass reading to infinity.
+	if (!isfinite(cal_val) || fabs(cal_val) < 1e-6)
+	{
+		cal_val = default_scale;
+		Serial.print("(invalid, using default) ");
+	}
 	Serial.print(cal_val, num_digits);
 	Serial.println(" div/" + units);
 	loadcell.set_scale(cal_val);
