@@ -127,9 +127,8 @@ void initLCD()
 void setup()
 {
 	Serial.begin(115200);
-	while (!Serial)
-	{
-	}
+	// Do not wait on `Serial`: the scale must run standalone (no host, e.g.
+	// on battery). On native-USB boards a blocking wait would hang here.
 
 	initLoadCell();
 	if (isLCD)
