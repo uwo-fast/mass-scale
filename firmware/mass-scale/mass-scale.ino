@@ -149,7 +149,7 @@ void loop()
 		else if (input == "c")
 		{
 			// Start calibration
-			Serial.println("Calibration started. Send 'u00' when unloaded.");
+			Serial.println("Calibration started. Send 'u00' when unloaded, or 'x' to abort.");
 			startCalibrationLoop();
 		}
 	}
@@ -214,11 +214,17 @@ void startCalibrationLoop()
 			String userInput = Serial.readStringUntil('\n');
 			userInput.trim();
 
-			if (userInput == "u00")
+			if (userInput == "x")
+			{
+				// Abort without changing the stored calibration.
+				Serial.println("Calibration aborted.");
+				return;
+			}
+			else if (userInput == "u00")
 			{
 				// Unloaded at 0g
 				loadcell.tare(20);
-				Serial.println("Unloaded. Now place a known weight and send 'aXY' (e.g., 'a50' for 50g).");
+				Serial.println("Unloaded. Now place a known weight and send 'aXY' (e.g., 'a50' for 50g). Send 'x' to abort.");
 			}
 			else if (userInput.startsWith("a"))
 			{
