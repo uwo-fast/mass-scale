@@ -31,9 +31,9 @@
 
 // Headers including a variety of definitions for the scale. These are separated
 // to help reduce the length of this script.
-#include "src\Libraries.hpp"
-#include "src\Pinouts.hpp"
-#include "src\Config.hpp" 
+#include "src/Libraries.hpp"
+#include "src/Pinouts.hpp"
+#include "src/Config.hpp" 
 
 
 const String REV = "2.0.1";
