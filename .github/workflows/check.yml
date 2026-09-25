@@ -1,0 +1,23 @@
+# Runs the same gate as `just check`, which is what the repo treats as CI.
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: extractions/setup-just@v2
+
+      - uses: arduino/setup-arduino-cli@v2
+
+      - name: Install the Arduino core and libraries
+        run: just firmware-deps
+
+      - name: just check
+        run: just check
