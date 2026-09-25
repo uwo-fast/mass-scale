@@ -124,9 +124,9 @@ repository** button gives it, from [`CITATION.cff`](CITATION.cff).
 
 ## License
 
-This repository is licensed by component: the firmware is `GPL-3.0-or-later`,
-the design files, circuit and test data `GPL-3.0`, the bundled libraries `MIT`
-and `LGPL-2.1-or-later`, the paper and the guides adapted from it `CC-BY-4.0`,
+This repository is licensed by component: the firmware, design files, circuit
+and test data are `GPL-3.0-or-later`, the bundled libraries `MIT` and
+`LGPL-2.1-or-later`, the paper and the guides adapted from it `CC-BY-4.0`,
 the Appropedia material `CC-BY-SA-4.0`, and the datasheets state none.
 [`LICENSING.md`](LICENSING.md) states what applies where, including the
 questions still open.

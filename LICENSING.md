@@ -14,7 +14,8 @@ repository with whatever licence it found there, and no single licence covers it
 ## What applies where
 
 "As stated" means the licence the file, its repository or its host declared when
-it was published. Nothing here has been relicensed.
+it was published. Apart from the files [note 4](#notes) covers, nothing here
+has been relicensed.
 
 | Path | Licence | Source of the statement |
 | --- | --- | --- |
@@ -23,8 +24,8 @@ it was published. Nothing here has been relicensed.
 | `firmware/DigitalMassBalance/`, except `src/HX711/` and `src/LiquidCrystal/` | `GPL-3.0-or-later` | the header of `DigitalMassBalance.ino`, © 2020 Benjamin Hubbard; the `LICENSE` beside it is the GPL-3.0 text |
 | `firmware/DigitalMassBalance/src/HX711/` | `MIT` | its headers, © 2018 Bogdan Necula |
 | `firmware/DigitalMassBalance/src/LiquidCrystal/` | `LGPL-2.1-or-later` — see [note 2](#notes) | the README of [arduino-libraries/LiquidCrystal](https://github.com/arduino-libraries/LiquidCrystal) at the commit these two files match (1.0.7), © 2006–2008 Hans-Christoph Steiner, © 2010 Arduino LLC; the files themselves carry no header |
-| `electronics/Circuit Diagram.fzz`, `docs/serial-protocol/` | `GPL-3.0` — see [note 1](#notes) | the `LICENSE` of [mtu-most/most_massbalance](https://gitlab.com/mtu-most/most_massbalance), the GPL-3.0 text with no "or later" statement for these files; the same files on OSF are under the OSF project's GPL 3.0 |
-| `cad/`, `electronics/*.png`, `docs/test-data/` | `GPL-3.0` — see [note 1](#notes) | licence of the [OSF project](https://osf.io/me9a8), "GNU General Public License (GPL) 3.0", 2020, and the paper: "released under a GNU General Public License (GPL) 3.0" |
+| `electronics/Circuit Diagram.fzz`, `docs/serial-protocol/` | `GPL-3.0-or-later` — see [notes 1 and 4](#notes) | the `LICENSE` of [mtu-most/most_massbalance](https://gitlab.com/mtu-most/most_massbalance), the GPL-3.0 text with no "or later" statement for these files, and the OSF project's "GNU General Public License (GPL) 3.0" for the same files; both read as or-later |
+| `cad/`, `electronics/*.png`, `docs/test-data/` | `GPL-3.0-or-later` — see [notes 1 and 4](#notes) | licence of the [OSF project](https://osf.io/me9a8), "GNU General Public License (GPL) 3.0", 2020, and the paper: "released under a GNU General Public License (GPL) 3.0"; read as or-later |
 | `docs/datasheets/` | none stated — see [open questions](#open-questions) | third-party documents (HTC-Sensor, Avia Semiconductor, Xiamen Ocular, the Scale Manufacturers Association) as uploaded to OSF; their publishers hold the copyright |
 | `docs/paper/instruments-04-00018.pdf` | `CC-BY-4.0` | the article, © 2020 by the authors, licensee MDPI |
 | `bom/README.md`, `docs/operation.md` | `CC-BY-4.0` | adapted from the paper, which they credit |
@@ -49,7 +50,8 @@ above for each new directory.
    2020 and no holder, and does not say whether later versions are allowed. The
    upstream repository's `LICENSE` is the GPL-3.0 text; its source files add
    "or (at your option) any later version" in their headers, but the Fritzing
-   circuit and the two protocol notes have no header of their own.
+   circuit and the two protocol notes have no header of their own. Both
+   statements are read as `GPL-3.0-or-later` (note 4).
 2. **LiquidCrystal.** The two files bundled with the 2020 sketch match
    `src/LiquidCrystal.cpp` and `.h` of arduino-libraries/LiquidCrystal at tag
    1.0.7 byte for byte, the commit the sketch's original git submodule pinned.
@@ -61,6 +63,16 @@ above for each new directory.
    (the "4.x" and "5.x" section numbers are the standard's) and adds the
    scale's own extended commands. The standard itself is in
    `docs/datasheets/ScaleCommProtocol5199M1.pdf`.
+4. **Unversioned GPL statements.** GPL statements that give no version
+   qualifier — OSF's "GPL 3.0", the paper's, and the upstream `LICENSE` for
+   the two files without a header — follow the MOST lab's standing practice:
+   `GPL-3.0-or-later` for software and `CERN-OHL-S-2.0` for hardware, applied
+   on 2026-09-25 by the FAST research group, which maintains this repository
+   and continues the lab's work. Where a paper and its OSF project state
+   different licences, the paper's statement is used; here they agree, and
+   every file they cover is under the GPL, so nothing has moved to
+   `CERN-OHL-S-2.0`. Michigan Technological University holds the copyright in
+   work its staff and students made there.
 
 ## Open questions
 
@@ -72,8 +84,6 @@ made public:
   which their publishers never made. Either keep them with their publishers'
   permission, or replace them with the links in
   [`docs/sources.md`](docs/sources.md).
-- **The GPL version** of the OSF files and of the two upstream files without a
-  header (note 1).
 - **`docs/images/Oscale.png`** is marked `GPL` on Appropedia with no version.
 - **LiquidCrystal's licence** is inferred from its upstream README (note 2).
 

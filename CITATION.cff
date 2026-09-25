@@ -9,9 +9,9 @@ authors:
     given-names: "Joshua M."
 repository-code: "https://github.com/uwo-fast/lab-grade-scale"
 url: "https://www.appropedia.org/Open_Source_Digitally_Replicable_Lab-Grade_Scales"
-# No `license:` key. The repository is licensed by component (GPL-3.0 design
-# files and firmware, bundled MIT and LGPL-2.1 libraries, CC-BY documents and
-# third-party datasheets that state none), and a licence list in CFF means
+# No `license:` key. The repository is licensed by component (GPL-3.0-or-later
+# design files and firmware, bundled MIT and LGPL-2.1 libraries, CC-BY documents
+# and third-party datasheets that state none), and a licence list in CFF means
 # "either, at your option", which is not what it grants. LICENSING.md states
 # what applies where.
 keywords:
