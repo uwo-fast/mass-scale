@@ -35,9 +35,9 @@
 // folder as this file. Arduino won't accept code that's elsewhere in the file
 // tree unless it's properly installed.
 // (https://arduino.github.io/arduino-cli/sketch-specification/)
-#include "src\MOST_MassBalance.h"
-#include "src\OLED.h"
-#include "src\LCD.h"
+#include "src/MOST_MassBalance.h"
+#include "src/OLED.h"
+#include "src/LCD.h"
 
 // HX711 Pins.
 // Data pin.
