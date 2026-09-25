@@ -36,10 +36,11 @@ linearly, and a parts cost of about USD 51 without an LCD or USD 66 with one
 to 289 for commercial scales with a serial interface.
 
 **Status.** Imported as published. Both firmware targets build with current
-tools, and the FreeCAD documents and published STLs are checked for integrity.
-Nothing has been rebuilt or re-tested here, the STLs have not been re-exported
-from the FreeCAD sources, and nothing has been redesigned yet. See
-[Known problems](#known-problems).
+tools, the FreeCAD documents and published STLs are checked for integrity, and
+the assembly re-exports from FreeCAD 1.1.3 with three of its four bodies
+matching the published STLs; the base differs (see
+[`cad/README.md`](cad/README.md)). Nothing has been rebuilt or re-tested here,
+and nothing has been redesigned yet. See [Known problems](#known-problems).
 
 ## Repository layout
 
@@ -94,6 +95,9 @@ Carried over from the published design, not fixed here:
 - **The housing is light.** The paper notes that the printed housing would
   deform under heavy loads, which side-loads the load cell; higher-capacity
   cells want a stiffer housing.
+- **The published `Base.stl` predates the FreeCAD document.** It is 1.25 %
+  smaller than the base the document builds, with the same outline; the other
+  three STLs match the document (see [`cad/README.md`](cad/README.md)).
 - **The paper's sketch is Windows-only as published**: its includes used
   backslashes, fixed here in three one-line commits (see
   [`CHANGELOG.md`](CHANGELOG.md)).

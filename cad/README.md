@@ -32,10 +32,44 @@ By their dimensions, the published STLs are:
 
 `just check` confirms each document is an intact FreeCAD archive holding the body
 [`parts.tsv`](parts.tsv) names, and that each STL encloses a positive volume
-(`just stl-stats` prints them). The STLs have not been re-exported here: no
-headless FreeCAD is available in the build environment, so they remain the
-author's exports. Re-export from FreeCAD (0.18 or later) by selecting a body and
-using File → Export.
+(`just stl-stats` prints them). The STLs are the author's exports; CI does not
+re-export them, because it has no FreeCAD.
+
+## How the published STLs compare with the source
+
+`just compare-freecad` runs [`../tools/export_freecad.py`](../tools/export_freecad.py)
+under `freecadcmd`, FreeCAD's headless interpreter: it opens
+`Mass Balance.FCStd`, recomputes it, reports any object that does not reach the
+up-to-date state, writes each body to `build/cad/freecad/` as binary STL with
+`MeshPart.meshFromShape` at a 0.01 mm linear deflection, and compares each
+export with the published file by volume and bounding box
+(`tools/stlcmp.py`). It needs FreeCAD on the machine (`FREECADCMD` names the
+interpreter when it is not on `PATH`); tessellations differ between exports,
+so a re-export is compared by volume and bounding box, not by hash.
+
+With FreeCAD 1.1.3, the document (saved by 0.18R4) opens with one deprecation
+notice, that the feature on `Sketch001` sets the old `Midplane` property in
+place of `SideType`, and a full recompute leaves every object up to date. The
+recomputed bodies have the same volume as the shapes saved in the file, to four
+decimals of a percent, so what follows compares the saved design with the
+published STLs:
+
+| Body | Published STL | Export | Published | Difference |
+| --- | --- | --- | --- | --- |
+| Base | `Base.stl` | 63300.7 mm³, 110 × 155 × 30 mm | 62517.0 mm³, 110 × 155 × 30 mm | +1.25 % |
+| Top | `Top.stl` | 28050.8 mm³, 110 × 125.02 × 7 mm | 28048.5 mm³, 110 × 125.02 × 7 mm | +0.01 % |
+| Bed | `Bed.stl` | 28167.5 mm³, 100 × 80 × 14 mm | 28166.1 mm³, 99.98 × 80 × 14 mm | +0.01 % |
+| Cover | `Cover.stl` | 14129.6 mm³, 107 × 87 × 22 mm | 14128.0 mm³, 107 × 87 × 22 mm | +0.01 % |
+
+Top, Bed and Cover match to within tessellation. The published `Base.stl` is
+784 mm³ smaller than the document's Base body: it carries a 2020-02-18
+timestamp in the OSF archive, two days before the document's last save
+(2020-02-20, by its own metadata), and the Base body's last four features (the
+screen holder, two PCB retainers and the cable-management pad) add 915 mm³
+after the USB slot, where the body is 62388 mm³. No single feature boundary reproduces 62517 mm³, so the published
+file is an export of an intermediate state of the base, and the document
+holds the later design. The bounding boxes are identical, so the difference is
+inside the shell.
 
 The paper prints the parts in PLA on a LulzBot TAZ 6 at 0.14 mm layers with 20 %
 cubic infill (Table 2 of the paper), and notes that all of them can be printed

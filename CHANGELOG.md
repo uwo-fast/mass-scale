@@ -35,6 +35,11 @@ own `v3.0.0` to `v3.4.0` tags are kept), and the design files from
   and a CI workflow running `just check`.
 - `cad/parts.tsv`, the list of bodies and their published STLs, and
   `tools/stlcmp.py`, which reports an STL's volume and bounding box.
+- `tools/export_freecad.py` and `just compare-freecad`, which re-export every
+  body from `Mass Balance.FCStd` under `freecadcmd` and compare the exports
+  with the published STLs. Top, Bed and Cover match; the published `Base.stl`
+  is 1.25 % smaller than the document's base and predates its last save
+  (`cad/README.md`).
 - `README.md`, `LICENSING.md` with the licence texts, `CITATION.cff`, and the
   FAST template's editor and line-ending configuration.
 
