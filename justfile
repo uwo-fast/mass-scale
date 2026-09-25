@@ -1,6 +1,7 @@
 # lab-grade-scale — CAD and firmware tasks
 # Requires: arduino-cli with the arduino:avr core and the libraries that
-# firmware-deps installs, python3, unzip. FreeCAD is not needed for check.
+# firmware-deps installs, python3, unzip. FreeCAD (freecadcmd) only for
+# compare-freecad; check does not need it.
 
 build := "build"
 fqbn := "arduino:avr:nano"
@@ -77,6 +78,17 @@ firmware:
     cp {{lib}}/examples/DigitalMassBalance/DigitalMassBalance.ino "$tmp/MOST_MassBalance/MOST_MassBalance.ino"
     arduino-cli compile --fqbn {{fqbn}} --build-path "$tmp/mmb" --output-dir {{build}}/firmware/MOST_MassBalance "$tmp/MOST_MassBalance"
     ls {{build}}/firmware/*/*.hex
+
+# Re-export every body from its FreeCAD document to build/cad/freecad/ and compare each with its published STL. Needs freecadcmd (FREECADCMD overrides the command); not part of check.
+compare-freecad:
+    #!/usr/bin/env bash
+    set -uo pipefail
+    {{env("FREECADCMD", "freecadcmd")}} tools/export_freecad.py; fail=$?
+    for f in {{build}}/cad/freecad/*.stl; do
+      n=$(basename "$f"); printf '  %-8s ' "${n%.stl}"
+      python3 tools/stlcmp.py "$f" "cad/stl/$n" || fail=1
+    done
+    exit $fail
 
 # Print volume, bounding box and triangle count of every published STL.
 stl-stats:
