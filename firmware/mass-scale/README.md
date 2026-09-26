@@ -1,4 +1,3 @@
-```markdown
 # mass-scale
 
 Arduino firmware for a 3D-printable digital mass balance using an HX711 load-cell amplifier and optional 16×2 LCD.
@@ -36,18 +35,22 @@ The tare button connects pin 8 to ground and uses the internal pull-up resistor.
 
 ## Dependencies
 
-Install these Arduino libraries:
+- `HX711` — the "HX711 Arduino Library" by Bogdan Necula
+  ([bogde/HX711](https://github.com/bogde/HX711)), 0.7.5
+- `LiquidCrystal` ([arduino-libraries/LiquidCrystal](https://github.com/arduino-libraries/LiquidCrystal)), 1.0.7
 
-- `HX711`
-- `LiquidCrystal`
-
-`EEPROM` is provided by the Arduino core.
+`EEPROM` is provided by the Arduino core. From the repository, `just firmware-libs`
+fetches both libraries at those versions into `build/deps/libraries/` and
+`just check-firmware` and `just firmware` build against them; in the Arduino
+IDE, install them from the Library Manager.
 
 ## Configuration
 
 Set the fallback calibration factor in `defaults.h`:
 
-<!-- codeblock 1 -->
+```cpp
+#define default_scale 0.016016
+```
 
 Set `isLCD` to `false` when no LCD is connected.
 
@@ -75,11 +78,15 @@ The tare button performs the same operation as the `t` command.
 2. Send `c`.
 3. Send `u00` when the scale is unloaded.
 4. Place a known mass on the scale.
-5. Send `a` followed by the mass in grams.
+5. Send `a` followed by the mass in grams (or `x` to abort).
 
 For a 500 g calibration mass:
 
-<!-- codeblock 2 -->
+```text
+c
+u00
+a500
+```
 
 The calculated sensitivity is stored in EEPROM and restored automatically after restart.
 
@@ -89,7 +96,9 @@ For best results, use a calibration mass near the normal operating range and wai
 
 The serial monitor reports the tare-subtracted raw HX711 reading and calibrated mass:
 
-<!-- codeblock 3 -->
+```text
+Raw: 617283.00, Mass: 500.00 g
+```
 
 The LCD, when enabled, displays the mass in grams.
 
@@ -100,24 +109,3 @@ Copyright © 2025 Cameron K. Brooks.
 This project is licensed under the GNU General Public License, version 3 or later.
 
 It is derived from `OS_Nano_Balance`, Copyright © 2019 Benjamin Hubbard.
-```
-
-<!-- codeblock 1 -->
-
-```cpp
-const float default_scale = 1234.567f;
-```
-
-<!-- codeblock 2 -->
-
-```text
-c
-u00
-a500
-```
-
-<!-- codeblock 3 -->
-
-```text
-Raw: 617283.00, Mass: 500.00 g
-```
