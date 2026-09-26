@@ -9,7 +9,7 @@ Run from the repository with FreeCAD's headless interpreter:
 Each document is opened and recomputed; any object that does not reach the
 Up-to-date state is reported. Each body with a published STL is then
 tessellated with MeshPart.meshFromShape at a 0.01 mm linear deflection and
-written as binary STL to build/cad/freecad/<stl>. Exits 1 if a document did
+written as binary STL to build/cad/freecad/<stl file name>. Exits 1 if a document did
 not recompute cleanly, after writing every export it could.
 """
 import os
@@ -44,10 +44,11 @@ def export(doc, label, stl):
     shape = bodies[0].Shape
     mesh = MeshPart.meshFromShape(Shape=shape, LinearDeflection=LINEAR_DEFLECTION,
                                   AngularDeflection=ANGULAR_DEFLECTION, Relative=False)
-    mesh.write(os.path.join(OUT, stl))
+    name = os.path.basename(stl)
+    mesh.write(os.path.join(OUT, name))
     bb = mesh.BoundBox
     print("  %-8s %9.1f mm3  bbox %.2f x %.2f x %.2f  tris %d  -> build/cad/freecad/%s" % (
-        label, shape.Volume, bb.XLength, bb.YLength, bb.ZLength, mesh.CountFacets, stl))
+        label, shape.Volume, bb.XLength, bb.YLength, bb.ZLength, mesh.CountFacets, name))
     return True
 
 

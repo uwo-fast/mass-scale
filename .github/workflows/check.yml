@@ -5,6 +5,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   check:
@@ -12,12 +13,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install OpenSCAD
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends openscad xvfb
+          openscad --version
+
       - uses: extractions/setup-just@v2
 
       - uses: arduino/setup-arduino-cli@v2
 
       - name: Install the Arduino core and libraries
-        run: just firmware-deps
+        run: |
+          arduino-cli core update-index
+          just firmware-deps
 
+      # xvfb because some OpenSCAD builds still want a display to export from,
+      # even headless.
       - name: just check
-        run: just check
+        run: xvfb-run -a just check

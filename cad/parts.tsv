@@ -1,8 +1,9 @@
-# FreeCAD document (under cad/)	body label	published STL (under cad/stl/, - for none)
-Mass Balance.FCStd	Base	Base.stl
-Mass Balance.FCStd	Top	Top.stl
-Mass Balance.FCStd	Bed	Bed.stl
-Mass Balance.FCStd	Cover	Cover.stl
-old/Base.FCStd	Base	-
-old/Bed.FCStd	Bed	-
-old/Face.FCStd	Body	-
+# FreeCAD document (under cad/)	body label	published STL (under cad/, - for none)
+freecad-2020/Mass Balance.FCStd	Base	freecad-2020/stl/Base.stl
+freecad-2020/Mass Balance.FCStd	Top	freecad-2020/stl/Top.stl
+freecad-2020/Mass Balance.FCStd	Bed	freecad-2020/stl/Bed.stl
+freecad-2020/Mass Balance.FCStd	Cover	freecad-2020/stl/Cover.stl
+freecad-2019/Base.FCStd	Base	-
+freecad-2019/Base-osf.FCStd	Base	-
+freecad-2019/Bed.FCStd	Bed	-
+freecad-2019/Face.FCStd	Body	-

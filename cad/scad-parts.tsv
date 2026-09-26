@@ -1,0 +1,7 @@
+# directory (under cad/)	file	-D assignments (comma-separated, - for none)	part	tolerated warning (regex, - for none)
+openscad	assembly.scad	show_platter=false	enclosure	-
+openscad	assembly.scad	show_enclosure=false	platter	-
+openscad	assembly.scad	-	assembly	-
+openscad-v3	mass-scale.scad	-	v3-enclosure	-
+openscad-v3	mass-scale.scad	show_enclosure=false,show_lid=true	v3-lid	-
+openscad-v3	test_load_cells.scad	-	v3-test_load_cells	-
