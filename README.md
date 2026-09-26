@@ -9,6 +9,8 @@
 [![Appropedia](https://img.shields.io/badge/Appropedia-project_page-lightblue.svg)](https://www.appropedia.org/Open_Source_Digitally_Replicable_Lab-Grade_Scales)
 [![Licensing](https://img.shields.io/badge/Licensing-by_component-lightgrey.svg)](LICENSING.md)
 
+![The assembled scale: the printed housing with its yellow weighing platform and the LCD](docs/images/Oscale.png)
+
 ## Overview
 
 The scale is a printed housing that holds a single-point parallel-beam load
