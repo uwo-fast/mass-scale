@@ -7,7 +7,7 @@ Arduino Nano (ATmega328P) reading an HX711 load-cell amplifier, with an optional
 | Directory | What it is | From |
 | --- | --- | --- |
 | [`DigitalMassBalance/`](DigitalMassBalance/) | **DigitalMassBalance 2.0.1**, the sketch the paper describes: one `.ino` plus `Config.hpp`, `Pinouts.hpp` and `Libraries.hpp` under `src/`, with the HX711 (0.7.4) and LiquidCrystal (1.0.7) libraries bundled beside them | OSF, uploaded 2020-04-15; the same files as upstream commit `1085674` (tag `mtu-instruments-2020`) |
-| [`MOST_MassBalance/`](MOST_MassBalance/) | **MOST_MassBalance 3.4.0**, the rework of that sketch into a library after the paper: a `MOST_MassBalance` class, a `DataFilter` averaging queue, a `DisplayInterface` with `LCD` and `OLED` implementations, and an example sketch | [gitlab.com/mtu-most/most_massbalance](https://gitlab.com/mtu-most/most_massbalance), history included (tag `mtu-final-2021`) |
+| [`MOST_MassBalance/`](MOST_MassBalance/) | **MOST_MassBalance 3.4.0**, the rework of that sketch into a library after the paper: a `MOST_MassBalance` class, a `DataFilter` averaging filter, a `DisplayInterface` with `LCD` and `OLED` implementations, and an example sketch | [gitlab.com/mtu-most/most_massbalance](https://gitlab.com/mtu-most/most_massbalance), history included (tag `mtu-final-2021`) |
 
 ## DigitalMassBalance (the paper's firmware)
 
@@ -35,7 +35,7 @@ Clones with the older bootloader need `--fqbn arduino:avr:nano:cpu=atmega328old`
 
 The library keeps every scale function in `src/` and ships one example,
 `examples/DigitalMassBalance/DigitalMassBalance.ino`, which wires an LCD and
-constructs a `MOST_MassBalance` with a 10-sample averaging queue and the tare
+constructs a `MOST_MassBalance` with a 10-sample averaging filter and the tare
 button on D8; `begin()` takes the HX711 pins, by default power on D4, data on D2
 and clock on D3, the same as the 2020 sketch. Its `README.md` explains
 the intended use: the library directory itself is the sketch folder, and the

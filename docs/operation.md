@@ -27,7 +27,7 @@ On power, over USB from a computer or a 5 V power block, the firmware:
 4. reads the saved calibration sensitivity from EEPROM, if a calibration has
    ever been run, and reports it; otherwise the sensitivity is 1 and the
    readout is the raw HX711 count;
-5. clears the averaging queue (10 readings by default, set in `Config.hpp`),
+5. clears the averaging filter (10 readings by default, set in `Config.hpp`),
    which sets the scale's response time;
 6. sets the tare button as an input with the internal pull-up, so it is active
    low.
