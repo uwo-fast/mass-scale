@@ -19,14 +19,14 @@ LCD is present, the 10-sample averaging window, the 3 s button hold that starts
 calibration, the default 235.9 g calibration mass, and the 9600 baud serial
 rate), and `Libraries.hpp` the includes. Its serial interface implements the
 Scale Manufacturers Association's SCP-0499 Level 2 command set; see
-[`../docs/operation.md`](../docs/operation.md) and
-[`../docs/serial-protocol/`](../docs/serial-protocol/).
+[`../../docs/operation.md`](../../docs/operation.md) and
+[`../../docs/serial-protocol/`](../../docs/serial-protocol/).
 
 Open the folder in the Arduino IDE, or build and upload with arduino-cli:
 
 ```sh
-arduino-cli compile --fqbn arduino:avr:nano firmware/DigitalMassBalance
-arduino-cli upload  --fqbn arduino:avr:nano -p /dev/ttyUSB0 firmware/DigitalMassBalance
+arduino-cli compile --fqbn arduino:avr:nano firmware/most-massbalance-2020/DigitalMassBalance
+arduino-cli upload  --fqbn arduino:avr:nano -p /dev/ttyUSB0 firmware/most-massbalance-2020/DigitalMassBalance
 ```
 
 Clones with the older bootloader need `--fqbn arduino:avr:nano:cpu=atmega328old`.
@@ -59,4 +59,4 @@ as a load-cell handler without the serial front end (added in 3.4.0).
 Only include paths, one commit each, so the sketches compile on Linux and macOS
 as well as Windows: the three `src\...` includes in each sketch use forward
 slashes, and `Libraries.hpp` points at the bundled libraries where the OSF
-upload placed them. See [`../CHANGELOG.md`](../CHANGELOG.md).
+upload placed them. See [`../../CHANGELOG.md`](../../CHANGELOG.md).

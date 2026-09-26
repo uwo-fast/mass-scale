@@ -18,7 +18,7 @@ firmware switches, rather than from the 5 V rail: the HX711 draws at most
 1.5 mA and the LCD a few mA, within what a pin supplies. The load cell connects
 to the HX711 as red → E+, black → E−, white → A−, green → A+. The Nano's pin
 assignments are in
-[`../firmware/DigitalMassBalance/src/Pinouts.hpp`](../firmware/DigitalMassBalance/src/Pinouts.hpp).
+[`../firmware/most-massbalance-2020/DigitalMassBalance/src/Pinouts.hpp`](../firmware/most-massbalance-2020/DigitalMassBalance/src/Pinouts.hpp).
 
 The parts are listed in [`../bom/`](../bom/README.md);
 [`../docs/electronics-assembly.md`](../docs/electronics-assembly.md) walks

@@ -4,8 +4,8 @@ Adapted from Sections 2.4 and 2.5 of the paper in [`paper/`](paper/):
 Hubbard BR, Pearce JM (2020). *Open-Source Digitally Replicable Lab-Grade
 Scales.* Instruments 4(3): 18 (`CC-BY-4.0`), and from the protocol notes in
 [`serial-protocol/`](serial-protocol/). It describes the
-[DigitalMassBalance 2.0.1](../firmware/DigitalMassBalance/) firmware the paper
-was written for; the later [MOST_MassBalance](../firmware/MOST_MassBalance/)
+[DigitalMassBalance 2.0.1](../firmware/most-massbalance-2020/DigitalMassBalance/) firmware the paper
+was written for; the later [MOST_MassBalance](../firmware/most-massbalance-2020/MOST_MassBalance/)
 library keeps the same commands. Text marked **Note** is added here.
 
 ![The assembled scale](images/Oscale.png)
