@@ -1,17 +1,20 @@
 cff-version: 1.2.0
 message: "If you use this scale, please cite the paper that describes it."
-title: "Open-Source Digitally Replicable Lab-Grade Scales"
+title: "Mass Scale"
 type: software
 authors:
   - family-names: "Hubbard"
     given-names: "Benjamin R."
   - family-names: "Pearce"
     given-names: "Joshua M."
-repository-code: "https://github.com/uwo-fast/lab-grade-scale"
+  - family-names: "Brooks"
+    given-names: "Cameron K."
+repository-code: "https://github.com/uwo-fast/mass-scale"
 url: "https://www.appropedia.org/Open_Source_Digitally_Replicable_Lab-Grade_Scales"
 # No `license:` key. The repository is licensed by component (GPL-3.0-or-later
-# design files and firmware, bundled MIT and LGPL-2.1 libraries, CC-BY documents
-# and third-party datasheets that state none), and a licence list in CFF means
+# firmware and design files, GPL-3.0-or-later and CERN-OHL-S-2.0 OpenSCAD
+# designs, bundled MIT, LGPL-2.1 and GPL-3.0 libraries, CC-BY documents and
+# third-party datasheets that state none), and a licence list in CFF means
 # "either, at your option", which is not what it grants. LICENSING.md states
 # what applies where.
 keywords:
@@ -36,3 +39,21 @@ preferred-citation:
   year: 2020
   month: 6
   doi: "10.3390/instruments4030018"
+references:
+  - type: software
+    title: "mass-scale: firmware and OpenSCAD designs for the 3D-printable digital balance"
+    authors:
+      - family-names: "Brooks"
+        given-names: "Cameron K."
+    year: 2026
+    repository-code: "https://github.com/uwo-fast/mass-scale"
+    notes: "The 2025-26 revival, whose history this repository carries (tag fast-revival-2026)."
+  - type: software
+    title: "OS Nano Balance"
+    authors:
+      - family-names: "Hubbard"
+        given-names: "Benjamin R."
+    year: 2019
+    repository-code: "https://github.com/brhubbar/OS_Nano_Balance"
+    url: "https://www.appropedia.org/3D_printed_digital_balance"
+    notes: "The 2019 predecessor, whose history this repository carries (tag mtu-nanobalance-2019)."
