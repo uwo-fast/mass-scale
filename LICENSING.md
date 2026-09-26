@@ -30,7 +30,7 @@ has been relicensed.
 | `docs/paper/instruments-04-00018.pdf` | `CC-BY-4.0` | the article, © 2020 by the authors, licensee MDPI |
 | `bom/README.md`, `docs/operation.md` | `CC-BY-4.0` | adapted from the paper, which they credit |
 | `docs/electronics-assembly.md` | `CC-BY-SA-4.0` | adapted from the Appropedia page it names; Appropedia's site licence |
-| `docs/images/` | per file — see [`docs/images/README.md`](docs/images/README.md) | the Appropedia file page of each image |
+| `docs/images/` | `CC-BY-SA-4.0` — see [note 4](#notes) | the Appropedia file page of each image: two state `CC-BY-SA-4.0`, and `Oscale.png` states `GPL` with no version, read as `CC-BY-SA-4.0` under note 4; per file in [`docs/images/README.md`](docs/images/README.md) |
 | `justfile`, `tools/`, `cad/parts.tsv`, `.github/`, and other build tooling added by FAST | `GPL-3.0-or-later` | FAST research group and contributors |
 | `README.md`, `LICENSING.md`, `CHANGELOG.md`, `CITATION.cff`, `docs/sources.md`, and the `README.md` in each directory except `firmware/MOST_MassBalance/` and `firmware/DigitalMassBalance/` | `GPL-3.0-or-later` **and** `CERN-OHL-S-2.0`, at your option | FAST research group and contributors |
 
@@ -71,8 +71,10 @@ above for each new directory.
    and continues the lab's work. Where a paper and its OSF project state
    different licences, the paper's statement is used; here they agree, and
    every file they cover is under the GPL, so nothing has moved to
-   `CERN-OHL-S-2.0`. Michigan Technological University holds the copyright in
-   work its staff and students made there.
+   `CERN-OHL-S-2.0`. Images the lab published with no licence, or with an
+   unversioned GFDL or GPL, are `CC-BY-SA-4.0`; here that is
+   `docs/images/Oscale.png`, applied on 2026-09-26. Michigan Technological
+   University holds the copyright in work its staff and students made there.
 
 ## Open questions
 
@@ -84,7 +86,6 @@ made public:
   which their publishers never made. Either keep them with their publishers'
   permission, or replace them with the links in
   [`docs/sources.md`](docs/sources.md).
-- **`docs/images/Oscale.png`** is marked `GPL` on Appropedia with no version.
 - **LiquidCrystal's licence** is inferred from its upstream README (note 2).
 
 ## Contributions
