@@ -56,31 +56,33 @@ to 289 for commercial scales with a serial interface.
 
 **Status.** The v2 enclosure and platter have been printed, and the firmware
 builds and has had its calibration and readout reworked since; neither has
-been characterised the way the paper characterised the 2020 scale. The v2 parts do not yet model the load cell's
-mounting or the electronics' seats, and v3 is unfinished; the firmware does
-not yet have the 2020 firmware's SMA protocol, OLED support or averaging
-filter. See [Known problems](#known-problems) and the issues.
+been characterised the way the paper characterised the 2020 scale. The v2
+parts do not yet model the load cell's mounting or the electronics' seats,
+and v3 is unfinished; the firmware does not yet have the 2020 firmware's SMA
+protocol, OLED support or averaging filter. See [Known problems](#known-problems) and the issues.
 
-## Repository layout
+## Documentation
 
-- `cad/` — every generation of the printed parts: `openscad/` (current),
-  `openscad-v3/` (in progress), `openscad-v1/`, `freecad-2020/` with the
-  published STLs, `freecad-2019/`, `openscad-2019/`
-  ([details](cad/README.md))
-- `firmware/` — `mass-scale/` (current), `most-massbalance-2020/` (the paper's
-  sketch and the library form of it), `os-nano-balance-2019/`
-  ([details](firmware/README.md))
-- `electronics/` — the 2020 Fritzing circuit and its breadboard and schematic
-  views ([details](electronics/README.md)); the pins are the same in every
-  generation
-- `bom/` — the paper's bill of materials ([as tables](bom/README.md))
-- `docs/` — the 2020 [operation guide](docs/operation.md), the
-  [breadboard assembly guide](docs/electronics-assembly.md),
-  [the paper](docs/paper/), the [datasheets](docs/datasheets/README.md), the
-  [test data](docs/test-data/README.md), the
-  [serial protocol notes](docs/serial-protocol/README.md), and
-  [sources](docs/sources.md) for everything else
-- `tools/` — the STL and FreeCAD comparison scripts the checks use
+[History](#history) says which folders hold each generation. Each top-level
+folder has a README:
+
+- [`cad/`](https://github.com/uwo-fast/mass-scale/blob/main/cad/README.md) -- the printed
+  parts of every generation, with the published 2020 STLs
+- [`firmware/`](https://github.com/uwo-fast/mass-scale/blob/main/firmware/README.md) -- the
+  current, 2020 and 2019 firmware, and the wiring
+- [`electronics/`](https://github.com/uwo-fast/mass-scale/blob/main/electronics/README.md) --
+  the 2020 Fritzing circuit and its breadboard and schematic views
+- [`bom/`](https://github.com/uwo-fast/mass-scale/blob/main/bom/README.md) -- the paper's bill
+  of materials, as tables
+
+`docs/` has the 2020 [operation guide](docs/operation.md), the
+[breadboard assembly guide](docs/electronics-assembly.md),
+[the paper](https://github.com/uwo-fast/mass-scale/tree/main/docs/paper), the
+[datasheets](docs/datasheets/README.md), the
+[test data](docs/test-data/README.md), the
+[serial protocol notes](docs/serial-protocol/README.md), and
+[sources](docs/sources.md) for everything else. `tools/` holds the STL and
+FreeCAD comparison scripts the checks use.
 
 ## Getting started
 
