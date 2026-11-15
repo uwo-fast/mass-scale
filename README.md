@@ -30,8 +30,11 @@ computer reads it continuously and calibrates it against a known mass.
   in progress, with a sliding, latching lid.
 - [`firmware/mass-scale/`](firmware/README.md) — the rewritten firmware:
   calibration over serial, stored in EEPROM; tare from the button or serial;
-  a non-blocking readout of raw and calibrated values ten times a second;
-  guards against a missing amplifier or a corrupt calibration.
+  a readout of raw and calibrated values on a 100 ms timer, each cycle
+  averaging three HX711 reads, so about 3 Hz at the 10 samples per second
+  HX711 modules default to; guards against a missing amplifier or a corrupt
+  calibration. Calibration holds up the readout and the button until it
+  finishes or is aborted.
 
 The 2020 design and firmware are kept in full and still checked, and the 2019
 files are kept for reference and attribution; see [History](#history) and
@@ -109,7 +112,7 @@ arduino-cli upload --fqbn arduino:avr:nano -p /dev/ttyUSB0 --input-dir build/fir
 ```
 
 Then open a serial monitor at 115200 baud (newline line endings). The scale
-tares itself at start-up and prints `Raw: …, Mass: … g`; `t` or the button
+tares itself at start-up and prints `Raw: <counts>, Mass: <grams> g`; `t` or the button
 tares it, and `c`, `u00` with the platter empty, then `a<grams>` with a known
 mass on it, calibrates it and stores the result in EEPROM. Any serial client
 that logs, such as PuTTY, records the readings.
