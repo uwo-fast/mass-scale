@@ -8,7 +8,7 @@
 
 [![Paper](https://img.shields.io/badge/Paper-Instruments_2020-blue.svg)](https://doi.org/10.3390/instruments4030018)
 [![Appropedia](https://img.shields.io/badge/Appropedia-project_page-lightblue.svg)](https://www.appropedia.org/Open_Source_Digitally_Replicable_Lab-Grade_Scales)
-[![Licensing](https://img.shields.io/badge/Licensing-by_component-lightgrey.svg)](LICENSING.md)
+[![Licensing](https://img.shields.io/badge/Licensing-by_component-lightgrey.svg)](https://github.com/uwo-fast/mass-scale/blob/main/LICENSING.md)
 
 ![The assembled 2020 scale: the printed housing with its yellow weighing platform and the LCD](docs/images/Oscale.png)
 
@@ -23,17 +23,18 @@ computer reads it continuously and calibrates it against a known mass.
 
 **The current design** is the revival's:
 
-- [`cad/openscad/`](cad/README.md#the-current-design) — the OpenSCAD v2
-  enclosure, with a bevelled front face for the LCD, and the platter that
-  fits over it. Parametric: the dimensions are variables at the top of
-  `assembly.scad`. [`cad/openscad-v3/`](cad/README.md) is the next revision,
-  in progress, with a sliding, latching lid.
-- [`firmware/mass-scale/`](firmware/README.md) — the rewritten firmware:
-  calibration over serial, stored in EEPROM; tare from the button or serial;
-  a readout of raw and calibrated values on a 100 ms timer, each cycle
-  averaging three HX711 reads, so about 3 Hz at the 10 samples per second
-  HX711 modules default to; guards against a missing amplifier or a corrupt
-  calibration. Calibration holds up the readout and the button until it
+- [`cad/openscad/`](https://github.com/uwo-fast/mass-scale/blob/main/cad/README.md#the-current-design)
+  — the OpenSCAD v2 enclosure, with a bevelled front face for the LCD, and the
+  platter that fits over it. Parametric: the dimensions are variables at the top
+  of `assembly.scad`.
+  [`cad/openscad-v3/`](https://github.com/uwo-fast/mass-scale/blob/main/cad/README.md)
+  is the next revision, in progress, with a sliding, latching lid.
+- [`firmware/mass-scale/`](https://github.com/uwo-fast/mass-scale/blob/main/firmware/README.md)
+  — the rewritten firmware: calibration over serial, stored in EEPROM; tare from
+  the button or serial; a readout of raw and calibrated values on a 100 ms
+  timer, each cycle averaging three HX711 reads, so about 3 Hz at the 10 samples
+  per second HX711 modules default to; guards against a missing amplifier or a
+  corrupt calibration. Calibration holds up the readout and the button until it
   finishes or is aborted.
 
 The 2020 design and firmware are kept in full and still checked, and the 2019
@@ -66,14 +67,14 @@ protocol, OLED support or averaging filter. See [Known problems](#known-problems
 [History](#history) says which folders hold each generation. Each top-level
 folder has a README:
 
-- [`cad/`](https://github.com/uwo-fast/mass-scale/blob/main/cad/README.md) -- the printed
-  parts of every generation, with the published 2020 STLs
-- [`firmware/`](https://github.com/uwo-fast/mass-scale/blob/main/firmware/README.md) -- the
-  current, 2020 and 2019 firmware, and the wiring
-- [`electronics/`](https://github.com/uwo-fast/mass-scale/blob/main/electronics/README.md) --
-  the 2020 Fritzing circuit and its breadboard and schematic views
-- [`bom/`](https://github.com/uwo-fast/mass-scale/blob/main/bom/README.md) -- the paper's bill
-  of materials, as tables
+- [`cad/`](https://github.com/uwo-fast/mass-scale/blob/main/cad/README.md) --
+  the printed parts of every generation, with the published 2020 STLs
+- [`firmware/`](https://github.com/uwo-fast/mass-scale/blob/main/firmware/README.md)
+  -- the current, 2020 and 2019 firmware, and the wiring
+- [`electronics/`](https://github.com/uwo-fast/mass-scale/blob/main/electronics/README.md)
+  -- the 2020 Fritzing circuit and its breadboard and schematic views
+- [`bom/`](https://github.com/uwo-fast/mass-scale/blob/main/bom/README.md) --
+  the paper's bill of materials, as tables
 
 `docs/` has the 2020 [operation guide](docs/operation.md), the
 [breadboard assembly guide](docs/electronics-assembly.md),
@@ -102,11 +103,12 @@ just firmware        # build every firmware target and leave the .hex files unde
 `OPENSCAD_FLAGS` adds flags to every render.
 
 To build one: render `enclosure` and `platter` from `cad/openscad/`
-(`just render`, or the customizer in OpenSCAD's GUI with `assembly.scad`), buy
-the parts in [`bom/`](bom/README.md) (the electronics are the same in every
-generation), wire them as in [`firmware/README.md`](firmware/README.md#wiring)
-or the [breadboard guide](docs/electronics-assembly.md), and flash the
-firmware:
+(`just render`, or the customizer in OpenSCAD's GUI with `assembly.scad`), buy the
+parts in
+[`bom/`](https://github.com/uwo-fast/mass-scale/blob/main/bom/README.md) (the
+electronics are the same in every generation), wire them as in
+[`firmware/README.md`](https://github.com/uwo-fast/mass-scale/blob/main/firmware/README.md#wiring)
+or the [breadboard guide](docs/electronics-assembly.md), and flash the firmware:
 
 ```sh
 just firmware
@@ -114,13 +116,13 @@ arduino-cli upload --fqbn arduino:avr:nano -p /dev/ttyUSB0 --input-dir build/fir
 ```
 
 Then open a serial monitor at 115200 baud (newline line endings). The scale
-tares itself at start-up and prints `Raw: <counts>, Mass: <grams> g`; `t` or the button
-tares it, and `c`, `u00` with the platter empty, then `a<grams>` with a known
-mass on it, calibrates it and stores the result in EEPROM. Any serial client
-that logs, such as PuTTY, records the readings.
-[`firmware/mass-scale/README.md`](firmware/mass-scale/README.md) has the
-details; [`docs/operation.md`](docs/operation.md) describes the 2020 firmware
-and its SCP-0499 commands.
+tares itself at start-up and prints `Raw: <counts>, Mass: <grams> g`; `t` or the
+button tares it, and `c`, `u00` with the platter empty, then `a<grams>` with a
+known mass on it, calibrates it and stores the result in EEPROM. Any serial
+client that logs, such as PuTTY, records the readings.
+[`firmware/mass-scale/README.md`](https://github.com/uwo-fast/mass-scale/blob/main/firmware/mass-scale/README.md)
+has the details; [`docs/operation.md`](docs/operation.md) describes the 2020
+firmware and its SCP-0499 commands.
 
 ## Known problems
 
@@ -142,14 +144,16 @@ fixed here; each is an issue:
 - **The housing is light.** The paper notes that the printed housing would
   deform under heavy loads, which side-loads the load cell; higher-capacity
   cells want a stiffer housing.
-- **The published 2020 `Base.stl` predates the FreeCAD document.** It is
-  1.25 % smaller than the base the document builds, with the same outline; the
-  other three STLs match the document (see [`cad/README.md`](cad/README.md)).
+- **The published 2020 `Base.stl` predates the FreeCAD document.** It is 1.25 %
+  smaller than the base the document builds, with the same outline; the other
+  three STLs match the document (see
+  [`cad/README.md`](https://github.com/uwo-fast/mass-scale/blob/main/cad/README.md)).
 - **The paper's sketch was Windows-only as published**: its includes used
-  backslashes, fixed here; [`CHANGELOG.md`](CHANGELOG.md) lists the import
-  fixes. The 2019 sketch is kept as published and is not built.
-- **Third-party datasheets** are redistributed without a licence statement;
-  see [`LICENSING.md`](LICENSING.md).
+  backslashes, fixed here;
+  [`CHANGELOG.md`](https://github.com/uwo-fast/mass-scale/blob/main/CHANGELOG.md)
+  lists the import fixes. The 2019 sketch is kept as published and is not built.
+- **Third-party datasheets** are redistributed without a licence statement; see
+  [`LICENSING.md`](https://github.com/uwo-fast/mass-scale/blob/main/LICENSING.md).
 
 ## History
 
@@ -162,26 +166,28 @@ them. An annotated tag marks each source as it was:
 | **2020 — the MOST lab-grade scale**, Benjamin Hubbard and Joshua Pearce | The scale the paper describes: one parametric FreeCAD document, the DigitalMassBalance 2.0.1 sketch implementing the SMA SCP-0499 serial protocol, and its later library form MOST_MassBalance 3.4.0. Published in [*Instruments*](https://doi.org/10.3390/instruments4030018), on [OSF me9a8](https://osf.io/me9a8), at [gitlab.com/mtu-most/most_massbalance](https://gitlab.com/mtu-most/most_massbalance) and on [Appropedia](https://www.appropedia.org/Open_Source_Digitally_Replicable_Lab-Grade_Scales). Here: `cad/freecad-2020/`, `firmware/most-massbalance-2020/`, `electronics/`, `bom/`, `docs/` | `mtu-instruments-2020` (the firmware as published with the paper), `mtu-final-2021` (upstream's last commit), `mtu-osf-2020` (the OSF files as published), and upstream's own `v3.0.0` to `v3.4.0` |
 | **2025–26 — the FAST revival**, Cameron Brooks | A new OpenSCAD enclosure and platter (v2), a next revision in progress (v3) using the [load-cell-scad](https://github.com/CameronBrooks11/load-cell-scad) library, and a rewrite of the 2019 firmware with calibration over serial. Published at [uwo-fast/mass-scale](https://github.com/uwo-fast/mass-scale), which this repository continues. Here: `cad/openscad/`, `cad/openscad-v3/`, `cad/openscad-v1/`, `firmware/mass-scale/` | `fast-revival-2026` |
 
-[`CHANGELOG.md`](CHANGELOG.md) lists what changed when the histories were
-joined and when the 2020 files were imported; [`docs/sources.md`](docs/sources.md)
-says where every file came from and what was left out.
+[`CHANGELOG.md`](https://github.com/uwo-fast/mass-scale/blob/main/CHANGELOG.md)
+lists what changed when the histories were joined and when the 2020 files were
+imported; [`docs/sources.md`](docs/sources.md) says where every file came from
+and what was left out.
 
 ## Citation
 
 If you use this scale, please cite the paper above. GitHub's **Cite this
-repository** button gives it, from [`CITATION.cff`](CITATION.cff), which also
-references the 2019 and revival work.
+repository** button gives it, from
+[`CITATION.cff`](https://github.com/uwo-fast/mass-scale/blob/main/CITATION.cff),
+which also references the 2019 and revival work.
 
 ## License
 
-This repository is licensed by component: the current firmware and the 2019
-and 2020 firmware and design files are `GPL-3.0-or-later`; the revival's
-OpenSCAD designs are `GPL-3.0-or-later` and `CERN-OHL-S-2.0`, at your option;
-the bundled libraries are `MIT` and `LGPL-2.1-or-later` and the vendored
-load-cell-scad `GPL-3.0`; the paper and the guides adapted from it are
-`CC-BY-4.0`, the Appropedia material `CC-BY-SA-4.0`, and the datasheets state
-none. [`LICENSING.md`](LICENSING.md) states what applies where, including the
-questions still open.
+This repository is licensed by component: the current firmware and the 2019 and
+2020 firmware and design files are `GPL-3.0-or-later`; the revival's OpenSCAD
+designs are `GPL-3.0-or-later` and `CERN-OHL-S-2.0`, at your option; the bundled
+libraries are `MIT` and `LGPL-2.1-or-later` and the vendored load-cell-scad
+`GPL-3.0`; the paper and the guides adapted from it are `CC-BY-4.0`, the
+Appropedia material `CC-BY-SA-4.0`, and the datasheets state none.
+[`LICENSING.md`](https://github.com/uwo-fast/mass-scale/blob/main/LICENSING.md)
+states what applies where, including the questions still open.
 
 ## Contact
 

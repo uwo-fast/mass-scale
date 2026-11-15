@@ -1,11 +1,14 @@
 # Operating the scale
 
-Adapted from Sections 2.4 and 2.5 of the paper in [`paper/`](paper/):
-Hubbard BR, Pearce JM (2020). *Open-Source Digitally Replicable Lab-Grade
-Scales.* Instruments 4(3): 18 (`CC-BY-4.0`), and from the protocol notes in
-[`serial-protocol/`](serial-protocol/). It describes the
-[DigitalMassBalance 2.0.1](../firmware/most-massbalance-2020/DigitalMassBalance/) firmware the paper
-was written for; the later [MOST_MassBalance](../firmware/most-massbalance-2020/MOST_MassBalance/)
+Adapted from Sections 2.4 and 2.5 of the paper in
+[`paper/`](https://github.com/uwo-fast/mass-scale/tree/main/docs/paper): Hubbard
+BR, Pearce JM (2020). *Open-Source Digitally Replicable Lab-Grade Scales.*
+Instruments 4(3): 18 (`CC-BY-4.0`), and from the protocol notes in
+[`serial-protocol/`](serial-protocol/README.md). It describes the
+[DigitalMassBalance
+2.0.1](https://github.com/uwo-fast/mass-scale/tree/main/firmware/most-massbalance-2020/DigitalMassBalance)
+firmware the paper was written for; the later
+[MOST_MassBalance](https://github.com/uwo-fast/mass-scale/tree/main/firmware/most-massbalance-2020/MOST_MassBalance)
 library keeps the same commands. Text marked **Note** is added here.
 
 ![The assembled scale](images/Oscale.png)
@@ -54,7 +57,7 @@ protocol to Level 2: the six Level 1 commands plus extensions. Open the port at
 9600 baud. Every command is a character between a line feed and a carriage
 return, `<LF>c<CR>`; the `<ESC>` reset is the one exception. The responses,
 `<LF><s><r><n><m><f><xxxxxx.xxx><uuu><CR>`, are described in
-[`serial-protocol/Response Formats.txt`](serial-protocol/Response%20Formats.txt).
+[`serial-protocol/Response Formats.txt`](https://github.com/uwo-fast/mass-scale/blob/main/docs/serial-protocol/Response%20Formats.txt).
 
 | Command | Does |
 | --- | --- |

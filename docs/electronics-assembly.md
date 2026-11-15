@@ -5,11 +5,11 @@ Adapted from the "Electronics Assembly" section of the Appropedia page
 written by Benjamin Hubbard in February 2021 (`CC-BY-SA-4.0`). Text marked
 **Note** is added here.
 
-This is one way to wire the electronics for the 2020 FreeCAD housing on a
-4 × 6 cm solder breadboard. It follows the schematic in
-[`../electronics/`](../electronics/README.md). The breadboard's pads are named
-by a letter on one axis and a number on the other; the pad names below locate
-every part.
+This is one way to wire the electronics for the 2020 FreeCAD housing on a 4 × 6
+cm solder breadboard. It follows the schematic in
+[`electronics/`](https://github.com/uwo-fast/mass-scale/blob/main/electronics/README.md).
+The breadboard's pads are named by a letter on one axis and a number on the
+other; the pad names below locate every part.
 
 ![The finished breadboard with the Arduino Nano and HX711 installed](images/Balance_Breadboard_PCBs.jpg)
 
@@ -42,7 +42,8 @@ every part.
   5 mm x 45 mm
 
 **Note:** the header counts here differ from the paper's Table 1, which lists
-the parts of an earlier build; see [`../bom/`](../bom/README.md).
+the parts of an earlier build; see
+[`bom/`](https://github.com/uwo-fast/mass-scale/blob/main/bom/README.md).
 
 ## Install the header pins
 
@@ -164,5 +165,6 @@ Power down, plug the HX711 into the other female header, and install a load
 cell, connecting it to the four male header pins.
 
 The scale should now work. For the mechanical assembly and the load-cell
-mounting, see Section 2.3 of the paper in [`paper/`](paper/), and for using the
-scale, [`operation.md`](operation.md).
+mounting, see Section 2.3 of the paper in
+[`paper/`](https://github.com/uwo-fast/mass-scale/tree/main/docs/paper), and for
+using the scale, [`operation.md`](operation.md).

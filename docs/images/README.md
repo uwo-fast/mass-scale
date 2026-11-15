@@ -11,7 +11,8 @@ All three are the originals, checked against the SHA-1 Appropedia records.
 | `Balance_Breadboard_PCBs.jpg` | the solder breadboard with the Arduino Nano and HX711 installed (3024 × 3024) | Brhubbar, 2021-02-15 | `CC-BY-SA-4.0` | Appropedia file page: `CC-BY-SA-4.0` |
 | `Balance_Breadboard_No_PCBs.jpg` | the same breadboard with all wires and pins visible (3024 × 3024) | Brhubbar, 2021-02-15 | `CC-BY-SA-4.0` | Appropedia file page: `CC-BY-SA-4.0` |
 
-"Licence" is the licence that applies to the file here; "Original statement"
-is what its Appropedia page declares. The page that shows them is
-`CC-BY-SA-4.0`. See [`../../LICENSING.md`](../../LICENSING.md), note 4, for
-the standing practice.
+"Licence" is the licence that applies to the file here; "Original statement" is
+what its Appropedia page declares. The page that shows them is `CC-BY-SA-4.0`.
+See
+[`LICENSING.md`](https://github.com/uwo-fast/mass-scale/blob/main/LICENSING.md),
+note 4, for the standing practice.
