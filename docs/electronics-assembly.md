@@ -5,11 +5,11 @@ Adapted from the "Electronics Assembly" section of the Appropedia page
 written by Benjamin Hubbard in February 2021 (`CC-BY-SA-4.0`). Text marked
 **Note** is added here.
 
-This is one way to wire the scale on a 4 × 6 cm solder breadboard, the way the
-third scale was assembled. It follows the schematic in
-[`../electronics/`](../electronics/README.md). The breadboard is a grid whose
-pads are named by a letter on one axis and a number on the other, as in the
-game of Battleship; the pad names below locate every part.
+This is one way to wire the electronics for the 2020 FreeCAD housing on a
+4 × 6 cm solder breadboard. It follows the schematic in
+[`../electronics/`](../electronics/README.md). The breadboard's pads are named
+by a letter on one axis and a number on the other; the pad names below locate
+every part.
 
 ![The finished breadboard with the Arduino Nano and HX711 installed](images/Balance_Breadboard_PCBs.jpg)
 
@@ -38,7 +38,8 @@ game of Battleship; the pad names below locate every part.
 - Male header pins: 1 × 4-pin
 - 16 × 2 LCD
 - Normally-open push-button
-- Heat shrink: 1 × 45 mm (cut in half), 3 × 45 mm, 5 × 45 mm
+- Heat shrink, diameter x length: 1 mm x 45 mm (cut in half), 3 mm x 45 mm,
+  5 mm x 45 mm
 
 **Note:** the header counts here differ from the paper's Table 1, which lists
 the parts of an earlier build; see [`../bom/`](../bom/README.md).
