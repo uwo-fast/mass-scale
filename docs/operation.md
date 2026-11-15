@@ -42,7 +42,8 @@ the last three at the report rate set in `Config.hpp` (1 Hz).
   corner of the LCD acknowledges the press.
 - **Calibrate.** Hold the button for at least 3 s (`CAL_WAIT` in
   `Config.hpp`). The scale tares, then shows the mass to put on the bed (the
-  calibration mass in `Config.hpp`, 235.9 g by default, one US cup of water).
+  calibration mass in the sketch's `Config.hpp`, 235.9 g, one US cup of water;
+  the MOST_MassBalance library defaults to 100 g).
   When it detects the added mass it averages 10 readings, works out the new
   sensitivity and saves it to EEPROM.
 
@@ -60,7 +61,6 @@ return, `<LF>c<CR>`; the `<ESC>` reset is the one exception. The responses,
 | `W` | return the displayed weight |
 | `Z` | zero the scale (with nothing on the bed) |
 | `T` | tare: subtract the mass now on the bed, for instance a container |
-| `T<xxxxxx.xxx>` | set the tare weight to the value given |
 | `M` | return the stored tare weight |
 | `C` | clear the tare, so readings refer to the zero set by `Z` |
 | `D` | run the scale diagnostics |
@@ -68,7 +68,7 @@ return, `<LF>c<CR>`; the `<ESC>` reset is the one exception. The responses,
 | `R` | repeat the weight continuously at the report rate, until another command arrives |
 | `<ESC>` | software reset; wait a few seconds, then send `A` to confirm the scale is back |
 | `XC` | calibrate with the default calibration mass |
-| `XC<xxxxxx.xxx>` | calibrate with the mass given; the scale zeroes, echoes the expected mass, measures for two minutes, then reports the new reading |
+| `XC<xxxxxx.xxx>` | calibrate with the mass given, written as exactly 10 characters (`XC000100.000` for 100 g); the scale clears the tare, echoes the expected mass and zeroes, waits for the mass to be added, then waits 1 s and takes 10 readings 1 s apart (about 11 s) before reporting the new reading |
 | `XL` | toggle power to the LCD, for power saving when the display is not needed |
 | `XP` | scroll the readout precision between 0 and 4 decimal places |
 | `X?` | list the commands (the leading `X` of the extended commands is also announced at the end of start-up) |
