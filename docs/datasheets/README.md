@@ -36,4 +36,6 @@ repository's history (tag `mtu-osf-2020`).
 
 Two further documents that were on OSF, the operator manuals of the Denver
 Instruments A-160 and APX402 balances used for comparison, were never kept
-here; [`../sources.md`](../sources.md) says where they are.
+here;
+[`dev/sources-inventory.md`](https://github.com/uwo-fast/mass-scale/blob/main/dev/sources-inventory.md)
+records them.
