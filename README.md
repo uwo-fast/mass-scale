@@ -151,7 +151,9 @@ fixed here; each is an issue:
 - **The paper's sketch was Windows-only as published**: its includes used
   backslashes, fixed here;
   [`CHANGELOG.md`](https://github.com/uwo-fast/mass-scale/blob/main/CHANGELOG.md)
-  lists the import fixes. The 2019 sketch is kept as published and is not built.
+  lists the import fixes. The 2019 sketch is kept as published and is not built:
+  it includes its libraries at the submodule paths of its own repository, with
+  backslashes.
 - **Third-party datasheets** are redistributed without a licence statement; see
   [`LICENSING.md`](https://github.com/uwo-fast/mass-scale/blob/main/LICENSING.md).
 

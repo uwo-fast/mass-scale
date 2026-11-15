@@ -7,7 +7,7 @@ generation;
 [`CHANGELOG.md`](https://github.com/uwo-fast/mass-scale/blob/main/CHANGELOG.md)
 says what changed on import, and
 [`dev/sources-inventory.md`](https://github.com/uwo-fast/mass-scale/blob/main/dev/sources-inventory.md)
-lists the files left out, with their checksums.
+lists the files left out, with checksums where they had them.
 
 ## Primary
 

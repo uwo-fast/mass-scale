@@ -9,7 +9,8 @@ Instruments 4(3): 18 (`CC-BY-4.0`), and from the protocol notes in
 2.0.1](https://github.com/uwo-fast/mass-scale/tree/main/firmware/most-massbalance-2020/DigitalMassBalance)
 firmware the paper was written for; the later
 [MOST_MassBalance](https://github.com/uwo-fast/mass-scale/tree/main/firmware/most-massbalance-2020/MOST_MassBalance)
-library keeps the same commands. Text marked **Note** is added here.
+library keeps the same commands and adds a 15-character form of `XC`. Text
+marked **Note** is added here.
 
 ![The assembled scale](images/Oscale.png)
 
@@ -75,6 +76,10 @@ return, `<LF>c<CR>`; the `<ESC>` reset is the one exception. The responses,
 | `XL` | toggle power to the LCD, for power saving when the display is not needed |
 | `XP` | scroll the readout precision between 0 and 4 decimal places |
 | `X?` | list the commands (the leading `X` of the extended commands is also announced at the end of start-up) |
+
+**Note:** the protocol notes also list a `T` command to set the tare weight,
+and a calibration that measures for two minutes. Neither firmware does either:
+there is no `T` command, and calibration takes about 11 s, as above.
 
 **Note:** the commands are single characters after the `<LF>`, so a terminal
 program has to send the line feed first; PuTTY with its session logging is what
