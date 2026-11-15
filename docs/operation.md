@@ -1,12 +1,16 @@
 # Operating the scale
 
-Adapted from Sections 2.4 and 2.5 of the paper in [`paper/`](paper/):
-Hubbard BR, Pearce JM (2020). *Open-Source Digitally Replicable Lab-Grade
-Scales.* Instruments 4(3): 18 (`CC-BY-4.0`), and from the protocol notes in
-[`serial-protocol/`](serial-protocol/). It describes the
-[DigitalMassBalance 2.0.1](../firmware/most-massbalance-2020/DigitalMassBalance/) firmware the paper
-was written for; the later [MOST_MassBalance](../firmware/most-massbalance-2020/MOST_MassBalance/)
-library keeps the same commands. Text marked **Note** is added here.
+Adapted from Sections 2.4 and 2.5 of the paper in
+[`paper/`](https://github.com/uwo-fast/mass-scale/tree/main/docs/paper): Hubbard
+BR, Pearce JM (2020). *Open-Source Digitally Replicable Lab-Grade Scales.*
+Instruments 4(3): 18 (`CC-BY-4.0`), and from the protocol notes in
+[`serial-protocol/`](serial-protocol/README.md). It describes the
+[DigitalMassBalance
+2.0.1](https://github.com/uwo-fast/mass-scale/tree/main/firmware/most-massbalance-2020/DigitalMassBalance)
+firmware the paper was written for; the later
+[MOST_MassBalance](https://github.com/uwo-fast/mass-scale/tree/main/firmware/most-massbalance-2020/MOST_MassBalance)
+library keeps the same commands and adds a 15-character form of `XC`. Text
+marked **Note** is added here.
 
 ![The assembled scale](images/Oscale.png)
 
@@ -42,7 +46,8 @@ the last three at the report rate set in `Config.hpp` (1 Hz).
   corner of the LCD acknowledges the press.
 - **Calibrate.** Hold the button for at least 3 s (`CAL_WAIT` in
   `Config.hpp`). The scale tares, then shows the mass to put on the bed (the
-  calibration mass in `Config.hpp`, 235.9 g by default, one US cup of water).
+  calibration mass in the sketch's `Config.hpp`, 235.9 g, one US cup of water;
+  the MOST_MassBalance library defaults to 100 g).
   When it detects the added mass it averages 10 readings, works out the new
   sensitivity and saves it to EEPROM.
 
@@ -53,14 +58,13 @@ protocol to Level 2: the six Level 1 commands plus extensions. Open the port at
 9600 baud. Every command is a character between a line feed and a carriage
 return, `<LF>c<CR>`; the `<ESC>` reset is the one exception. The responses,
 `<LF><s><r><n><m><f><xxxxxx.xxx><uuu><CR>`, are described in
-[`serial-protocol/Response Formats.txt`](serial-protocol/Response%20Formats.txt).
+[`serial-protocol/Response Formats.txt`](https://github.com/uwo-fast/mass-scale/blob/main/docs/serial-protocol/Response%20Formats.txt).
 
 | Command | Does |
 | --- | --- |
 | `W` | return the displayed weight |
 | `Z` | zero the scale (with nothing on the bed) |
 | `T` | tare: subtract the mass now on the bed, for instance a container |
-| `T<xxxxxx.xxx>` | set the tare weight to the value given |
 | `M` | return the stored tare weight |
 | `C` | clear the tare, so readings refer to the zero set by `Z` |
 | `D` | run the scale diagnostics |
@@ -68,10 +72,14 @@ return, `<LF>c<CR>`; the `<ESC>` reset is the one exception. The responses,
 | `R` | repeat the weight continuously at the report rate, until another command arrives |
 | `<ESC>` | software reset; wait a few seconds, then send `A` to confirm the scale is back |
 | `XC` | calibrate with the default calibration mass |
-| `XC<xxxxxx.xxx>` | calibrate with the mass given; the scale zeroes, echoes the expected mass, measures for two minutes, then reports the new reading |
+| `XC<xxxxxx.xxx>` | calibrate with the mass given, written as exactly 10 characters (`XC000100.000` for 100 g); the scale clears the tare, echoes the expected mass and zeroes, waits for the mass to be added, then waits 1 s and takes 10 readings 1 s apart (about 11 s) before reporting the new reading |
 | `XL` | toggle power to the LCD, for power saving when the display is not needed |
 | `XP` | scroll the readout precision between 0 and 4 decimal places |
 | `X?` | list the commands (the leading `X` of the extended commands is also announced at the end of start-up) |
+
+**Note:** the protocol notes also list a `T` command to set the tare weight,
+and a calibration that measures for two minutes. Neither firmware does either:
+there is no `T` command, and calibration takes about 11 s, as above.
 
 **Note:** the commands are single characters after the `<LF>`, so a terminal
 program has to send the line feed first; PuTTY with its session logging is what
@@ -93,7 +101,7 @@ The load cell must be mounted with its wires running toward the end fixed to
 the base; wires leaving the floating end interfere with the measurement.
 
 - **TAL220:** bolt the M5 end (the wires run to it) to the TAL220 boss in the
-  base, connect the cell to the HX711 (red E+, black E−, white A−, green A+),
+  base, connect the cell to the HX711 (red E+, black E-, white A-, green A+),
   snap the lid onto the base, then bolt the bed to the free end with the two
   M4 screws.
 - **TAL221:** the lid is sandwiched between the bed and the load cell. Screw

@@ -11,6 +11,6 @@ scale's own extended commands.
 | `Command Formats.txt` | each command the scale accepts: `W` weight, `Z` zero, `T` tare, `M` tare weight, `C` clear tare, `D` diagnostics, `A`/`B` about, `R` repeat, `<ESC>` reset, and the extended `XC` calibration commands |
 | `Response Formats.txt` | the response message format and its status characters, and the diagnostics and about responses |
 
-The standard itself is `ScaleCommProtocol5199M1.pdf` in
-[`../datasheets/`](../datasheets/README.md). [`../operation.md`](../operation.md)
-lists the commands in use.
+The standard itself, `ScaleCommProtocol5199M1.pdf`, is not kept here;
+[`../datasheets/`](../datasheets/README.md) links it.
+[`../operation.md`](../operation.md) lists the commands in use.

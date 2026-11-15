@@ -5,11 +5,11 @@ Adapted from the "Electronics Assembly" section of the Appropedia page
 written by Benjamin Hubbard in February 2021 (`CC-BY-SA-4.0`). Text marked
 **Note** is added here.
 
-This is one way to wire the scale on a 4 × 6 cm solder breadboard, the way the
-third scale was assembled. It follows the schematic in
-[`../electronics/`](../electronics/README.md). The breadboard is a grid whose
-pads are named by a letter on one axis and a number on the other, as in the
-game of Battleship; the pad names below locate every part.
+This is one way to wire the electronics for the 2020 FreeCAD housing on a 4 x 6
+cm solder breadboard. It follows the schematic in
+[`electronics/`](https://github.com/uwo-fast/mass-scale/blob/main/electronics/README.md).
+The breadboard's pads are named by a letter on one axis and a number on the
+other; the pad names below locate every part.
 
 ![The finished breadboard with the Arduino Nano and HX711 installed](images/Balance_Breadboard_PCBs.jpg)
 
@@ -17,31 +17,33 @@ game of Battleship; the pad names below locate every part.
 
 ## Required items
 
-- 4 × 6 cm solder breadboard
-- 200 mm (8″) lengths of twisted pair, as from Cat 5 cable:
-  - 2 × green / green-white
-  - 1 × blue / blue-white
-  - 1 × orange / orange-white
-  - 1 × brown / brown-white
-  - 1 × blue / orange
+- 4 x 6 cm solder breadboard
+- 200 mm (8 in) lengths of twisted pair, as from Cat 5 cable:
+  - 2 x green / green-white
+  - 1 x blue / blue-white
+  - 1 x orange / orange-white
+  - 1 x brown / brown-white
+  - 1 x blue / orange
 - 22 AWG solid-core wire:
-  - 2 × 40 mm (1.5″) yellow
-  - 1 × 20 mm (1″) green
-  - 3 × 30 mm (1.25″) green
-  - 1 × 40 mm (1.5″) green
-  - 1 × 25 mm (1″) red
-  - 1 × 45 mm (1.75″) red
-  - 4 × 8 mm (0.25″) bare
-- 220 Ω resistor
-- 10 kΩ trimmer potentiometer
-- Female header pins: 2 × 15-pin, 1 × 6-pin, 1 × 4-pin
-- Male header pins: 1 × 4-pin
-- 16 × 2 LCD
+  - 2 x 40 mm (1.5 in) yellow
+  - 1 x 20 mm (1 in) green
+  - 3 x 30 mm (1.25 in) green
+  - 1 x 40 mm (1.5 in) green
+  - 1 x 25 mm (1 in) red
+  - 1 x 45 mm (1.75 in) red
+  - 4 x 8 mm (0.25 in) bare
+- 220 ohm resistor
+- 10 kohm trimmer potentiometer
+- Female header pins: 2 x 15-pin, 1 x 6-pin, 1 x 4-pin
+- Male header pins: 1 x 4-pin
+- 16 x 2 LCD
 - Normally-open push-button
-- Heat shrink: 1 × 45 mm (cut in half), 3 × 45 mm, 5 × 45 mm
+- Heat shrink, diameter x length: 1 mm x 45 mm (cut in half), 3 mm x 45 mm,
+  5 mm x 45 mm
 
 **Note:** the header counts here differ from the paper's Table 1, which lists
-the parts of an earlier build; see [`../bom/`](../bom/README.md).
+the parts of an earlier build; see
+[`bom/`](https://github.com/uwo-fast/mass-scale/blob/main/bom/README.md).
 
 ## Install the header pins
 
@@ -49,17 +51,17 @@ Solder the headers onto the breadboard as listed.
 
 | Female header | Breadboard position |
 | --- | --- |
-| 15 × 1 | T0–T14 |
-| 15 × 1 | N0–N14 |
-| 6 × 1 | A4–F4 |
-| 4 × 1 | B14–E14 |
+| 15 x 1 | T0-T14 |
+| 15 x 1 | N0-N14 |
+| 6 x 1 | A4-F4 |
+| 4 x 1 | B14-E14 |
 
 | Male header | Breadboard position |
 | --- | --- |
-| 4 × 1 | C1–F1 |
+| 4 x 1 | C1-F1 |
 
 Finally, use the four bare pieces of wire to connect the four male header pins
-to their four neighbours on the 6 × 1 female header. The other two receivers on
+to their four neighbours on the 6 x 1 female header. The other two receivers on
 that header (A4 and B4) are not used; they are there to locate the HX711
 amplifier.
 
@@ -88,7 +90,7 @@ the table, each end is written `pad to insert into: pad to solder to`.
 | Red 45 mm | B13: B14 | M6: N6 |
 | Green 20 mm | L3: M3 | G7: F7 |
 | Red 25 mm | M14: N14 | G9: F9 |
-| 220 Ω resistor | L14: M14 | I14 |
+| 220 ohm resistor | L14: M14 | I14 |
 
 ## Wire the button
 
@@ -99,7 +101,7 @@ installed in place in the scale's housing.
 
 ## Wire the LCD
 
-The LCD has 16 pins, numbered 1 (VSS) to 16 (LED−), as in the schematic. It is
+The LCD has 16 pins, numbered 1 (VSS) to 16 (LED-), as in the schematic. It is
 wired with all the remaining twisted pairs and the three 30 mm pieces of green
 solid-core wire.
 
@@ -151,7 +153,7 @@ glue on two or three corners secures it.
 
 ## Finishing up
 
-Put the Arduino Nano onto the two 15 × 1 headers and load a sketch that drives
+Put the Arduino Nano onto the two 15 x 1 headers and load a sketch that drives
 only the LCD and prints something on it. (With the scale firmware, comment out
 the initialisation of the balance, load cell and HX711 for this step, since the
 HX711 is not installed yet and the firmware would wait for it.) The LCD is now
@@ -163,5 +165,6 @@ Power down, plug the HX711 into the other female header, and install a load
 cell, connecting it to the four male header pins.
 
 The scale should now work. For the mechanical assembly and the load-cell
-mounting, see Section 2.3 of the paper in [`paper/`](paper/), and for using the
-scale, [`operation.md`](operation.md).
+mounting, see Section 2.3 of the paper in
+[`paper/`](https://github.com/uwo-fast/mass-scale/tree/main/docs/paper), and for
+using the scale, [`operation.md`](operation.md).

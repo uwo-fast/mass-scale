@@ -7,11 +7,12 @@ All three are the originals, checked against the SHA-1 Appropedia records.
 
 | File | Shows | Uploaded by | Licence | Original statement |
 | --- | --- | --- | --- | --- |
-| `Oscale.png` | the assembled scale (404 × 344) | J.M.Pearce, 2020-04-27 | `CC-BY-SA-4.0` | Appropedia file page: `GPL`, no version; `CC-BY-SA-4.0` under the lab's standing practice, applied 2026-09-26 |
-| `Balance_Breadboard_PCBs.jpg` | the solder breadboard with the Arduino Nano and HX711 installed (3024 × 3024) | Brhubbar, 2021-02-15 | `CC-BY-SA-4.0` | Appropedia file page: `CC-BY-SA-4.0` |
-| `Balance_Breadboard_No_PCBs.jpg` | the same breadboard with all wires and pins visible (3024 × 3024) | Brhubbar, 2021-02-15 | `CC-BY-SA-4.0` | Appropedia file page: `CC-BY-SA-4.0` |
+| `Oscale.png` | the assembled scale (404 x 344) | J.M.Pearce, 2020-04-27 | `CC-BY-SA-4.0` | Appropedia file page: `GPL`, no version; `CC-BY-SA-4.0` under the lab's standing practice, applied 2026-09-26 |
+| `Balance_Breadboard_PCBs.jpg` | the solder breadboard with the Arduino Nano and HX711 installed (3024 x 3024) | Brhubbar, 2021-02-15 | `CC-BY-SA-4.0` | Appropedia file page: `CC-BY-SA-4.0` |
+| `Balance_Breadboard_No_PCBs.jpg` | the same breadboard with all wires and pins visible (3024 x 3024) | Brhubbar, 2021-02-15 | `CC-BY-SA-4.0` | Appropedia file page: `CC-BY-SA-4.0` |
 
-"Licence" is the licence that applies to the file here; "Original statement"
-is what its Appropedia page declares. The page that shows them is
-`CC-BY-SA-4.0`. See [`../../LICENSING.md`](../../LICENSING.md), note 4, for
-the standing practice.
+"Licence" is the licence that applies to the file here; "Original statement" is
+what its Appropedia page declares. The page that shows them is `CC-BY-SA-4.0`.
+See
+[`LICENSING.md`](https://github.com/uwo-fast/mass-scale/blob/main/LICENSING.md),
+note 4, for the standing practice.
