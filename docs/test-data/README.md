@@ -26,13 +26,15 @@ mass left on the bed for about 30 s, after an hour's warm-up.
 
 ## Spreadsheet
 
-`Balance Shootout.xlsx` (last changed 2020-06-25) holds the processed data, one
+`Balance Shootout.xlsx` (last changed 2020-06-24) holds the processed data, one
 sheet per test: the standard-mass tests above (`200623 - 100g Standard Mass`,
 `200623 - 500g Standard Mass`, `200623 - 5000g Standards PLA`,
-`200624 - 5000g Standards Wood`), the comparisons against the Denver A-160
+`200624 - 5000g Standards Wood`, and `200624 - 5000g Standards PL (2)` for
+`200624 - 5000g (PLA).log`), the comparisons against the Denver A-160
 analytical balance (`200221 - 5000g vs A-160 LC1`, `200221 - 500g vs A-160 LC1`
 and `LC2`, `200323 - 500g vs A-160`), the self-calibration of the 100 g cell
-against the 500 g cell (`200414 - 100g vs WAOAW and 500g`), and `200121`.
+against the 500 g cell (`200414 - 100g vs WAOAW and 500g`), `200121`, and
+`Sheet1`, a priced list of the electronic components and load-cell hardware.
 
 ## Plots
 
