@@ -146,9 +146,8 @@ fixed here; each is an issue:
   1.25 % smaller than the base the document builds, with the same outline; the
   other three STLs match the document (see [`cad/README.md`](cad/README.md)).
 - **The paper's sketch was Windows-only as published**: its includes used
-  backslashes, fixed here in three one-line commits (see
-  [`CHANGELOG.md`](CHANGELOG.md)). The 2019 sketch is kept as published and
-  is not built.
+  backslashes, fixed here; [`CHANGELOG.md`](CHANGELOG.md) lists the import
+  fixes. The 2019 sketch is kept as published and is not built.
 - **Third-party datasheets** are redistributed without a licence statement;
   see [`LICENSING.md`](LICENSING.md).
 
