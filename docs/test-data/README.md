@@ -45,6 +45,6 @@ load cell, the standard deviation of five repeated readings at each mass
 
 | Load cell | Files | Result in the paper |
 | --- | --- | --- |
-| 5 kg TAL220 | `5kg Std.png`, `5kg Avg Diff.png` | σ 0.0163 g on average, 0.0363 g from the A-160 |
-| 500 g TAL221 | `500g Std.png`, `500g Avg Diff.png` | σ 0.0207 g, 0.0142 g from the A-160 |
-| 100 g TAL221 | `100g Std.png`, `100g Avg Diff.png` | σ 0.005 g, 0.0198 g from the 500 g TAL221 it was calibrated against |
+| 5 kg TAL220 | `5kg Std.png`, `5kg Avg Diff.png` | sigma 0.0163 g on average, 0.0363 g from the A-160 |
+| 500 g TAL221 | `500g Std.png`, `500g Avg Diff.png` | sigma 0.0207 g, 0.0142 g from the A-160 |
+| 100 g TAL221 | `100g Std.png`, `100g Avg Diff.png` | sigma 0.005 g, 0.0198 g from the 500 g TAL221 it was calibrated against |

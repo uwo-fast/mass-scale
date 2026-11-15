@@ -13,7 +13,7 @@ lists the files left out, with their checksums.
 
 | What | Where |
 | --- | --- |
-| Paper, 2020 | [doi:10.3390/instruments4030018](https://doi.org/10.3390/instruments4030018), open access, `CC-BY-4.0` · in [`paper/`](https://github.com/uwo-fast/mass-scale/tree/main/docs/paper) · a [preprint](https://www.preprints.org/manuscript/202004.0472/v1) and an [author copy](https://digitalcommons.mtu.edu/michigantech-p/2052) also exist |
+| Paper, 2020 | [doi:10.3390/instruments4030018](https://doi.org/10.3390/instruments4030018), open access, `CC-BY-4.0`; in [`paper/`](https://github.com/uwo-fast/mass-scale/tree/main/docs/paper); a [preprint](https://www.preprints.org/manuscript/202004.0472/v1) and an [author copy](https://digitalcommons.mtu.edu/michigantech-p/2052) also exist |
 | Firmware library, with history | [gitlab.com/mtu-most/most_massbalance](https://gitlab.com/mtu-most/most_massbalance), included here (tags `mtu-instruments-2020`, `mtu-final-2021`, and upstream's own `v3.0.0` to `v3.4.0`) |
 | CAD, the paper's sketch, circuit, datasheets and test data | [OSF me9a8](https://osf.io/me9a8), "Open source laboratory logging digital scale" (DOI 10.17605/OSF.IO/ME9A8), imported unchanged in the commit tagged `mtu-osf-2020` |
 | Project page, with the breadboard assembly guide | [Appropedia: Open Source Digitally Replicable Lab-Grade Scales](https://www.appropedia.org/Open_Source_Digitally_Replicable_Lab-Grade_Scales), adapted in [`electronics-assembly.md`](electronics-assembly.md) |

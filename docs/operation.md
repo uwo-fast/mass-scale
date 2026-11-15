@@ -96,7 +96,7 @@ The load cell must be mounted with its wires running toward the end fixed to
 the base; wires leaving the floating end interfere with the measurement.
 
 - **TAL220:** bolt the M5 end (the wires run to it) to the TAL220 boss in the
-  base, connect the cell to the HX711 (red E+, black E−, white A−, green A+),
+  base, connect the cell to the HX711 (red E+, black E-, white A-, green A+),
   snap the lid onto the base, then bolt the bed to the free end with the two
   M4 screws.
 - **TAL221:** the lid is sandwiched between the bed and the load cell. Screw

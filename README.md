@@ -4,7 +4,7 @@
 > amplifier and an Arduino Nano, read over serial for data logging. Three
 > generations in one repository: Benjamin Hubbard's 2019 OS Nano Balance, the
 > lab-grade scale Michigan Tech's MOST lab published in *Instruments* in 2020,
-> and the FAST research group's 2025–26 revival, which is the current design.
+> and the FAST research group's 2025-26 revival, which is the current design.
 
 [![Paper](https://img.shields.io/badge/Paper-Instruments_2020-blue.svg)](https://doi.org/10.3390/instruments4030018)
 [![Appropedia](https://img.shields.io/badge/Appropedia-project_page-lightblue.svg)](https://www.appropedia.org/Open_Source_Digitally_Replicable_Lab-Grade_Scales)
@@ -17,20 +17,20 @@
 The scale is a printed housing that holds a single-point parallel-beam load
 cell (a TAL220 for kilogram ranges or a TAL221 for gram ranges), an HX711
 24-bit load-cell amplifier, an Arduino Nano, a push-button, and optionally a
-16 × 2 LCD. Everything runs from 5 V over USB, so a phone charger or a
+16 x 2 LCD. Everything runs from 5 V over USB, so a phone charger or a
 computer's USB port powers it. The button tares the scale; over serial, a
 computer reads it continuously and calibrates it against a known mass.
 
 **The current design** is the revival's:
 
 - [`cad/openscad/`](https://github.com/uwo-fast/mass-scale/blob/main/cad/README.md#the-current-design)
-  — the OpenSCAD v2 enclosure, with a bevelled front face for the LCD, and the
+  -- the OpenSCAD v2 enclosure, with a bevelled front face for the LCD, and the
   platter that fits over it. Parametric: the dimensions are variables at the top
   of `assembly.scad`.
   [`cad/openscad-v3/`](https://github.com/uwo-fast/mass-scale/blob/main/cad/README.md)
   is the next revision, in progress, with a sliding, latching lid.
 - [`firmware/mass-scale/`](https://github.com/uwo-fast/mass-scale/blob/main/firmware/README.md)
-  — the rewritten firmware: calibration over serial, stored in EEPROM; tare from
+  -- the rewritten firmware: calibration over serial, stored in EEPROM; tare from
   the button or serial; a readout of raw and calibrated values on a 100 ms
   timer, each cycle averaging three HX711 reads, so about 3 Hz at the 10 samples
   per second HX711 modules default to; guards against a missing amplifier or a
@@ -162,9 +162,9 @@ them. An annotated tag marks each source as it was:
 
 | Generation | What | Tags |
 | --- | --- | --- |
-| **2019 — OS Nano Balance**, Benjamin Hubbard | The first version: an Arduino Nano, an HX711 and a TAL220 or TAL221 in printed parts drawn first in OpenSCAD and then in FreeCAD, with a sketch that calibrates from a button against a fixed mass. Published at [brhubbar/OS_Nano_Balance](https://github.com/brhubbar/OS_Nano_Balance) and on Appropedia as [3D printed digital balance](https://www.appropedia.org/3D_printed_digital_balance). Here: `firmware/os-nano-balance-2019/`, `cad/freecad-2019/`, `cad/openscad-2019/` | `mtu-nanobalance-2019` |
-| **2020 — the MOST lab-grade scale**, Benjamin Hubbard and Joshua Pearce | The scale the paper describes: one parametric FreeCAD document, the DigitalMassBalance 2.0.1 sketch implementing the SMA SCP-0499 serial protocol, and its later library form MOST_MassBalance 3.4.0. Published in [*Instruments*](https://doi.org/10.3390/instruments4030018), on [OSF me9a8](https://osf.io/me9a8), at [gitlab.com/mtu-most/most_massbalance](https://gitlab.com/mtu-most/most_massbalance) and on [Appropedia](https://www.appropedia.org/Open_Source_Digitally_Replicable_Lab-Grade_Scales). Here: `cad/freecad-2020/`, `firmware/most-massbalance-2020/`, `electronics/`, `bom/`, `docs/` | `mtu-instruments-2020` (the firmware as published with the paper), `mtu-final-2021` (upstream's last commit), `mtu-osf-2020` (the OSF files as published), and upstream's own `v3.0.0` to `v3.4.0` |
-| **2025–26 — the FAST revival**, Cameron Brooks | A new OpenSCAD enclosure and platter (v2), a next revision in progress (v3) using the [load-cell-scad](https://github.com/CameronBrooks11/load-cell-scad) library, and a rewrite of the 2019 firmware with calibration over serial. Published at [uwo-fast/mass-scale](https://github.com/uwo-fast/mass-scale), which this repository continues. Here: `cad/openscad/`, `cad/openscad-v3/`, `cad/openscad-v1/`, `firmware/mass-scale/` | `fast-revival-2026` |
+| **2019, OS Nano Balance**, Benjamin Hubbard | The first version: an Arduino Nano, an HX711 and a TAL220 or TAL221 in printed parts drawn first in OpenSCAD and then in FreeCAD, with a sketch that calibrates from a button against a fixed mass. Published at [brhubbar/OS_Nano_Balance](https://github.com/brhubbar/OS_Nano_Balance) and on Appropedia as [3D printed digital balance](https://www.appropedia.org/3D_printed_digital_balance). Here: `firmware/os-nano-balance-2019/`, `cad/freecad-2019/`, `cad/openscad-2019/` | `mtu-nanobalance-2019` |
+| **2020, the MOST lab-grade scale**, Benjamin Hubbard and Joshua Pearce | The scale the paper describes: one parametric FreeCAD document, the DigitalMassBalance 2.0.1 sketch implementing the SMA SCP-0499 serial protocol, and its later library form MOST_MassBalance 3.4.0. Published in [*Instruments*](https://doi.org/10.3390/instruments4030018), on [OSF me9a8](https://osf.io/me9a8), at [gitlab.com/mtu-most/most_massbalance](https://gitlab.com/mtu-most/most_massbalance) and on [Appropedia](https://www.appropedia.org/Open_Source_Digitally_Replicable_Lab-Grade_Scales). Here: `cad/freecad-2020/`, `firmware/most-massbalance-2020/`, `electronics/`, `bom/`, `docs/` | `mtu-instruments-2020` (the firmware as published with the paper), `mtu-final-2021` (upstream's last commit), `mtu-osf-2020` (the OSF files as published), and upstream's own `v3.0.0` to `v3.4.0` |
+| **2025-26, the FAST revival**, Cameron Brooks | A new OpenSCAD enclosure and platter (v2), a next revision in progress (v3) using the [load-cell-scad](https://github.com/CameronBrooks11/load-cell-scad) library, and a rewrite of the 2019 firmware with calibration over serial. Published at [uwo-fast/mass-scale](https://github.com/uwo-fast/mass-scale), which this repository continues. Here: `cad/openscad/`, `cad/openscad-v3/`, `cad/openscad-v1/`, `firmware/mass-scale/` | `fast-revival-2026` |
 
 [`CHANGELOG.md`](https://github.com/uwo-fast/mass-scale/blob/main/CHANGELOG.md)
 lists what changed when the histories were joined and when the 2020 files were
