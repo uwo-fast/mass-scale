@@ -92,6 +92,13 @@ the table, each end is written `pad to insert into: pad to solder to`.
 | Red 25 mm | M14: N14 | G9: F9 |
 | 220 ohm resistor | L14: M14 | I14 |
 
+**Note:** all three firmwares power the LCD from pin D5 (`lcd_vcc = 5` in
+`mass-scale.ino`, `LCD_VCC = 5` in the 2020 sketch's `Pinouts.hpp`). By this
+guide's pad numbering (GND at N3, D2 at N4, D8 at N10), D5 is pad N7 and N14 is
+D12. The red 25 mm wire and the 220 ohm resistor share pad M14 and feed the
+potentiometer's Vcc (F9) and I14. If that node is the LCD's supply, it belongs
+on N7, not N14. Check against your build before soldering.
+
 ## Wire the button
 
 Connect one of the green / green-white twisted pairs to the pins of the button,
